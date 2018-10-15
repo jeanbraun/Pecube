@@ -1,0 +1,26 @@
+----
+nx = 31
+ny = 31
+nskip = 1
+dlon = 0.025
+dlat = 0.025
+
+topo_file_name = BLCKU/
+
+age_AHe_flag = 1
+
+nfault = 1
+
+ntime = 10
+
+time_topo1 =     3.000000
+time_topo2 =     2.700000
+time_topo3 =     2.400000
+time_topo4 =     2.100000
+time_topo5 =     1.800000
+time_topo6 =     1.500000
+time_topo7 =     1.200000
+time_topo8 =     0.900000
+time_topo9 =     0.600000
+time_topo10 =     0.300000
+----

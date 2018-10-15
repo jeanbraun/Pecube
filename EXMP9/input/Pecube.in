@@ -1,0 +1,28 @@
+Simple Pecube test
+Uniform exhumation rate at 1 km/Myr
+through a flat topography
+The main purpose is to compare predicted FT length distributions
+produced by Peter van der Beek routine (FT_code_flag = 0)
+or Richard Ketcham routine (FT_lemgth = 1)
+For this we use a "fake" data file that only contain one sample with a location (LAT LON) only
+
+echo_input_file = 1
+
+nx = 21
+ny = 21
+
+ntime = 1
+time_topo1 = 10
+output1 = 0
+
+nfault = 1
+npoint1 = -1
+
+nstep1 = 1
+time_start1_1 = 20
+time_end1_1 = 0
+velo1_1 = 1
+
+!FT_code_flag = 1
+
+data_folder = TEST

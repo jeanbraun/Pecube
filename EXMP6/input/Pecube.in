@@ -1,0 +1,39 @@
+Simple Pecube test
+Uniform exhumation rate at 0.4 km/Myr
+through a finite amplitude topography from Kings Canyon
+but using a multiple stage tectonomorphic history
+and introducing a data folder
+
+echo_input_file = 1
+
+nx = 61
+ny = 61
+nskip = 2
+lon0 = -119.5
+lat0 = 37
+topo_file_name = Topo30
+
+data_folder = KGHelium
+
+ntime = 3
+time_topo1 = 90
+amplification1 = 3
+time_topo2 = 70
+amplification2 = 3
+time_topo3 = 5
+amplification3 = 0
+offset = 1
+
+nfault = 1
+npoint1 = -1
+
+nstep1 = 2
+time_start1_1 = 90
+time_end1_1 = 70
+velo1_1 = 1.
+time_start1_2 = *
+time_end1_2 = 0
+velo1_2 = 0.04
+
+age_AHE_flag = 1
+

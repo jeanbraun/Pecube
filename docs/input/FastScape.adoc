@@ -1,0 +1,58 @@
+----
+Pecube_nx = 31
+Pecube_ny = 31
+Pecube_nfreq = 30
+Pecube_xmin = 0
+Pecube_xax = 100.d3
+Pecube_ymin = 0.
+Pecube_ymax = 100.d3
+ 
+Basic geometry
+ 
+nx =   100
+ny =   100
+xl =    100000.    
+yl =    100000.    
+ 
+Time stepping
+ 
+dt =    30000.00    
+nstep =    300
+nfreq =    30 
+ 
+Number of threads/cores to use
+ 
+num_threads =      2
+
+Incision law
+ 
+law = 1
+m =   0.400000
+kf =   0.100000E-04
+kd = 0.5
+ 
+Boundary conditions
+ 
+boundary_condition = 1111
+ 
+Precipitations
+ 
+precipitation_n = 0
+precipitation_v1 =    1.00000
+ 
+Initial topography
+ 
+initial_topography_n = 0
+initial_topography_v1 =    0.000
+ 
+Uplift rate
+ 
+uplift_n = 0
+uplift_v1 =   1.00000E-03
+ 
+Plotting options
+ 
+plot_all = 0
+plot_topo = 1
+vtk = 1
+----

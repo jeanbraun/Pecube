@@ -1,0 +1,31 @@
+Simple Pecube test
+Uniform exhumation rate at 1 km/Myr
+through a flat topogarphy that is rapoidly carved into a high relief surface in the last 1 Myr
+The main purpose is to predict TL/OSL trap filing rate
+
+echo_input_file = 1
+
+nx = 121
+ny = 121
+topo_file_name = Topo30
+lon0 = 94.5
+lat0 = 29.5
+nskip = 2
+
+ntime = 2
+time_topo1 = 10
+amplification1 = 0
+offset1 = 0
+time_topo2 = 1
+amplification2 = 0
+offset2 = 6
+
+nfault = 1
+npoint1 = -1
+
+nstep1 = 1
+time_start1_1 = time_topo1
+time_end1_1 = 0
+velo1_1 = 1
+
+age_TL_flag = 1

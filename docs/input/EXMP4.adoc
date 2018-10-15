@@ -1,0 +1,51 @@
+----
+echo_input_file = 1
+
+nx = 101
+ny = 21
+nskip = 2
+
+age_AHe_flag = 1
+
+ntime = 1
+time_topo1 = 10
+
+thickness = 10
+
+nfault = 2
+lon1 = 0
+lat1 = 0
+lon2 = 0
+lat2 = 0.175
+
+npoint1 = 4
+r1_1 = 100
+s1_1 = 0
+r1_2 = 60
+s1_2 = 0
+r1_3 = 50
+s1_3 = -10
+r1_4 = 0
+s1_4 = -10
+
+nstep1 = 1
+time_start1_1 = 10
+time_end1_1 = 5
+velo1_1 = -1
+
+npoint2 = 4
+
+r2_1 = 100
+s2_1 = 0
+r2_2 = 80
+s2_2 = 0
+r2_3 = 70
+s2_3 = -10
+r2_4 = 0
+s2_4 = -10
+
+nstep2 = 1
+time_start2_1 = 5
+time_end2_1 = 0
+velo2_1 = -1
+----

@@ -1,0 +1,25 @@
+Simple Pecube test
+Uniform exhumation rate at 2 km/Myr
+through a flat topography
+
+echo_input_file = 1
+
+nx = 21
+ny = 21
+
+ntime = 2
+time_topo1 = 10
+output1 = 0
+time_topo2 = 5
+output2 = 0
+
+nfault = 1
+npoint1 = -1
+
+nstep1 = 1
+time_start1_1 = 10
+time_end1_1 = 0
+velo1_1 = 2
+
+data_folder = fake
+save_PTT_paths = 1
