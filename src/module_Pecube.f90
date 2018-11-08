@@ -6,6 +6,19 @@ module Pecube
 
 !--------------------------------------------------------------------------------------------
 
+! "version" type that contains information about Pecube version
+
+  type version
+
+  character*5 :: str = "4.2.0"
+  integer :: major = 4
+  integer :: minor = 2
+  integer :: patch = 0
+
+  end type version
+
+!--------------------------------------------------------------------------------------------
+
 ! "param" type that contains all input parameters
 
   type parameters
@@ -357,7 +370,7 @@ module Pecube
     integer,intent(inout)::nd
     real*4,intent(inout)::range(2,1024),par(1024)
     end subroutine cscanfile
-    
+
   end interface scanfile
 
 !--------------------------------------------------------------------------------------------
