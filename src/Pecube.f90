@@ -3,6 +3,7 @@
 program Main
 
 use Pecube
+type (version) :: vers
 type (parameters) :: p, p0
 integer :: nd
 real*4, dimension(1024) :: par
@@ -10,17 +11,25 @@ real*4, dimension(2,1024) :: range
 real*4 :: misfit
 character*5 run
 
+character*9 arg
 integer :: numarg
 
 integer k
 character*9 cparam(1024)
+
 
 numarg=command_argument_count()
 if (numarg.eq.0) then
 write (*,*) 'You need to specify a run directory (i.e. RUN00 for example)'
 stop 'End of run'
 else
-call getarg (1,run)
+   call getarg (1,arg)
+   if (arg.eq.'--version') then
+      write (*,*) vers%str
+      stop
+   else
+      run = arg
+   endif
 endif
 
 ! checks that the run directory exists, otherwise exits
