@@ -54,6 +54,7 @@ call read_input_file (run//'/input/Pecube.in', 0, p0, nd, range, par)
 if (nd.eq.0) write (*,*) '---------------------------------------------------------------------------------'
 if (nd.eq.0) write (*,*) '-------------------------------Pecube--------------------------------------------'
 if (nd.eq.0) write (*,*) '---------------------------------------------------------------------------------'
+if (nd.eq.0) write (*,*) 'version:',vers%str
 if (p0%echo_input_file.gt.0) then
 if (nd.eq.0) write (*,*) '---------------------------------------------------------------------------------'
 if (nd.eq.0) write (*,*) '-----------------------Echoing input parameters----------------------------------'
@@ -183,6 +184,7 @@ end subroutine writemodels
 !      implicit real*8 (a-h,o-z)
       implicit none
 
+      type (version) :: vers
       type (parameters) p
       type (faulttype),dimension(:),allocatable::fault,faultp
 
@@ -402,6 +404,7 @@ end subroutine writemodels
       tempsurfp=0.d0 !VKP
 
       if (nd.eq.0.and.ilog.eq.1) open (9,file=run//'/LOG/Pecube.log',status='unknown')
+      if (nd.eq.0.and.ilog.eq.1) write (9,*) 'This is Pecube version ',vers%str
       if (nd.eq.0.and.ilog.eq.1) write (9,*) 'Reading Geometry'
 
 ! read in nodal geometry
