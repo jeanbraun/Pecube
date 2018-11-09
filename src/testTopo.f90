@@ -103,11 +103,7 @@ if (.not.vivi) then
     read (8,*) zNZ
     close (8)
     else
-<<<<<<< HEAD
-    open (8,file=run//'/data/'//fnme(1:nfnme),status='old')
-=======
     open (8,file = run//'/data/'//fnme(1:nfnme),status='old')
->>>>>>> aed26a7e265f2f7b89412d80229ac6650732f710
       if (xyz) then
         do j=ny0,1,-1
           do i=1,nx0
