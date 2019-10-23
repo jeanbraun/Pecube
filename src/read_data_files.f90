@@ -101,6 +101,8 @@ if (iproc.lt.10) cproc(1:3)='000'
 if (iproc.lt.100) cproc(1:2)='00'
 if (iproc.lt.1000) cproc(1:1)='0'
 
+call system ('mkdir -p tmp')
+
 call system ('ls '//folder//' > tmp/data_lst'//cproc//'.txt')
 
   if (nd.eq.0) then
@@ -148,7 +150,8 @@ close (8)
 ! third check that data is complete
 
 if (iproc.eq.0) open (123, file = folder//'_Messages.txt', status = 'unknown')
-if (iproc.eq.0) call check_obs (nsample, sample, obs, field_name, nfield, xlon1, xlon2, xlat1, xlat2)
+call check_obs (nsample, sample, obs, field_name, nfield, xlon1, xlon2, xlat1, xlat2, iproc)
+if (iproc.eq.0) close (123)
 
 ! HERE WE WRITE DATA TO PECUBE INPUT FILE
 
@@ -249,7 +252,7 @@ end subroutine add_to_obs
 ! Here we run a few tests on the data to make sure that they can be localized, that each data has its uncertainty and that
 ! uncertainty has its data
 
-subroutine check_obs (nsample, sample, obs, field_name, nfield, xlon1, xlon2, xlat1, xlat2)
+subroutine check_obs (nsample, sample, obs, field_name, nfield, xlon1, xlon2, xlat1, xlat2, iproc)
 
 integer :: nsample, nfield
 double precision, dimension(nfield,nsample) :: obs
@@ -264,11 +267,11 @@ character*100, dimension(nsample) :: sample
   do jsample = 1, nsample
     if ((obs(1,jsample)-xlon1)*(obs(1,jsample)-xlon2).gt.0.d0 .or. &
         (obs(2,jsample)-xlat1)*(obs(2,jsample)-xlat2).gt.0.d0) then
-    write (123,'(a)') 'Warning: sample '//trim(sample(jsample))//' Outside lat-lon box for this Pecube run'
-    write (123,'(a)') 'Lat-Lon:'
-    write (123,*) obs(2,jsample), obs(1,jsample)
-    write (123,'(a)') 'Bounds:'
-    write (123,*) xlat1, xlat2, xlon1, xlon2
+    if (iproc.eq.0) write (123,'(a)') 'Warning: sample '//trim(sample(jsample))//' Outside lat-lon box for this Pecube run'
+    if (iproc.eq.0) write (123,'(a)') 'Lat-Lon:'
+    if (iproc.eq.0) write (123,*) obs(2,jsample), obs(1,jsample)
+    if (iproc.eq.0) write (123,'(a)') 'Bounds:'
+    if (iproc.eq.0) write (123,*) xlat1, xlat2, xlon1, xlon2
       do isample = jsample, nsample - 1
       obs(:,isample) = obs(:,isample + 1)
       sample(isample) = sample(isample + 1)
@@ -281,21 +284,21 @@ character*100, dimension(nsample) :: sample
 ! sends warning and error messages
 
   do jsample = 1, nsample
-  if (obs(1,jsample).lt.-9998.) write (123,'(a)') 'Error: NO LONGITUDE, cannot use sample '&
+  if (obs(1,jsample).lt.-9998..and.iproc.eq.0) write (123,'(a)') 'Error: NO LONGITUDE, cannot use sample '&
                                 //trim(sample(jsample))//' that is not located'
-  if (obs(2,jsample).lt.-9998.) write (123,'(a)') 'Error: NO LATITUDE, cannot use sample '&
+  if (obs(2,jsample).lt.-9998..and.iproc.eq.0) write (123,'(a)') 'Error: NO LATITUDE, cannot use sample '&
                                 //trim(sample(jsample))//' that is not located'
-  if (obs(3,jsample).lt.-9998.) write (123,'(a)') 'Warning: No Height provided, set to zero for sample '&
+  if (obs(3,jsample).lt.-9998..and.iproc.eq.0) write (123,'(a)') 'Warning: No Height provided, set to zero for sample '&
                                 //trim(sample(jsample))
     do i = 4, 19, 2
-    if (obs(i,jsample).gt.-9998. .and. obs(i+1,jsample).lt.-9998.) write (123,'(a)') 'Warning: Adding uncertainty for ' &
+    if (obs(i,jsample).gt.-9998. .and. obs(i+1,jsample).lt.-9998..and.iproc.eq.0) write (123,'(a)') &
+    'Warning: Adding uncertainty for ' &
     //field_name(i)//' in sample '//trim(sample(jsample))
-    if (obs(i,jsample).lt.-9998. .and. obs(i+1,jsample).gt.-9998.) write (123,'(a)') 'Error: Uncertainty is specified' &
+    if (obs(i,jsample).lt.-9998. .and. obs(i+1,jsample).gt.-9998..and.iproc.eq.0) write (123,'(a)') &
+    'Error: Uncertainty is specified' &
     //'but not data for '//field_name(i)//' in sample '//trim(sample(jsample))
     enddo
   enddo
-
-close (123)
 
 ! normalizes track distributions
   do jsample = 1, nsample

@@ -198,7 +198,7 @@ c
 c             		                	Generate or read in
 c						starting models 
 c
- 	call NA_initial_sample
+ 	      call NA_initial_sample
      &       (na_models,nd,ranget,range,nsamplei,
      &        istype,monte,calcmovement,scales,misfit,run)
 c
@@ -223,6 +223,9 @@ c
         tmis = 0.
         tnat = 0.
         ns = nsamplei
+         CALL MPI_BCAST
+     &          (na_models(ntot+1), nsamplei,
+     &           MPI_REAL, 0, MPI_COMM_WORLD, ierr)
 
 
 	do 20 it = 1,itmax+1
@@ -363,6 +366,10 @@ c             taxist2 = taxist2 + taxis2
 
 
 	   end if
+
+            CALL MPI_BCAST
+     &          (na_models(ntot+1), nsample,
+     &           MPI_REAL, 0, MPI_COMM_WORLD, ierr)
 
 c
  20	continue

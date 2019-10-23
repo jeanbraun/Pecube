@@ -10,7 +10,7 @@ module Pecube
 
   type version
 
-  character*5 :: str = "4.2.0"
+  character*5 :: str = "4.2.1"
   integer :: major = 4
   integer :: minor = 2
   integer :: patch = 0
@@ -180,10 +180,10 @@ module Pecube
   character*128 :: bottom_right_desc = "Scaling value for uplift function applied at bottom right corner of grid"
 
   double precision :: upper_right = 1.d0
-  character*128 :: upper_right_desc = "Scaling value for uplift function applied at upper right corner of grid"
+  character*128 :: upper_right_desc = "Scaling value for uplift function applied at top right corner of grid"
 
   double precision :: upper_left = 1.d0
-  character*128 :: upper_left_desc = "Scaling value for uplift function applied at upper left corner of grid"
+  character*128 :: upper_left_desc = "Scaling value for uplift function applied at top left corner of grid"
 
   integer, dimension(:), allocatable :: npoint
   character*128 :: npoint_desc = "number of points used to describe each fault geometry"
