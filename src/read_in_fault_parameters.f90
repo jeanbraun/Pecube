@@ -50,8 +50,8 @@ y2=(y2-xlat1)/(xlat2-xlat1)*yl
   allocate (fault(i)%x(4),fault(i)%y(4))
   fault(i)%x(1) = p%bottom_left
   fault(i)%x(2) = p%bottom_right
-  fault(i)%x(3) = p%upper_right
-  fault(i)%x(4) = p%upper_left
+  fault(i)%x(4) = p%upper_right
+  fault(i)%x(3) = p%upper_left
   else
   allocate (fault(i)%x(fault(i)%n),fault(i)%y(fault(i)%n))
     do k=1,fault(i)%n

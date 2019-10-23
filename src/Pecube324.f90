@@ -257,9 +257,9 @@ read (55,'(a1024)') line
     read (55,'(a1024)') line
     write (77,'(a," = ",a)') 'bottom_right',trim(line)
     read (55,'(a1024)') line
-    write (77,'(a," = ",a)') 'upper_right',trim(line)
+    write (77,'(a," = ",a)') 'top_right',trim(line)
     read (55,'(a1024)') line
-    write (77,'(a," = ",a)') 'upper_left',trim(line)
+    write (77,'(a," = ",a)') 'top_left',trim(line)
 ! real fault geometry
     else
       do k=1,n

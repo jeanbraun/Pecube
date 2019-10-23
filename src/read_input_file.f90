@@ -165,9 +165,9 @@ call scanfile (fnme, "bottom_left", p%bottom_left, p%bottom_left_desc, res, voca
 
 call scanfile (fnme, "bottom_right", p%bottom_right, p%bottom_right_desc, res, vocal, nd, range, par)
 
-call scanfile (fnme, "upper_right", p%upper_right, p%upper_right_desc, res, vocal, nd, range, par)
+call scanfile (fnme, "top_right", p%upper_right, p%upper_right_desc, res, vocal, nd, range, par)
 
-call scanfile (fnme, "upper_left", p%upper_left, p%upper_left_desc, res, vocal, nd, range, par)
+call scanfile (fnme, "top_left", p%upper_left, p%upper_left_desc, res, vocal, nd, range, par)
 
 npoint_max = maxval(p%npoint)
 if (npoint_max.lt.0) npoint_max = 4

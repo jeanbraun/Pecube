@@ -450,10 +450,10 @@ Uplift velocity (in km/Myr) imposed across the entire depth range at the bottom 
 `bottom_right` _(default = `1`)_::
 Uplift velocity (in km/Myr) imposed across the entire depth range at the bottom right corner of the **Pecube** domain (maximum longitude and minimum latitude).
 
-`upper_right` _(default = `1`)_::
+`top_right` _(default = `1`)_::
 Uplift velocity (in km/Myr) imposed across the entire depth range at the upper right corner of the **Pecube** domain (maximum longitude and maximum latitude).
 
-`upper_left` _(default = `1`)_::
+`top_left` _(default = `1`)_::
 Uplift velocity (in km/Myr) imposed across the entire depth range at the upper left corner of the **Pecube** domain (minimum longitude and maximum latitude).
 
 `nstep**__i__**` (no default value)::
