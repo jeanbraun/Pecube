@@ -179,11 +179,14 @@ p%s = 0.d0
   do i = 1, p%nfault
   write (ci,'(i10)') i
     if (p%npoint(i).lt.0) then
-      do j = 1, 4
-      write (cj,'(i10)') j
-      call scanfile (fnme, "r"//trim(adjustl(ci))//"_"//trim(adjustl(cj)), p%r(j,i), p%r_desc, res, vocal, nd, range, par)
-      if (res.eq.999) p%r(j,i)=p%r(j-1,i)
-      enddo
+! these lines were commented out to allow for combining two velocity fields
+! one defined by a fault and one defined by a uniform velocity field (vertical only)
+! These lines were a legacy from Pecube v3
+!      do j = 1, 4
+!      write (cj,'(i10)') j
+!      call scanfile (fnme, "r"//trim(adjustl(ci))//"_"//trim(adjustl(cj)), p%r(j,i), p%r_desc, res, vocal, nd, range, par)
+!      if (res.eq.999) p%r(j,i)=p%r(j-1,i)
+!      enddo
     else
       do j = 1, p%npoint(i)
       write (cj,'(i10)') j
