@@ -1297,7 +1297,7 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
           do i=1,nsurf
           xxx=xlonmin+(xlonmax-xlonmin)*(xsurf(i)-xmin)/(xmax-xmin)
           yyy=xlatmin+(xlatmax-xlatmin)*(ysurf(i)-ymin)/(ymax-ymin)
-          write (12,'(g12.6,11(",",g12.6))') xxx,yyy,zsurf(i)*1000,age1(i),age2(i),age3(i),age4(i),age5(i), &
+          write (12,'(g12.6,12(",",g12.6))') xxx,yyy,zsurf(i)*1000,age1(i),age2(i),age3(i),age4(i),age5(i), &
                                        age6(i),age7(i),age8(i),sngl(sum(length*ftdist(:,i))),nNs(i)
           enddo
         close (12)
