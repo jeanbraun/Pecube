@@ -1,0 +1,13 @@
+#
+#       Neighbourhood Algorithm input options file
+#
+0         : Algorithm type (NA or Uniform MC: 1=MC,0=NA)
+    4         : Maximum number of iterations
+    8        : Sample size for first iteration
+    8         : Sample size for all other iterations
+    4         : Number of cells to re-sample
+n,210728  : Use Quasi random number generator ? (y/n);random seed
+0         : Type of initial sample (0=random;1=read in a NAD file)
+1         : Output information level (0=silent,1=summary info,2=1+models)
+y         : Turn timing mode on ? (y/n)
+n         : Turn debug mode on ? (y/n)
