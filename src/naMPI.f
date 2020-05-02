@@ -496,7 +496,7 @@ c						add NA-info to begining
 c						of header file
 c
         fnme = run//'/NA/na.nad'
-	call NA_header
+	if (lroot) call NA_header
      &       (lu_nad,fnme,header,nh_max,nh,nd,
      &        range,scales,nsamplei,nsample,ncells,nh_user)
 
