@@ -42,6 +42,7 @@
       age6=0.
       age7=0.
       age8=0.
+      ftdist = 0. ! bug fix by Yuntao May 4, 2020
 
         do i=1,nsurf
         if (iproc.eq.0.and.nd.eq.0) call screen_counter (i,nsurf,0)
@@ -68,7 +69,6 @@
         final_age = 0
         fmean = 0
         oldest_age  = 0
-        ftdist = 0.
           if (ageflag(3).eq.1) then
           call ketch_main(nrec,ztime_3,ztemp_3,alo,final_age,oldest_age,fmean,fdist)
           age3(i)=real(final_age,4)
