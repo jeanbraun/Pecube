@@ -63,6 +63,7 @@ y2=(y2-xlat1)/(xlat2-xlat1)*yl
   endif
 
   fault(i)%nstep = p%nstep(i)
+  fault(i)%static = p%static(i)
 
   allocate (fault(i)%timestart(fault(i)%nstep),fault(i)%timeend(fault(i)%nstep), &
             fault(i)%velo(fault(i)%nstep))
