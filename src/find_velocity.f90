@@ -32,6 +32,8 @@ vz=0.d0
 
   do i=1,nfault
 
+    if (iflag.eq.1 .and. fault(i)%static.eq.1) goto 333
+
 ! first we rotate/translate the coordinates of the point, if needed
     if (iflag.eq.1.and.fault(i)%n.gt.0) then
     xp=(x-fault(i)%x1)*fault(i)%xn+(y-fault(i)%y1)*fault(i)%yn

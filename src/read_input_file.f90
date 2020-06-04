@@ -150,13 +150,15 @@ call scanfile (fnme, "lon2", p%x2, p%x2_desc, res, vocal, nd, range, par)
 
 call scanfile (fnme, "lat2", p%y2, p%y2_desc, res, vocal, nd, range, par)
 
-allocate (p%npoint(p%nfault), p%nstep(p%nfault))
+allocate (p%npoint(p%nfault), p%nstep(p%nfault), p%static(p%nfault))
 p%npoint = 0
 p%nstep = 0
+p%static = 0
   do i = 1, p%nfault
   write (ci,'(i10)') i
   call scanfile (fnme, "npoint"//trim(adjustl(ci)), p%npoint(i), p%npoint_desc, res, vocal, nd, range, par)
   call scanfile (fnme, "nstep"//trim(adjustl(ci)), p%nstep(i), p%nstep_desc, res, vocal, nd, range, par)
+  call scanfile (fnme, "static"//trim(adjustl(ci)), p%static(i), p%static_desc, res, vocal, nd, range, par)
   enddo
 if (vocal.eq.4) p%npoint(1)=2
 if (vocal.eq.4) p%nstep(1)=2

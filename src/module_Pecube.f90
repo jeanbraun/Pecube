@@ -197,6 +197,9 @@ module Pecube
   integer, dimension(:), allocatable :: nstep
   character*128 :: nstep_desc = "Number of time steps used to describe the motion on each fault"
 
+  integer, dimension(:), allocatable :: static
+  character*128 :: static_desc = "Flag to activate velocity field (static=0) or not (static=1)"
+
   double precision, dimension(:,:), allocatable :: time_start
   character*128 :: time_start_desc = "Starts of time steps used to describe the motion on each fault (in yr)"
 
@@ -312,7 +315,7 @@ module Pecube
 
 ! as well as xn,yn the normal to the (x1,y1)-(x2,y2) line in the z=0 plane
 
-  integer n,nstep
+  integer n,nstep,static
   double precision,dimension(:),pointer::x,y
   double precision x1,y1,x2,y2
   double precision,dimension(:),pointer::timestart,timeend,velo

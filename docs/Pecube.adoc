@@ -480,6 +480,9 @@ One can also force a time value (either `time_start` or `time_end`) to be equal 
 `velo**__i__**_**__j__**` (no default value)::
 Velocity amplitude (in km/Myr) for time interval **__j__** for fault **__i__**.
 
+`static**__i__**` _(default = `0`)_::
+Flag used to inhibit the contribution from fault **__i__** to the computed velocity field; when this flag is set to 1 the fault is only used to advect the other faults, it does not contribute to the velocity field used to compute the advection term in **Pecube**.
+
 `logarithmic_velocity` _(default = `0`)_::
 Flag used to specify whether velocities are given as logarithmic values (if set to 1) (this is potentially useful for inversion purposes). See section <<Inversion>> for more details about **Pecube** inversion mode.
 
