@@ -97,8 +97,49 @@ endif
   write (71,'(a)') 'y         : Turn timing mode on ? (y/n)'
   write (71,'(a)') 'n         : Turn debug mode on ? (y/n)'
   close (71)
+    if (p%save_ages_inversion.eq.1) then
+      if (p%age_AHe_flag.ne.0.) then
+      open (71,file=run//'/NA/AgeApatiteHelium.csv',status='unknown',position='rewind')
+      write (71,'("Predicted Apatite Helium Ages")')
+      close (71)
+      endif
+      if (p%age_AFT_flag.ne.0.) then
+      open (71,file=run//'/NA/AgeApatiteFT.csv',status='unknown',position='rewind')
+      write (71,'("Predicted Apatite FT Ages")')
+      close (71)
+      endif
+      if (p%age_ZHe_flag.ne.0.) then
+      open (71,file=run//'/NA/AgeZirconHelium.csv',status='unknown',position='rewind')
+      write (71,'("Predicted Zircon Helium Ages")')
+      close (71)
+      endif
+      if (p%age_ZFT_flag.ne.0.) then
+      open (71,file=run//'/NA/AgeZirconFT.csv',status='unknown',position='rewind')
+      write (71,'("Predicted Zircon FT Ages")')
+      close (71)
+      endif
+      if (p%age_KAr_flag.ne.0.) then
+      open (71,file=run//'/NA/AgeKSparArgon.csv',status='unknown',position='rewind')
+      write (71,'("Predicted K-spar Argon Ages")')
+      close (71)
+      endif
+      if (p%age_BAr_flag.ne.0.) then
+      open (71,file=run//'/NA/AgeBiotiteArgon.csv',status='unknown',position='rewind')
+      write (71,'("Predicted Biotite Argon Ages")')
+      close (71)
+      endif
+      if (p%age_MAr_flag.ne.0.) then
+      open (71,file=run//'/NA/AgeMuscoviteArgon.csv',status='unknown',position='rewind')
+      write (71,'("Predicted Muscovite Argon Ages")')
+      close (71)
+      endif
+      if (p%age_HAr_flag.ne.0.) then
+      open (71,file=run//'/NA/AgeHornblendeArgon.csv',status='unknown',position='rewind')
+      write (71,'("Predicted Hornblende Argon Ages")')
+      close (71)
+      endif
+    endif
   endif
-
   if (nd.eq.0) then
   call forward (nd, par, misfit, run, 0)
   else
@@ -1735,8 +1776,50 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
 
         if (nd.ne.0) then
         open (71,file=run//'/NA/NA_int_res.csv',status='unknown',position='append')
-        write (71,'(g15.9,99(",",g15.9))') misfit,(param(i),i=1,nd)
+        write (71,'(g15.9,99(a1,g15.9))') misfit,(",",param(i),i=1,nd)
         close (71)
+          if (p%save_ages_inversion.eq.1) then
+            if (p%age_AHe_flag.ne.0.) then
+            open (71,file=run//'/NA/AgeApatiteHelium.csv',status='unknown',position='append')
+            write (71,'(g15.9,99(a1,g15.9))') misfit,(",",agehe(i),i=1,nhe)
+            close (71)
+            endif
+            if (p%age_AFT_flag.ne.0.) then
+            open (71,file=run//'/NA/AgeApatiteFT.csv',status='unknown',position='append')
+            write (71,'(g15.9,99(a1,g15.9))') misfit,(",",ageft(i),i=1,nft)
+            close (71)
+            endif
+            if (p%age_ZHe_flag.ne.0.) then
+            open (71,file=run//'/NA/AgeZirconHelium.csv',status='unknown',position='append')
+            write (71,'(g15.9,99(a1,g15.9))') misfit,(",",ageheZ(i),i=1,nheZ)
+            close (71)
+            endif
+            if (p%age_ZFT_flag.ne.0.) then
+            open (71,file=run//'/NA/AgeZirconFT.csv',status='unknown',position='append')
+            write (71,'(g15.9,99(a1,g15.9))') misfit,(",",ageftZ(i),i=1,nftZ)
+            close (71)
+            endif
+            if (p%age_KAr_flag.ne.0.) then
+            open (71,file=run//'/NA/AgeKSparArgon.csv',status='unknown',position='append')
+            write (71,'(g15.9,99(a1,g15.9))') misfit,(",",agearK(i),i=1,narK)
+            close (71)
+            endif
+            if (p%age_BAr_flag.ne.0.) then
+            open (71,file=run//'/NA/AgeBiotiteArgon.csv',status='unknown',position='append')
+            write (71,'(g15.9,99(a1,g15.9))') misfit,(",",agearB(i),i=1,narB)
+            close (71)
+            endif
+            if (p%age_MAr_flag.ne.0.) then
+            open (71,file=run//'/NA/AgeMuscoviteArgon.csv',status='unknown',position='append')
+            write (71,'(g15.9,99(a1,g15.9))') misfit,(",",agearM(i),i=1,narM)
+            close (71)
+            endif
+            if (p%age_HAr_flag.ne.0.) then
+            open (71,file=run//'/NA/AgeHornblendeArgon.csv',status='unknown',position='append')
+            write (71,'(g15.9,99(a1,g15.9))') misfit,(",",agearH(i),i=1,narH)
+            close (71)
+            endif
+          endif
         endif
       if (nd.eq.0) write (6,*) 'Misfit : ',misfit
       if (nd.ne.0) write (*,*) 'Misfit:',misfit,misfit1,misfit2,misfit3,misfit4,' - Params',param(1:nd)
