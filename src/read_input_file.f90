@@ -252,6 +252,9 @@ call scanfile (fnme, "sample_size_for_all_other_iterations", p%sample_size_for_a
 call scanfile (fnme, "number_of_cells_to_resample", p%number_of_cells_to_resample, &
                       p%misfit_weight_TL_desc, res, vocal, nd, range, par)
 
+call scanfile (fnme, "save_ages_inversion", p%save_ages_inversion, &
+                      p%save_ages_inversion_desc, res, vocal, nd, range, par)
+
 return
 end
 

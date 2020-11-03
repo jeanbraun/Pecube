@@ -216,7 +216,10 @@ module Pecube
   character*128 :: debug_desc = "Flag to enable debugging mode"
 
   integer :: save_PTT_paths = 0
-  character*128 :: save_PTT_paths_desc = "Flag to save PTT paths at observvation points"
+  character*128 :: save_PTT_paths_desc = "Flag to save PTT paths at observation points"
+
+  integer :: save_ages_inversion = 0
+  character*128 :: save_ages_inversion_desc = "Flag to save predicted ages for each model runs during NA inversion"
 
   integer :: save_eroded_volume = 0
   character*128 :: save_eroded_volume_desc = "Flag to save eroded volume history"
