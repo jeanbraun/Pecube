@@ -16,7 +16,7 @@
       type (faulttype) fault(nfault)
 
       double precision,dimension(:,:),allocatable::zNZ
-      double precision,dimension(:),allocatable::z,xz,yz
+      double precision,dimension(:),allocatable::z,xz,yz,zsmooth
       double precision,dimension(:),allocatable::timek,topomag,topooffset
       integer,dimension(:),allocatable::iout
       integer,dimension(:,:),allocatable::iconz,neighz
@@ -418,7 +418,14 @@ endif !VKP
             close (67)
             endif
           endif !VKP
-        write (7,*) (z(k)*topomag(istep+1)+topooffset(istep+1),k=1,nsurf)
+          if (topomag(istep+1).lt.0.) then
+            allocate(zsmooth(nsurf))
+            call smooth_topo(z, zsmooth, nx, ny, int(-topomag(istep+1)), int(topooffset(istep+1)))
+            write (7,*) (zsmooth(k), k=1,nsurf)
+            deallocate(zsmooth)
+          else
+            write (7,*) (z(k)*topomag(istep+1)+topooffset(istep+1),k=1,nsurf)
+          endif
           if (vivi) then !VKP
             if (nx0.gt.0) then
             open (67,file=run//'/data/'//fnme(1:nfnme)//'/uplift'//c5(1:nc5),status='old') !VKP

@@ -10,10 +10,10 @@ module Pecube
 
   type version
 
-  character*5 :: str = "4.2.1"
+  character*5 :: str = "4.2.2"
   integer :: major = 4
   integer :: minor = 2
-  integer :: patch = 0
+  integer :: patch = 2
 
   end type version
 
