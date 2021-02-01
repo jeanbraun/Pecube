@@ -1184,7 +1184,7 @@ The file should be in the <code>$RUN/data</code> directory and contain a single 
 <dl>
 <dt class="hdlist1"><code>ntime</code> <em>(default = <code>1</code>)</em></dt>
 <dd>
-<p>Number of time steps needed to describe the scenario for the evolution of the topography. For each time step, you will need to provide an amplification factor, <code>amplification<sub><em>i</em></sub></code>, an offset factor, <code>offset<sub><em>i</em></sub></code>, as well as an output flag value, <code>output<sub><em>i</em></sub></code>. At step <code><strong><em>i</em></strong></code>, the topography used in <strong>Pecube</strong>, <code>h<sub><em>i</em></sub></code>, is obtained by the following scaling of the topography, <code>h<sub><em>0</em></sub></code>, in the input file: <code>h<sub><em>i</em></sub> = offset<sub><em>i</em></sub> + amplification<sub><em>i</em></sub> x h<sub><em>0</em></sub></code></p>
+<p>Number of time steps needed to describe the scenario for the evolution of the topography. For each time step, you will need to provide an amplification factor, <code>amplification<sub><em>i</em></sub></code>, an offset factor, <code>offset<sub><em>i</em></sub></code>, as well as an output flag value, <code>output<sub><em>i</em></sub></code>. At step <code><strong><em>i</em></strong></code>, the topography used in <strong>Pecube</strong>, <code>h<sub><em>i</em></sub></code>, is obtained by the following scaling of the topography, <code>h<sub><em>0</em></sub></code>, in the input file: <code>h<sub><em>i</em></sub> = offset<sub><em>i</em></sub> + amplification<sub><em>i</em></sub> x h<sub><em>0</em></sub></code>. If the amplification factor is negative, the topography will be smoothed rather than amplified/offset. In this case the absolute value of <code>amplification<sub><em>i</em></sub></code> is the number of times that a gaussian filter of 10 pixel width will be applied to the topography (the larger <code>amplification<sub><em>i</em></sub></code>, the smoother the resulting topography). In this case (<code>amplification<sub><em>i</em></sub>&lt;0</code>), the parameter <code>offset<sub><em>i</em></sub></code> determines in which direction the smoothing is applied. If <code>offset<sub><em>i</em></sub>=0</code> the smoothing leads to a surface that tends towards the mean of the initial surface topography; if <code>offset<sub><em>i</em></sub>=-1</code>, the smoothing tends to create a surface that follows the valley bottoms, while if <code>offset<sub><em>i</em></sub>=1</code>, the smoothing tends to create a surface that follows the peaks.</p>
 </dd>
 </dl>
 </div>
@@ -1228,12 +1228,30 @@ The file should be in the <code>$RUN/data</code> directory and contain a single 
 <dl>
 <dt class="hdlist1"><code>amplification<strong><em>i</em></strong></code> <em>(default = <code>1</code>)</em></dt>
 <dd>
-<p>Topographic amplification factor used at time <code><strong><em>i</em></strong></code></p>
+<p>Topographic amplification factor used at time <code><strong><em>i</em></strong></code> (or, if negative, number of smoothing cycles applied to the topography)</p>
 </dd>
 <dt class="hdlist1"><code>offset<strong><em>i</em></strong></code> <em>(default = <code>0</code>)</em></dt>
 <dd>
-<p>Topographic offset factor used at time <code><strong><em>i</em></strong></code></p>
+<p>Topographic offset factor used at time <code><strong><em>i</em></strong></code> (or, if <code>amplification<sub><em>i</em></sub>&lt;0</code>, the direction of smoothing: 1: upwards, 0: towards the mean, -1:downwards)</p>
 </dd>
+</dl>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Beware that excessive smoothing can lead to large computing overhead. It is not advisable to apply more than 10 smoothing cycles to large DEMS.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="dlist">
+<dl>
 <dt class="hdlist1"><code>output<strong><em>i</em></strong></code> <em>(default = <code>1</code>)</em></dt>
 <dd>
 <p>Output flag used at time <code><strong><em>i</em></strong></code>. If <code>output<strong><em>i</em></strong> = 1</code>, <strong>Pecube</strong> will compute and output thermochronological ages at time <code><strong><em>i</em></strong></code>. If <code>output<strong><em>i</em></strong> = 0</code>, <strong>Pecube</strong> will not compute nor will it output ages at time <code><strong><em>i</em></strong></code></p>
@@ -3851,7 +3869,7 @@ where <code>Y</code> is Young&#8217;s moduls, <code>EET</code> effective elastic
 <div id="footer">
 <div id="footer-text">
 Version 4.0<br>
-Last updated 2020-06-04 09:44:55 +0200
+Last updated 2021-02-01 13:47:08 +0100
 </div>
 </div>
 </body>

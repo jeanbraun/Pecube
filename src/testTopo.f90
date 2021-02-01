@@ -15,7 +15,7 @@ double precision zl,xl,yl,x,y,h
 double precision,dimension(:),allocatable::timek,topomag,topooffset,a1,a2,a3,a4,a5,a6,a7,a8
 integer, dimension(:),allocatable::io
 double precision,dimension(:,:),allocatable::zNZ
-double precision,dimension(:),allocatable::z,xz,yz
+double precision,dimension(:),allocatable::z,xz,yz,zsmooth
 double precision timesteps(1000)
 integer dosteps(1000)
 double precision xlon1,xlat1,xlon2,xlat2
@@ -119,6 +119,7 @@ if (.not.vivi) then
   nx=(nx0-1)/nskip+1
   ny=(ny0-1)/nskip+1
   allocate (z(nx*ny))
+  allocate (zsmooth(nx*ny))
   ij=0
     do j=1,ny0,nskip
       do i=1,nx0,nskip
@@ -168,6 +169,7 @@ else
   ny=(ny0-1)/nskip+1 !VKP
   allocate (zNZ(nx0,ny0)) !VKP
   allocate (z(nx*ny)) !VKP
+  allocate (zsmooth(nx*ny))
   topomag=1.d0 !VKP
   topooffset=0.d0 !VKP
 
@@ -262,6 +264,7 @@ itime=int(timesteps(istep+1))
   endif !VKP
 
 print*,'creating Topo file'
+if (topomag(istep+1).lt.0) call smooth_topo(z, zsmooth, nx, ny, int(-topomag(istep+1)), int(topooffset(istep+1)))
 open(unit=iunit,file=run//'/VTK/Topo'//cs//'.vtk',status='unknown')
 write(iunit,'(a)')'# vtk DataFile Version 3.0'
 write(iunit,'(a)')'surface'
@@ -275,7 +278,11 @@ ij=0
   x=xl*float(i-1)/float(nx-1)
   y=yl*float(j-1)/float(ny-1)
   ij=ij+1
-  write(iunit,'(3f16.11)') x,y,z(ij)*topomag(istep+1)+topooffset(istep+1)+zl
+  if (topomag(istep+1).lt.0) then
+    write(iunit,'(3f16.11)') x,y,zsmooth(ij)+zl
+  else
+    write(iunit,'(3f16.11)') x,y,z(ij)*topomag(istep+1)+topooffset(istep+1)+zl
+  endif
   enddo
   enddo
 write(iunit,'(A6, 2I10)') 'CELLS ',(nx-1)*(ny-1),(1+4)*(nx-1)*(ny-1)
@@ -299,15 +306,25 @@ ij=0
   do j=1,ny
     do i=1,nx
     ij=ij+1
-    write(iunit,'(f18.13)') z(ij)*topomag(istep+1)+topooffset(istep+1)
+    if (topomag(istep+1).lt.0.) then
+      write(iunit,'(f18.13)') zsmooth(ij)
+    else
+      write(iunit,'(f18.13)') z(ij)*topomag(istep+1)+topooffset(istep+1)
+    endif
     enddo
   enddo
 else
 write(iunit,'(a7,i10,a6)')'POINTS ',-nx0,' float'
   do i=1,-nx0
-  write(iunit,'(3f16.11)') (xz(i)-xlon1)/(xlon2-xlon1)*xl, &
-                           (yz(i)-xlat1)/(xlat2-xlat1)*yl, &
-                           z(i)*topomag(istep+1)+topooffset(istep+1)+zl
+  if (topomag(istep+1).lt.0.) then
+    write(iunit,'(3f16.11)') (xz(i)-xlon1)/(xlon2-xlon1)*xl, &
+                            (yz(i)-xlat1)/(xlat2-xlat1)*yl, &
+                            zsmooth(i)+zl
+  else
+    write(iunit,'(3f16.11)') (xz(i)-xlon1)/(xlon2-xlon1)*xl, &
+                            (yz(i)-xlat1)/(xlat2-xlat1)*yl, &
+                             z(i)*topomag(istep+1)+topooffset(istep+1)+zl
+  endif
   enddo
 write(iunit,'(A6, 2I10)') 'CELLS ',-ny0,(1+3)*(-ny0)
     do i=1,-ny0
@@ -320,9 +337,15 @@ write(iunit,'(A11, I10)') 'CELL_TYPES ',-ny0
 write(iunit,'(a11,i10)')'POINT_DATA ',-nx0
 write(iunit,'(a)')'SCALARS Topo float 1'
 write(iunit,'(a)')'LOOKUP_TABLE default'
+  if (topomag(istep+1).lt.0.) then
+    do i=1,-nx0
+    write(iunit,'(f18.13)') zsmooth(i)
+    enddo
+  else
     do i=1,-nx0
     write(iunit,'(f18.13)') z(i)*topomag(istep+1)+topooffset(istep+1)
     enddo
+  endif
 endif
 close(iunit)
 print*,'Step',istep,'done'

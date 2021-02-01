@@ -279,7 +279,8 @@ Stride used to read the topo_input_file. When `nskip=1`, all points of the `topo
 === Time evolution parameters
 
 `ntime` _(default = `1`)_::
-Number of time steps needed to describe the scenario for the evolution of the topography. For each time step, you will need to provide an amplification factor, `amplification~__i__~`, an offset factor, `offset~__i__~`, as well as an output flag value, `output~__i__~`. At step `**__i__**`, the topography used in **Pecube**, `h~__i__~`, is obtained by the following scaling of the topography, `h~__0__~`, in the input file: `h~__i__~ = offset~__i__~ + amplification~__i__~ x h~__0__~`
+Number of time steps needed to describe the scenario for the evolution of the topography. For each time step, you will need to provide an amplification factor, `amplification~__i__~`, an offset factor, `offset~__i__~`, as well as an output flag value, `output~__i__~`. At step `**__i__**`, the topography used in **Pecube**, `h~__i__~`, is obtained by the following scaling of the topography, `h~__0__~`, in the input file: `h~__i__~ = offset~__i__~ + amplification~__i__~ x h~__0__~`. If the amplification factor is negative, the topography will be smoothed rather than amplified/offset. In this case the absolute value of `amplification~__i__~` is the number of times that a gaussian filter of 10 pixel width will be applied to the topography (the larger `amplification~__i__~`, the smoother the resulting topography). In this case (`amplification~__i__~<0`), the parameter `offset~__i__~` determines in which direction the smoothing is applied. If `offset~__i__~=0` the smoothing leads to a surface that tends towards the mean of the initial surface topography; if `offset~__i__~=-1`, the smoothing tends to create a surface that follows the valley bottoms, while if `offset~__i__~=1`, the smoothing tends to create a surface that follows the peaks.
+
 [NOTE]
 ====
 There is an implied time step corresponding to present-day, for which the amplification factor `amplification~__ntime+1__~` is 1, the offset `offset~__ntime+1__~` is 0 and the output flag, `offset~__ntime+1__~` is 1. `ntime` should therefore be regarded as the number of intervals used to describe the topographic scenario, and the `time_topo**__i__**` values the times at which each interval starts.
@@ -293,10 +294,14 @@ Because **Pecube** uses geological time, the various `time_topo**__i__**` must m
 ====
 
 `amplification**__i__**` _(default = `1`)_::
-Topographic amplification factor used at time `**__i__**`
+Topographic amplification factor used at time `**__i__**` (or, if negative, number of smoothing cycles applied to the topography)
 
 `offset**__i__**` _(default = `0`)_::
-Topographic offset factor used at time `**__i__**`
+Topographic offset factor used at time `**__i__**` (or, if `amplification~__i__~<0`, the direction of smoothing: 1: upwards, 0: towards the mean, -1:downwards)
+[WARNING]
+====
+Beware that excessive smoothing can lead to large computing overhead. It is not advisable to apply more than 10 smoothing cycles to large DEMS.
+====
 
 `output**__i__**` _(default = `1`)_::
 Output flag used at time `**__i__**`. If `output**__i__** = 1`, **Pecube** will compute and output thermochronological ages at time `**__i__**`. If `output**__i__** = 0`, **Pecube** will not compute nor will it output ages at time `**__i__**`

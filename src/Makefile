@@ -4,10 +4,10 @@
 # this removes the mpi commands in NA
 
 FLAGS = -c -O
-FF90 = gfortran -fbounds-check
-FF77 = gfortran -fd-lines-as-comments -fbounds-check
-CC = gcc -fbounds-check
-LINK = gfortran -fbounds-check -static-libgfortran -static-libgcc -static-libstdc++
+FF90 = gfortran #-fbounds-check
+FF77 = gfortran -fd-lines-as-comments #-fbounds-check
+CC = gcc #-fbounds-check
+LINK = gfortran -static-libgfortran -static-libgcc -static-libstdc++ #-fbounds-check 
 
 # use these lines to produce a parallel (mpi) version to parallelize the inversion
 # Note that some compilers will not allow to have an "include" command preceded by a "d" as an indication
@@ -69,7 +69,8 @@ scanfile.o \
 read_data_files.o \
 ExtractDEM.o \
 initialize_random_seed.o \
-calculate_TL.o
+calculate_TL.o \
+smooth_topo.o
 
 OBJECTS_MPI = \
 module_Pecube.o \
@@ -114,7 +115,8 @@ scanfile.o \
 read_data_files.o \
 ExtractDEM.o \
 initialize_random_seed.o \
-calculate_TL.o
+calculate_TL.o\
+smooth_topo.o
 
 OBJECTS_TEST = \
 testFault.o \
@@ -127,7 +129,8 @@ read_input_file.o \
 read_data_files.o \
 scanfile.o \
 testTopo.o \
-ExtractDEM.o
+ExtractDEM.o\
+smooth_topo.o
 
 OBJECTS_VTK = \
 vtk.o
