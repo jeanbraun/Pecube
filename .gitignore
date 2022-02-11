@@ -30,6 +30,16 @@
 *.exe
 *.out
 *.app
+**bin/Pecube
+**bin/Pecube324
+**bin/Test
+**bin/Vtk
+**bin/PecubeMPI
 
 # misc
 .DS_Store
+tmp/*
+
+# test folders
+NAZ2Y/*
+CAN2Y/*

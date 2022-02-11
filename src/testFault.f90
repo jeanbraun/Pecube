@@ -42,6 +42,8 @@ call system ('rm '//run//'/VTK/*')
 ! read in the number of faults
 
 p%run_name = run
+! Initiate nd (mod. Xavier Robert; 2022/02/11)
+nd=0
 call read_input_file (run//'/input/Pecube.in', 0, p, nd, range, param)
 nfault = p%nfault
 if (nfault.eq.0) nfault=1
