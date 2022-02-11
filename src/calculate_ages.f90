@@ -65,7 +65,7 @@
             if (ztemp(nrec-irec+1).gt.500) ztemp(nrec-irec+1)=500
             ztemp_3(irec)=ztemp(nrec-irec+1) !MOD VKP
         enddo
-        alo = 16.0
+        alo = 16.3
         final_age = 0
         fmean = 0
         oldest_age  = 0
