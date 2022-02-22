@@ -1,6 +1,6 @@
 = **Pecube** User Guide
 Jean Braun <jbraun@gfz-potsdam.de>
-V4.0, 11-09-2018
+V4.2.2, 22-02-2022
 :toc: left
 :icons: font
 
@@ -8,7 +8,7 @@ V4.0, 11-09-2018
 
 **Pecube** is often referred to as a `thermo-kinematic' model because the velocity field used in the advection term of the heat equation is specified by the user, not derived from a dynamical model. However, **Pecube** is more than a simple thermo-kinematic model because it allows for a finite amplitude, time varying surface topography. Temperature histories are computed for rock particles that will end up at the surface of the model. Rock paths are computed assuming a simple block uplift or motion along faults. From the temperature histories, **Pecube** compute ages for a variety of thermochronological systems that are compared to observed ages and/or displayed. **Pecube** can also be run in _Inversion_ mode by finding the optimum values of given model parameters within a specified range that minimize a misfit function. The misfit function is the norm of the difference between observations and predictions. The optimization is performed using the Neighbourhood Algorithm.
 
-**Pecube** is intended to help thermochronologists in interpreting their data. It transforms tectonic and geomorphic scenarios into thermal histories that are computed to produce synthetic ages. In this latest version of **Pecube**, thermal histories extracted from the data using other pieces of software (such as QTQT or HEFTY) can be used as constraints rather than the ages themselves. This is a simple way to combine the strength of other pieces of software, which focus on predicting probable thermal histories to the strength of **Pecube**, which focus on predicting probable tectono-geomorphic scenarios.
+**Pecube** is intended to help thermochronologists in interpreting their data. It transforms tectonic and geomorphic scenarios into thermal histories that are computed to produce synthetic ages. In this latest version of **Pecube**, thermal histories extracted from the data using other pieces of software (such as `QTQt` or `HeFTy`) can be used as constraints rather than the ages themselves. This is a simple way to combine the strength of other pieces of software, which focus on predicting probable thermal histories to the strength of **Pecube**, which focus on predicting probable tectono-geomorphic scenarios.
 
 == Getting started
 
@@ -33,7 +33,7 @@ run.bat EXMP1
 
 [NOTE]
 ====
-If you can read this User Guide, it means that you have already managed to perform at least one of the important steps in installing **Pecube**: opening the tarball `Pecube_v4.0.tar.gz.
+If you can read this User Guide, it means that you have already managed to perform at least one of the important steps in installing **Pecube**: opening the tarball `Pecube_v4.2.tar.gz.
 ====
 
 For a basic installation of **Pecube**, you only need a computer running MacOSX, Linux or Windows. The **Pecube** tarball includes executables for MacOSX and Windows. If you have installed gfortran and gcc compilers, you will be able to create the required executables for your system by compiling Pecube. On a Windows machine you will also need a `make` facility such as `mingw32-make`. For a complete installation of **Pecube**, you will need gfortran and gcc compilers, an MPI installation and two other pieces of (free) software: `Paraview`, the kitware VTK viewer, and `R`, the statistical package.
@@ -42,7 +42,7 @@ Installation procedure for a basic installation:
 
 - untar the tarball:
 ----
-tar -xzvf Pecube_v4.0.tar.gz
+tar -xzvf Pecube_v4.2.tar.gz
 ----
 - go to the main **Pecube** directory:
 ----
@@ -95,7 +95,7 @@ where `$n` is the number of processors/cores/threads to be used by **Pecube**. T
 
 [NOTE]
 ====
-The MPI version should only be use din _Inversion_ mode as **Pecube** cannot take advantage of multi-processor architecture for a single run.
+The MPI version should only be used in _Inversion_ mode as **Pecube** cannot take advantage of multi-processor architecture for a single run.
 ====
 
 === VTK Postprocessor
@@ -111,7 +111,7 @@ bin/Test $NAME
 ----
 
 === Using old input files
-To allow easy migration to the **Pecube** version 4 (2018), a utility called Pecube324 is provided that transform the two input files `topo_parameters.txt` and `fault_parameters.txt` needed in the version 2 of **Pecube** into a single input file `Pecube.in` for **Pecube** version 3. To run the procedure, first copy the two version 2 input files in the folder `old_input` and run the `bin/Pecube324` utility:
+To allow easy migration to the **Pecube** version 4 (2018), a utility called `Pecube324` is provided that transform the two input files `topo_parameters.txt` and `fault_parameters.txt` needed in the version 2 of **Pecube** into a single input file `Pecube.in` for **Pecube** version 3. To run the procedure, first copy the two version 2 input files in the folder `old_input` and run the `bin/Pecube324` utility:
 ----
 bin/Pecube324
 ----
@@ -122,41 +122,41 @@ bin/Pecube324
 
 image::images/files.jpg["**Pecube** File Structure", align="center"]
 
-The `bin` folder contains the executables produced at compilation and that need to be used to run **Pecube**. The `src` folder contains the FOrtran (and C) code. The `tools` folder contains a few tools such as `NA.R` the R-script used for displaying the results of inversions or `GenerateTimes.fio`, a Fortran code to generate file names in a sequence. The `docs` folder contains the documentation as well as all the elements needed to update it (figures and the `Pecube.adoc` file). The `tmp` folder contains intermediary files created during a **Pecube** run. It should not be changed/eroased. The `old_input` is used to translate old **Pecube** input files (form V2) into a new input file (V3). The `topo` folder shold contain the `Topo30` file that contains the global world topography (see section <<TOPOGRAPHY,Topography parameters>>) for details. The other folders correspond to distinct **Pecube** projects. You should create one folder per idea/dataset/location/etc.
+The `bin` folder contains the executables produced at compilation and that need to be used to run **Pecube**. The `src` folder contains the Fortran (and C) code. The `tools` folder contains a few tools such as `NA.R` the R-script used for displaying the results of inversions or `GenerateTimes.fio`, a Fortran code to generate file names in a sequence. The `docs` folder contains the documentation as well as all the elements needed to update it (figures and the `Pecube.adoc` file). The `tmp` folder contains intermediary files created during a **Pecube** run. It should not be changed/erased. The `old_input` is used to translate old **Pecube** input files (form V2) into a new input file (V3). The `topo` folder shold contain the `Topo30` file that contains the global world topography (see section <<TOPOGRAPHY,Topography parameters>>) for details. The other folders correspond to distinct **Pecube** projects. You should create one folder per idea/dataset/location/etc.
 
 === bin
 
 This folder contains several shell scripts:
 
-- run.sh: used to run **Pecube**
-- crun.sh: used to compile **Pecube** and all its components AND run Peccube
-- compile.sh: used to compile **Pecube** and all its components
+- `run.sh`: used to run **Pecube**
+- `crun.sh`: used to compile **Pecube** and all its components AND run **Pecube**
+- `compile.sh`: used to compile **Pecube** and all its components
 - `tarngo.sh`: shell script to create a new **Pecube** tarball; to use it, one must be in the main **Pecube** folder and issue the command `tools/tarngo.sh VERSION` where `VERSION` is a version number or tag that will be added to the name of the tarball: `Pecube_VERSION.tar.gz`.
 
 [WARNING]
 ====
-crun.sh and compile.sh will work ONLY if you have `gfortran`, `gcc` and `mpi` properlyt installed on your computer
+crun.sh and compile.sh will work ONLY if you have `gfortran`, `gcc` and `mpi` properly installed on your computer.
 ====
 
 as well as some executables:
 
-- Pecube: **Pecube** executable
-- Vtk: executable to produce VTK output files after a **Pecube** run
-- Test: executable to produce VTK geometry files (such as topography, fault geometry, and velocity) before a **Pecube** run to check the validity of an input file
-- PecubeMPI: **Pecube** executable for multi-processor machines
-- Pecube324: Executable to transform "`old format`" **Pecube** input files to the "`new format`" input file
+- `Pecube`: **Pecube** executable
+- `Vtk`: executable to produce VTK output files after a **Pecube** run
+- `Test`: executable to produce VTK geometry files (such as topography, fault geometry, and velocity) before a **Pecube** run to check the validity of an input file
+- `PecubeMPI`: **Pecube** executable for multi-processor machines
+- `Pecube324`: Executable to transform "`old format`" **Pecube** input files to the "`new format`" input file
 
 [NOTE]
 ====
-Don't forget that to run **Pecube** or to perform any operation, the corresponding command muyst be issued form the main **Pecube** folder
+Don't forget that to run **Pecube** or to perform any operation, the corresponding command must be issued from the main **Pecube** folder
 ====
 
 === src
 
-This folder contains the complete set of ForTran and C subroutines that make up **Pecube**. They are all necessary for the user to compile **Pecube**.
+This folder contains the complete set of Fortran and C subroutines that make up **Pecube**. They are all necessary for the user to compile **Pecube**.
 [TIP]
 ====
-The content of the `src` folder should only be accessed/modified by expert users or developers. It is not recommended that you change any of the source files to perform an operation that could be accessed through the proper set of parameters or to perform an operation for q=which **Pecube** has not been designed.
+The content of the `src` folder should only be accessed/modified by expert users or developers. It is not recommended that you change any of the source files to perform an operation that could be accessed through the proper set of parameters or to perform an operation for which **Pecube** has not been designed.
 ====
 
 === tools
@@ -186,7 +186,7 @@ If this folder becomes too voluminous, the user may erase its content. But the f
 
 === old_input
 
-This is where the user should put the "`old format`" **Pecube** input files, namely `topo_parameters.txt` and `fault_parameters.txt` to be transformed/translated to the new format. To perform this translation, the user should then run the `Pecube324` executable. `Pecube324` will read the name of the run in `topo_parameters.txt` and will create a folder of the same name where the new input file `Pecube.in` will be stored (in the `data` folder)
+This is where the user should put the "`old format`" **Pecube** input files, namely `topo_parameters.txt` and `fault_parameters.txt` to be transformed/translated to the new format. To perform this translation, the user should then run the `Pecube324` executable. `Pecube324` will read the name of the run in `topo_parameters.txt` and will create a folder of the same name where the new input file `Pecube.in` will be stored (in the `data` folder).
 [NOTE]
 ====
 You must be in the main **Pecube** folder to perform this operation and issue the command `bin/Pecube324`
@@ -204,7 +204,7 @@ The project folders may also contain a `data` folder that contains the data coll
 
 For example, the user has performed an inversion using all the data from a series of files stored in the `data/dataset1` sub-folder. The user may wish to see how important a set Apatite Helium ages is in constraining the result of an inversion. For this the user creates a new subdirectory called `data/dataset2` in which all files from the `data/dataset1` sub-directory have been copied, EXCEPT for the file(s) containing the Apatite Helium ages. The user can then perform a new **Pecube** run or inversion by specifying `data_folder = dataset2` in the `Pecube.in` input file.
 
-After **Pecube** is run, the project folder will contain an `output` folder in which the **Pecube** outputs are stored as `.csv` files and `.out` or binary files. The `.csv` files can be opened in Excel or Numbers or any other data analysis software for processing. They include: the ages at all points of the topographic grid for each of the thermochronological systems (or as requested), the comparison between the data/observations and the **Pecube** predictions (if data has been provided to **Pecube**), time-temperature paths (if requested) and volume eroded (if requested). The `.out` files are binary files that are used to produce the `VTK` files stored in the `VTK` folder (see below). The content of all output files is described in the section <<Output>>
+After **Pecube** is run, the project folder will contain an `output` folder in which the **Pecube** outputs are stored as `.csv` files and `.out` or binary files. The `.csv` files can be opened in Excel or Numbers or any other data analysis software for processing. They include: the ages at all points of the topographic grid for each of the thermochronological systems (or as requested), the comparison between the data/observations and the **Pecube** predictions (if data has been provided to **Pecube**), time-temperature paths (if requested) and volume eroded (if requested). The `.out` files are binary files that are used to produce the `VTK` files stored in the `VTK` folder (see below). The content of all output files is described in the section <<Output>>.
 
 Other folders created at **Pecube** run time include:
 
@@ -223,7 +223,7 @@ The `topo` folder contains a single file called `Topo30` that contains a 30 sec 
 
 == Main input file
 
-**Pecube** input file `Pecube.in` contains all the directives and model parameter values needed for **Pecube** to perform a run, including the name of the topographic file (or DEM) and the name of the data folder where the data/observations to model are stored. it is stored in the `$RUN/input` directory/folder.
+**Pecube** input file `Pecube.in` contains all the directives and model parameter values needed for **Pecube** to perform a run, including the name of the topographic file (or DEM) and the name of the data folder where the data/observations to model are stored. It is stored in the `$RUN/input` directory/folder.
 
 === [[TOPOGRAPHY]]Topography parameters
 
@@ -240,14 +240,14 @@ The file should be in the `$RUN/data` directory and contain a single column of r
 ====
 
 `nx` _(default = `31`)_::
-Number of points describing the topography in the x-(or longitude-)direction
+Number of points describing the topography in the x-(or longitude-) direction
 [WARNING]
 ====
-`nx` can only take integer values. The value you attribute to it MUST be an integer. Do not use `nx = 25.0` or even `nx = 25.` This will cause **Pecube** to crash. Note that this warning applies to all paameters that can only take integer values. To make sure that this problem does not affect you, a good habit is to avoid using a decimal point at the end of numbers if you don't need it.
+`nx` can only take integer values. The value you attribute to it MUST be an integer. Do not use `nx = 25.0` or even `nx = 25.` This will cause **Pecube** to crash. Note that this warning applies to all parameters that can only take integer values. To make sure that this problem does not affect you, a good habit is to avoid using a decimal point at the end of numbers if you don't need it.
 ====
 
 `ny` _(default = `31`)_::
-Number of points describing the topography in the y-(or latitude-)direction
+Number of points describing the topography in the y-(or latitude-) direction
 
 `lon0` _(default = `0`)_::
 Longitude of the bottom left corner of the topographic data/file/grid(s)
@@ -311,7 +311,7 @@ Setting the output flag `output**__i__** = 1` at a time `**__i__**` that is not 
 ====
 
 `erosional_time_scale` _(default = `0`)_::
-Time scale (in Myr) that determines how the topography is interpolated between two time steps, i.e. during a given time interval. If the time scale is nil, the interpolation is linear; if the time scale is large and positive, the interpolation corresponds to a decelerating change throughout the time interval (the most likely "`geomorphic`" scenario for an eroding topography); if the time scale is large and negative, the interpolation corresponds to an accelerating change throughout the time interval. image:images/Tau.jpg[Erosional time scale,450,300,role="right"]
+Time scale (in Myr) that determines how the topography is interpolated between two time steps, i.e. during a given time interval. If the time scale is `nil`, the interpolation is linear; if the time scale is large and positive, the interpolation corresponds to a decelerating change throughout the time interval (the most likely "`geomorphic`" scenario for an eroding topography); if the time scale is large and negative, the interpolation corresponds to an accelerating change throughout the time interval. image:images/Tau.jpg[Erosional time scale,450,300,role="right"]
 [NOTE]
 ====
 The formula used in **Pecube** to interpolate topography during a time step is: +
@@ -339,7 +339,7 @@ Temperature (in &#176;C) at sea level (zero topography).
 ====
 The surface boundary condition in **Pecube** assumes that the temperature can vary as a function of elevation. The formula for `T(h)` used in **Pecube** is: +
 `T(h) = T(0) + LR h` +
-where `T(0)` is the temperature at zero elevation (`sea_level_temperature`) and `LR` is the lapse rate ('lapse_rate') or rate of change of temperature with elevation.
+where `T(0)` is the temperature at zero elevation (`sea_level_temperature`) and `LR` is the lapse rate (`lapse_rate`) or rate of change of temperature with elevation.
 ====
 
 `lapse_rate` _(default = `0`)_::
@@ -397,7 +397,7 @@ The vertical geometry of the faults is then specified by a number of `(r,s)` poi
 
 Velocities are then calculated by assuming that the velocity vector parallel to each of the successive fault segments. In regions where two segments of the fault can be used to define the velocity, the average is used. This ensures mass conservation across fault segments.  image:images/segments.jpg[Velocity field,250,400,role="right"]
 
-The amplitude of the velocity can change through time for each fault. It is specified through a termporal history made of time intervls and velocity magnitude. The velocity amplitude provided by the user is the horizontal convergence velocity (or divergence velocity). If the velocity is positive, the fault is asumed to be normal; if the velocity is negative the fault is assumed to be a thrust.
+The amplitude of the velocity can change through time for each fault. It is specified through a temporal history made of time intervals and velocity magnitude. The velocity amplitude provided by the user is the horizontal convergence velocity (or divergence velocity). If the velocity is positive, the fault is asumed to be normal; if the velocity is negative the fault is assumed to be a thrust.
 
 Note that the order in which the `(r,s)` points are given is important: it determines on which side of the fault the velocity is calculated/applied. The rule is that the velocity is applied on the right-hand side of the fault (going from the first to the last point defining the segments of the fault). The two options are illustrated in the following figure for a thrust fault (negative velocity amplitude).
 
@@ -437,7 +437,7 @@ The fault segment geometry (the `r` and `s` coordinates) as well as a velocity h
 Horizontal coordinate of point **__j__** of fault **__i__** (in km) used to define the fault **__i__** geometry. 
 [NOTE]
 ====
-- Note, as indicated above, that the order in which the coordinates are numbered ( from **__1__** to npoint**__i__**) is important as it defines in which of the two half-spaces (above or below the fault) the velocity is computed/set.
+- Note, as indicated above, that the order in which the coordinates are numbered (from **__1__** to npoint**__i__**) is important as it defines in which of the two half-spaces (above or below the fault) the velocity is computed/set.
 - If the user wishes to impose motion on either sides of the fault (overthrusting on top and underthrusting below, for example), two faults must be defined, with identical geometries but with the points defining the segments in reversed orders.
 ====
 
@@ -493,7 +493,7 @@ Flag used to specify whether velocities are given as logarithmic values (if set 
 
 === [[OUTPUTPARAMS]] Output parameters
 
-**Pecube** outputs the results of the computations in a variety of formats and files. A full descrition of the output from **Pecube** is given in section <<Output>>. One of these outputs is the computed ages at all points of the surface/topographic grid. The number of these points can be quite large (10,0000 or more) and computation of all ages (i.e. for all thermochronometric systems) will take some time. The user might not be interested in all different types of ages; therefore options exists to restrict the number of thermochronologis systems being computed by **Pecube**.
+**Pecube** outputs the results of the computations in a variety of formats and files. A full descrition of the output from **Pecube** is given in section <<Output>>. One of these outputs is the computed ages at all points of the surface/topographic grid. The number of these points can be quite large (10,0000 or more) and computation of all ages (i.e. for all thermochronometric systems) will take some time. The user might not be interested in all different types of ages; therefore options exists to restrict the number of thermochronologic systems being computed by **Pecube**.
 
 `age_TL_flag` _(default = `0`)_::
 Flag to impose the computation of Thermoluminescence ages (=1) at all points of the surface/topographic grid or to prevent it (1).
@@ -617,7 +617,7 @@ resolution of the FFT grid (in the x-direction) used to solve the flexure equati
 [[Inversion_parameters]]
 === Inversion parameters
 
-**Pecube** can be used in _Inversion_ mode to explore/find the value of seleceted parameters that produce ages that best fit observations/data provided by the user. The _Inversion_ mode is explained in section <<Inversion>> and makes use of the Neighbourhood Algorithm (NA). A few flags can be set to control/alter the behaviour of the Neighbourhood algorithm.
+**Pecube** can be used in _Inversion_ mode to explore/find the value of selected parameters that produce ages that best fit observations/data provided by the user. The _Inversion_ mode is explained in section <<Inversion>> and makes use of the Neighbourhood Algorithm (NA). A few flags can be set to control/alter the behaviour of the Neighbourhood algorithm.
 
 `maximum_number_of_iterations` _(default = `4`)_::
 Total number of NA iterations to be performed (not including the first one).
@@ -633,7 +633,7 @@ Number of model runs (and model parameter sets) performed during the first, init
 Number of model runs (and model parameter sets) performed during every subsequent iteration.
 
 `number_of_cells_to_resample` _(default = `4`)_::
-Number of Voronoi cells that will be resampled uniformly during any given iteration (except the first one). Those Voronoi cells are selected to be those that are charcaterized by the smallest misfit values..
+Number of Voronoi cells that will be resampled uniformly during any given iteration (except the first one). Those Voronoi cells are selected to be those that are charcaterized by the smallest misfit values.
 
 `misfit_weight_AGE` _(default = `1`)_::
 Factor or weight (dimensionless) multiplying the part of the misfit function that measures the difference between observed and predicted ages.
@@ -711,14 +711,14 @@ Each file contains a table that include, as columns:
 - Apatite Helium age
 - Zircon Helium age
 - Apatite Fission track age
-- Zircon aFission track ge
+- Zircon Fission track age
 - K-Feldspar K-Argon age
 - Biotite K-Argon age
 - Muscovite K-Argon age
 - Hornblend K-Argon age
 - Apatite Fission track mean track length
 
-Longitudes and latitudes are in decimal degrees, height is in meters, Ages are in Myr and length in microns Each row corresponds to a point on the topographic mesh. Note that only selected ages are computed, as instructed by the user in the `Pecube.in` file through the various `age_xxx_flags`. See section <<OUTPUTPARAMS,Output parameters>> for details.
+Longitudes and latitudes are in decimal degrees, height is in meters, Ages are in Myr and length in microns. Each row corresponds to a point on the topographic mesh. Note that only selected ages are computed, as instructed by the user in the `Pecube.in` file through the various `age_xxx_flags`. See section <<OUTPUTPARAMS,Output parameters>> for details.
 
 [WARNING]
 ====
@@ -757,7 +757,7 @@ The format of the `TimeTemperaturePaths.csv` file is:
 
 ==== Eroded volumes
 
-On request, a file containing the evolution through time of eroded volume is produced by **Pecube**. It is called `VolumeEroded.csv` and is stored in the `output ` folder. To generate the eroded volumes file, the flag `` must be set to 1 in the `Pecube.in` input file.
+On request, a file containing the evolution through time of eroded volume is produced by **Pecube**. It is called `VolumeEroded.csv` and is stored in the `output` folder. To generate the eroded volumes file, the flag `save_eroded_volume` must be set to 1 in the `Pecube.in` input file.
 
 The format of the `VolumeEroded.csv` file is:
 
@@ -784,7 +784,7 @@ where *i* is the number of the time step among those that have been saved as ind
 
 [NOTE]
 ====
-The `.vtk` files are not generated by **Pecube** _per se_ but by two other programs called `Test` and `Vtk` that are stored in binary form in the `bin` folder. These programs are automatically called when the user issues a `bin/run.sh $RUN` command, where $RUN is the name of the project being run. They can also be used individually by issuing one the the two following commands:
+The `.vtk` files are not generated by **Pecube** _per se_ but by two other programs called `Test` and `Vtk` that are stored in binary form in the `bin` folder. These programs are automatically called when the user issues a `bin/run.sh $RUN` command, where `$RUN` is the name of the project being run. They can also be used individually by issuing one the the two following commands:
 ----
 bin/Test $RUN
 ----
@@ -797,7 +797,7 @@ to generate the `**Pecube**00**__i__**.vtk` and `Ages00**__i__**.vtk`files
 
 [WARNING]
 ====
-Paraview is a very powerful yet free software that is widely used to represent scietific data in 3D. The author strongly recommends to **Pecube** users to learn the basics of Paraview as well as a=some of its advanced features to analyse **Pecube** predictions in details.
+Paraview is a very powerful yet free software that is widely used to represent scientific data in 3D. The author strongly recommends to **Pecube** users to learn the basics of Paraview as well as some of its advanced features to analyse **Pecube** predictions in details.
 ====
 
 === BIN files
@@ -845,7 +845,7 @@ The order of the columns (or tags) does not matter. The first column can be the 
 
 Some colums can be empty and some lines can be empty.
 
-Some columns may contain data that is not meaningful for **Pecube**; they will not be read but should not interfere with the meaningful information. Avoid, however, cluttering your `.csv` data files with useless information that increases the chance that your data be not read appropriately by Peube.
+Some columns may contain data that is not meaningful for **Pecube**; they will not be read but should not interfere with the meaningful information. Avoid, however, cluttering your `.csv` data files with useless information that increases the chance that your data be not read appropriately by **Pecube**.
 
 [WARNING]
 ====
@@ -948,7 +948,7 @@ The first sample has 9 track length measurements but no *HEIGHT* field; the seco
 
 ==== TH_files
 
-There exist several methods/pieces of software to extract thermal histories from thermochonometric data (HEFTY, QTQT for example). A new option allows to use these thermal histories to constrain **Pecube**, avoiding the need to perform age calculations in **Pecube**. In this way the user combines the strength of thermal history software such as QTQT with the strength of **Pecube**, designed to test tectonogeomorphic against thermal histories.
+There exist several methods/pieces of software to extract thermal histories from thermochonometric data (`HeFTy`, `QTQt` for example). A new option allows to use these thermal histories to constrain **Pecube**, avoiding the need to perform age calculations in **Pecube**. In this way the user combines the strength of thermal history software such as `QTQt` with the strength of **Pecube**, designed to test tectonogeomorphic against thermal histories.
 
 Thermal history files (TH_files) contain thermal histories for one or several samples. To each sample corresponds a number of rows in the file that contains the thermal history of the sample under the tags *TIMEH*, *TEMPH* and *DTEMPH*, that correspond to the time, temperature and uncertainty on temperature for each of the points of the thermal history. Times are in Myr in the past (geological time) and temperature and uncertainty on temperature are in &#176;C.
 [NOTE]
@@ -1012,7 +1012,7 @@ Some parameters cannot be inverted for. For example those that do not have a num
 [NOTE]
 ====
 - Some parameters appear as a series of numbers, such as the various times in the topographic or velocity history, or the successive coordinates of the points defining a fault geometry. In these situations, the user can use a star `*` instead of a time or coordinate value. This instructs NA to set the range for this parameter to be whatever value NA has selected for the previous value in the series and/or the next one. This of course does not apply for the first or last unmber in the series.
-- Note that this causes a strong correlation between two (or more) of the parameters NA is inverted for. This has soncequences for the way you shold interpret the outcome/result of the inversion.
+- Note that this causes a strong correlation between two (or more) of the parameters NA is inverted for. This has consequences for the way you should interpret the outcome/result of the inversion.
 ====
 
 === Misfit function
@@ -1028,6 +1028,7 @@ where Ao, dA and Ap are the observed, uncertainty in and predicted ages, N1 is t
 M1 = sqrt(sum [(Amo-Amp)^2^/Amo^2^+(AEso-AEsp)^2^/AEso^2^]/Na)
 ----
 where the summation is over the different age/systems used/available and Na is their number.
+
 - the fission track length part
 ----
 M1a = Kuiper test comparing observed and predicted track length distributions
@@ -1037,11 +1038,13 @@ M1a = Kuiper test comparing observed and predicted track length distributions
 M2 = sqrt(sum [(To-Tp)^2^/dT^2^]/N2)
 ----
 where To, dT and Tp are the observed, uncertainty in and predicted temperature, N2 is the total number of steps in the thermal histories
+
 - the ^43^He part
 ----
 M3 = sqrt(sum [(Ro-Rp)^2^/(0.1*Ro)^2^]/N3)
 ----
 where Ro and Rp are the observed, uncertainty and predicted percent gas release, N3 is the total number of steps in the step heating procedure
+
 - the Thermo Luminescence part
 ----
 M4 = sqrt(sum [(NNo-NNp)^2^/dNN^2^]/N4)
@@ -1054,9 +1057,9 @@ In _Inversion_ mode, **Pecube** performs not one but MANY forward model runs. Th
 
 - that the user should consider limiting the cost of a single forward model run: for this the user should consider increasing the value of the stride parameter (`nskip`) to lower the horizontal resolution used in **Pecube**; the user should also consider decreasing the value of the vertical spatial resolution (`nz`); to help the user, all flags selecting which ages to calculate at the horizontal grid points are automatically turned off (i.e. set to 0);
 
-- that the user should try to limit the number of forward model runs performed during the inversion: for this the user should consider minimizinfg the number of model parameters to invert for; this is because the number of points necessary to sample a space of dimension `N` increases almost exponentially with the diemension `N`; NA is recommended for highly nonlinear problem having a relatively small number of parameters (<10);
+- that the user should try to limit the number of forward model runs performed during the inversion: for this the user should consider minimizing the number of model parameters to invert for; this is because the number of points necessary to sample a space of dimension `N` increases almost exponentially with the dimension `N`; NA is recommended for highly nonlinear problem having a relatively small number of parameters (<10);
 
-- that the user should try to use a multi-processors/cores machine: we provide the user with a version of **Pecube** that is optimized for running on a multi processor machine by makeing of MPI (Message Passing Interface); to use this feature, the user have a purposedly compiled version of **Pecube** or create it by issuing the `make MPI` command; this requires that the adequate libraries and compiler options have been installed on the computer.
+- that the user should try to use a multi-processors/cores machine: we provide the user with a version of **Pecube** that is optimized for running on a multi processor machine by making of MPI (Message Passing Interface); to use this feature, the user have a purposedly compiled version of **Pecube** or create it by issuing the `make MPI` command; this requires that the adequate libraries and compiler options have been installed on the computer.
 
 === Inversion results
 
@@ -1078,17 +1081,17 @@ When run in _Inversion_ mode, **Pecube** issues a single line to the screen per 
 
 === EXMP1
 
-In this first example link:input/EXMP1.html[Pecube.in], we perform a simple experiment using a flat surface topography (no `topo_file_name` is specified). The grid is of dimension 21x21 kilometers (approximately) as the default grid spacings `dlon = 0.0083333` and `dlat = 0.0083333` are used. The experiment goes for 10 million years as specified by `time_topo1 = 10`. We impose a uniform uplift `npoint = -1` set to `velo1_1 = 2` over the complete experiment time, i.e. from `time_start1_1 = 10` to `time_end1_` = 0`.
+In this first example link:input/EXMP1.html[Pecube.in], we perform a simple experiment using a flat surface topography (no `topo_file_name` is specified). The grid is of dimension 21x21 kilometers (approximately) as the default grid spacings `dlon = 0.0083333` and `dlat = 0.0083333` are used. The experiment goes for 10 million years as specified by `time_topo1 = 10`. We impose a uniform uplift `npoint = -1` set to `velo1_1 = 2` over the complete experiment time, i.e. from `time_start1_1 = 10` to `time_end1_2 = 0`.
 
-The predcited Apatite Helium age is 0.84 Ma and the T-t or Temperature-time path for a particle in the middle of the model is shown in the following figure. To extract that information, we introduced a "fake" data file that only contains one point of which the lcatitude and longitude only are specified and set `save_PTT_paths = 1`. We see the exponential shape of the Tt path which simply reflects the exponentional geotherm being established by the finite advection of rocks through th eupper fixed surface. This is due to the finite value of the "Peclet" number (`Pe = vL/k`) where `v` is the exhumation velocity, `L` the thickness of the layer being exhumed and `k` the thermal diffusivity. In this example, `v = 2 km/Myr`, `L = 35km` and `k = 25 km^2^/Myr`, such that `Pe = 2*35/25 = 2.8`.
+The predicted Apatite Helium age is 0.84 Ma and the T-t or Temperature-time path for a particle in the middle of the model is shown in the following figure. To extract that information, we introduced a "fake" data file that only contains one point of which the latitude and longitude only are specified and set `save_PTT_paths = 1`. We see the exponential shape of the Tt path which simply reflects the exponentional geotherm being established by the finite advection of rocks through the upper fixed surface. This is due to the finite value of the "Peclet" number (`Pe = vL/k`) where `v` is the exhumation velocity, `L` the thickness of the layer being exhumed and `k` the thermal diffusivity. In this example, `v = 2 km/Myr`, `L = 35km` and `k = 25 km^2^/Myr`, such that `Pe = 2*35/25 = 2.8`.
 
 image::images/Ttpath.jpg["Tt-path extracted from **Pecube**", 500,300,align="center"]
 
 === EXMP2
 
-In this second example link:input/EXMP2.html[Pecube.in], we use a finite amplitude topography arbitrarily extracted from the global topographic database `topo30` at the locatino of Kings Canyon in the Sierra Nevada of Souther California. For this we specify the latitude and longitude of the bottom left corner of the area of interest and cut out a sqaure of dimensions 60x60 km approximately.
+In this second example link:input/EXMP2.html[Pecube.in], we use a finite amplitude topography arbitrarily extracted from the global topographic database `topo30` at the location of Kings Canyon in the Sierra Nevada of Souther California. For this we specify the latitude and longitude of the bottom left corner of the area of interest and cut out a square of dimensions 60x60 km approximately.
 
-The results are shown as two plots of the resulting Apatite Helium ages, one assuming that the topography remains constant through time link:input/EXMP2.html[Pecube.in], the other that the topography amplitude has decreased from 3 times its present-day amplitude at 10 Ma to its present-day amplitude at 0 Ma link:input/EXMP2b.html[Pecube.in]. This is imposed by changing the `amplification1` to 1 or 3, respectively. In the first case we see a strong positive age-elevation relationship at all wavelengths. In the second case we see a strong negative age-elevation relationship at the longest wavelengths of the topography and a positive age-elevation relationship at short wavelength. See Braun (Terra Nova, 2002) for further explanation of this behaviour.
+The results are shown as two plots of the resulting Apatite Helium ages, one assuming that the topography remains constant through time link:input/EXMP2.html[(Pecube.in)], the other that the topography amplitude has decreased from 3 times its present-day amplitude at 10 Ma to its present-day amplitude at 0 Ma link:input/EXMP2b.html[(Pecube.in)]. This is imposed by changing the `amplification1` to 1 or 3, respectively. In the first case we see a strong positive age-elevation relationship at all wavelengths. In the second case we see a strong negative age-elevation relationship at the longest wavelengths of the topography and a positive age-elevation relationship at short wavelength. See Braun (Terra Nova, 2002) for further explanation of this behaviour.
 
 image::images/KG1.jpg["Predicted AHe ages for a constant amplitude topography", 500,500,align="center"]
 
@@ -1102,11 +1105,11 @@ Note that to obtain the `.vtk` files necessary to produce the 3D plots one needs
 [[EXMP3]]
 === EXMP3
 
-This example link:input/EXMP3.html[Pecube.in] is very similar to the previous one, except that the topographic history is more complex, i.e. made up of more than one step. There are three steps, one that starts at 90 Ma when the topography is 3 times higher than present-day, one that starts at 70 Ma when the topography is still 3 times higher than today. This represents the tectonically active phase. We then impose that the relief disappears completely over the interval starting at 70 Ma and finishing at 5 Ma to form a flat plateau at 1 km elevation. Finally the topography is recreated (to its present-day value) in the last 5 Ma to mimic an erosional response to a climate change, for example (by setting `offset3 = 1`). The velocity field is relatively fast (1 km/Myr) during the tectonic phase (between 90 and 70 Ma). Them much slower, i.e. 0.04 km/Myr, during the interval (70-5 Ma).
+This example link:input/EXMP3.html[Pecube.in] is very similar to the previous one, except that the topographic history is more complex, i.e. made up of more than one step. There are three steps, one that starts at 90 Ma when the topography is 3 times higher than present-day, one that starts at 70 Ma when the topography is still 3 times higher than today. This represents the tectonically active phase. We then impose that the relief disappears completely over the interval starting at 70 Ma and finishing at 5 Ma to form a flat plateau at 1 km elevation. Finally the topography is recreated (to its present-day value) in the last 5 Ma to mimic an erosional response to a climate change, for example (by setting `offset3 = 1`). The velocity field is relatively fast (1 km/Myr) during the tectonic phase (between 90 and 70 Ma). Then much slower, i.e. 0.04 km/Myr, during the interval (70-5 Ma).
 
-Note that `nskip = 2` to force **Pecube** to use half the resolution (in each direction) of the input DEM. In fact, **Pecube** only uses every second point in the DEM (in both directions). Note also the use of a start * to impose that the time of the start of the second interval of the velocity scenario is equal to the time of the end of the first interval.
+Note that `nskip = 2` to force **Pecube** to use half the resolution (in each direction) of the input DEM. In fact, **Pecube** only uses every second point in the DEM (in both directions). Note also the use of a start `*` to impose that the time of the start of the second interval of the velocity scenario is equal to the time of the end of the first interval.
 
-The resulting topography, Apatite Helium ages and 3D temperature structure ar eshown in the following figure. It shows the evolution of the topography, as imposed, the very large variation in ages a the end of the model run, as well as the advection of the isotherms during the tectonic phase.
+The resulting topography, Apatite Helium ages and 3D temperature structure are shown in the following figure. It shows the evolution of the topography, as imposed, the very large variation in ages at the end of the model run, as well as the advection of the isotherms during the tectonic phase.
 
 |===
 ||
@@ -1122,7 +1125,7 @@ Note the very large spread of ages on the present-day landscape. The age distrib
 
 In this example, we introduce two thrust faults that will be activated in sequence. For simplicity we will assume that the topography is flat. They are made of two segments each, a horizontal segment at 10 km depth and a dipping segment at 45&#176; dip. The faults are offset by 20 km. We assume that the motion on the first fault last between 10 and 5 Ma and that motion on the second fault lasts between 5 and 0 Ma. The velocity does not change over time and is set at 1 km/Myr. Here is the resulting link:input/EXMP4.html[Pecube.in].
 
-The results are shown in the two figures below and show the resulting velocity field at 5 Ma and at present-day, as well as the predicted Apatite Helium ages at the end of the run. The distribution of ages is made of very young ages near the most recent fault and intermediary ages above the first structure. Note that the faults have not bee advected one by the other which, in this situation of in-sequence faulting, makes no difference for the predicted age distribution.
+The results are shown in the two figures below and show the resulting velocity field at 5 Ma and at present-day, as well as the predicted Apatite Helium ages at the end of the run. The distribution of ages is made of very young ages near the most recent fault and intermediary ages above the first structure. Note that the faults have not been advected one by the other which, in this situation of in-sequence faulting, makes no difference for the predicted age distribution.
 
 image::images/Velo1.jpg["Velocity field at 5 Ma", 500,500,align="center"]
 
@@ -1152,9 +1155,9 @@ Note that it is recommended to replace the `topo_file_name` `Whataroa.dat` by th
 [[EXMP6]]
 === EXMP6
 
-In this example link:input/EXMP6.html[Pecube.in] we show how to include a simple dataset into **Pecube**. The example is otherwise identical to that of <<EXMP3>>. The data is in a file stored in the folder that is given by the `data_folder` parameter, in this case `KGHelium`. The data file is named link:input/KingsCanyon.html[KingsCanyon.csv]. It contains He ages collected by House et al (1988) in the Kings Canyon area. The data file contains three compulsory columns names `SAMPLE`, `LON` and `LAT` that are needed to identify each data point/age and to position it in the model. The Apatite Helium data is stored in a column called `AHE`; the uncertainty in age in `DAHE`, the height of the sample location in `HEIGHT` and the grain size in the column `SIZE`. Units are given in the section near the <<Data types>>. Note that the data file could contain empty columns or lines, or columns containing other information. These extra columns could be other ages (other chronometric systems) or a fission track length distribution. Columns that do not correspond to anything meaningful for **Pecube** are simply ignored.
+In this example link:input/EXMP6.html[Pecube.in] we show how to include a simple dataset into **Pecube**. The example is otherwise identical to that of <<EXMP3>>. The data is in a file stored in the folder that is given by the `data_folder` parameter, in this case `KGHelium`. The data file is named link:input/KingsCanyon.html[KingsCanyon.csv]. It contains He ages collected by House et al (1988) in the Kings Canyon area. The data file contains three compulsory columns names `SAMPLE`, `LON` and `LAT` that are needed to identify each data point/age and to position it in the model. The Apatite Helium data is stored in a column called `AHE`, the uncertainty in age in `DAHE`, the height of the sample location in `HEIGHT` and the grain size in the column `SIZE`. Units are given in the section near the <<Data types>>. Note that the data file could contain empty columns or lines, or columns containing other information. These extra columns could be other ages (other chronometric systems) or a fission track length distribution. Columns that do not correspond to anything meaningful for **Pecube** are simply ignored.
 
-When running **Pecube** (with the option `echo_input_file = 1`, it echoes to the screen the number of data points for each type of data. Note that all data types are considered as having potentially age information and are therefore added up to give the `Number of ages samples`. While reading the data, **Pecube** might produce comments concerning the data in a file called `data/xxx.txt` where `xxx` is the name of the data folder. These messages include information on the data that has been neglected because it is not located in the area modeled by **Pecube** or because it cannot be located (no `LAT` or `LON` column).
+When running **Pecube** with the option `echo_input_file = 1`, it echoes to the screen the number of data points for each type of data. Note that all data types are considered as having potentially age information and are therefore added up to give the `Number of ages samples`. While reading the data, **Pecube** might produce comments concerning the data in a file called `data/xxx.txt` where `xxx` is the name of the data folder. These messages include information on the data that has been neglected because it is not located in the area modeled by **Pecube** or because it cannot be located (no `LAT` or `LON` column).
 
 The comparison between the predicted and observed ages is given in the file link:input/CompareAGEKG.html[output/CompareAGE.csv]. It contains many columns that are now paired between an observation column and a prediction column. For example the `AHEOBS` column contains the observed Apatite Helium ages and the `AGEPRED` column contains the equivalent predicted ages.
 
@@ -1162,7 +1165,7 @@ We see that the predicted ages do not compare well with the data. A measure of t
 
 === EXMP7
 
-In this example, we will try to improve the fit to data obtained in <<EXMP6>>. For this we will use **Pecube** in _Inversion_ mode. To achieve this, all that is needed is to replace one of several of the model parameters in the link:input/EXMP7.html[Pecube.in] file by a range. A range is specified by giving two numbers/values separated by a colon ":" rather than a single number/value. Here we will attempt to improve the fit to data by inverting for the exhymation rate in the second, slow phase of exhumation and the time at which that pahse starts (`time_start1_2`). We would like however the timing of the topographic scenario (defined by the `time_topoi` parameters). To achieve this, we synchronize the timing by specifying `time_start1_2 = time_topo2` in the input file and specify a range for the `time_topo2` parameter, in this case `time_topo2 = 70:100`.
+In this example, we will try to improve the fit to data obtained in <<EXMP6>>. For this we will use **Pecube** in _Inversion_ mode. To achieve this, all that is needed is to replace one of several of the model parameters in the link:input/EXMP7.html[Pecube.in] file by a range. A range is specified by giving two numbers/values separated by a colon "`:`" rather than a single number/value. Here we will attempt to improve the fit to data by inverting for the exhumation rate in the second, slow phase of exhumation and the time at which that pahse starts (`time_start1_2`). We would like however the timing of the topographic scenario (defined by the `time_topoi` parameters). To achieve this, we synchronize the timing by specifying `time_start1_2 = time_topo2` in the input file and specify a range for the `time_topo2` parameter, in this case `time_topo2 = 70:100`.
 
 [NOTE]
 ====
@@ -1196,11 +1199,11 @@ image::images/Parameters_2x2_EXMP8.jpg["Results of the inversion", 500,500,align
 
 === EXMP9
 
-In this other simple example link:input/EXMP9.html[Pecube.in],we show how to extract predicted ages and a fission track length distribution at any point at the surface of the model. For this we introduce a `fake' data file that contains a point for which only the Lat-Lon information is given. We also change the value of the `FT_code_flag` to compare fission track length predictions from the two models used in **Pecube**, one by Peter van der Beek and one by Ritch Ketcham.
+In this other simple example link:input/EXMP9.html[(Pecube.in)], we show how to extract predicted ages and a fission track length distribution at any point at the surface of the model. For this we introduce a `fake` data file that contains a point for which only the Lat-Lon information is given. We also change the value of the `FT_code_flag` to compare fission track length predictions from the two models used in **Pecube**, one by Peter van der Beek and one by Ritch Ketcham.
 
 The code should be run twice, changing the value of `FT_code_flag` (0 or 1).
 
-The results are stored in the file `output/CompareAGE.csv` (with `FT_code_flag=0`:
+The results are stored in the file `output/CompareAGE.csv` (with `FT_code_flag=0`):
 [%header,format=csv]
 |===
 LON,LAT,AHEPRED,AFTPRED,ZHEPRED,ZFTPRED,KARPRED,BARPRED,MARPRED,HARPRED
@@ -1227,7 +1230,7 @@ Here we produce TL/OSL data, i.e. relative number of trapped electrons, at the s
 
 Note that to predict TL/OSL data, values are needed for a range of parameters such as `TL_doser`, `TL_D0`, `TL_a`, `TL_b`, `TL_Et`, `TL_logs`, and `TL_logrho`. These can be set in the input file. They also have default values (see section <<OUTPUTPARAMS, Output parameters>>).
 
-The results are shown in the following figure as contour of relative number of trapped electrons. The red areas corresponds to regions where **Pecube** predicts tha the signal is saturated.
+The results are shown in the following figure as contours of relative number of trapped electrons. The red areas correspond to regions where **Pecube** predicts that the signal is saturated.
 
 image::images/OSL.jpg["Predicted TL data () on top of the final topography", 500,300,align="center"]
 
