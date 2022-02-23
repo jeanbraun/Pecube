@@ -8,7 +8,7 @@ integer,dimension(:,:),allocatable::icon,iconsurf
 real tim
 integer nnode,nelem,nsurf,nelemsurf,mpe,npe,irec,nrec,itime,i,j,k,iunit,i1,i2,istep
 integer nnx
-character cs*3,ct*3,run*5,iq*1
+character cs*3,ct*3,run*255,iq*1 ! Remove 5 charact limitation (XR; 2022/02/23)
 integer numarg
 
 numarg=command_argument_count()
@@ -19,15 +19,15 @@ else
 call getarg (1,run)
 endif
 
-call system ('mkdir -p '//run//'/VTK')
+call system ('mkdir -p '//trim(run)//'/VTK') ! Remove 5 charact limitation (XR; 2022/02/23)
 
 print*,'Doing temperature and velocity'
 
-open (77,file=run//'/output/Pecube.out',status='old',access='direct',recl=16)
+open (77,file=trim(run)//'/output/Pecube.out',status='old',access='direct',recl=16) ! Remove 5 charact limitation (XR; 2022/02/23)
 read (77,rec=1) nnode,nelem,mpe,tim
 close (77)
 
-open (77,file=run//'/output/Pecube.out',status='old',access='direct',recl=4)
+open (77,file=trim(run)//'/output/Pecube.out',status='old',access='direct',recl=4) ! Remove 5 charact limitation (XR; 2022/02/23)
 nrec=1
 1 read (77,rec=(nrec-1)*(4+12*nnode+mpe*nelem)+1) nnx
 if (nnx.lt.0) goto 999
@@ -37,7 +37,7 @@ goto 1
 999 nrec=nrec-1
 close (77)
 
-open (77,file=run//'/output/Pecube.out',status='old',access='direct',recl=4*(4+12*nnode+mpe*nelem))
+open (77,file=trim(run)//'/output/Pecube.out',status='old',access='direct',recl=4*(4+12*nnode+mpe*nelem)) ! Remove 5 charact limitation (XR; 2022/02/23)
 
 allocate (x(nnode),y(nnode),z(nnode),t(nnode))
 allocate (vx(nnode),vy(nnode),vz(nnode))
@@ -62,7 +62,7 @@ if (itime.lt.100) ct(1:1)='0'
 
 iunit=30
 
-open(unit=iunit,file=run//'/VTK/Pecube'//cs//'.vtk')
+open(unit=iunit,file=trim(run)//'/VTK/Pecube'//cs//'.vtk') ! Remove 5 charact limitation (XR; 2022/02/23)
 write(iunit,'(a)')'# vtk DataFile Version 3.0'
 write(iunit,'(a)')'velocities'
 write(iunit,'(a)')'ASCII'
@@ -154,11 +154,11 @@ close (77)
 
 print*,'Doing Ages and topo'
 
-open (77,file=run//'/output/Ages.out',status='old',access='direct',recl=16)
+open (77,file=trim(run)//'/output/Ages.out',status='old',access='direct',recl=16) ! Remove 5 charact limitation (XR; 2022/02/23)
 read (77,rec=1) nsurf,nelemsurf,npe,tim
 close (77)
 
-open (77,file=run//'/output/Ages.out',status='old',access='direct',recl=4)
+open (77,file=trim(run)//'/output/Ages.out',status='old',access='direct',recl=4) ! Remove 5 charact limitation (XR; 2022/02/23)
 nrec=1
 2 read (77,rec=(nrec-1)*(4+14*nsurf+npe*nelemsurf)+1) nnx
 if (nnx.lt.0) goto 998
@@ -168,7 +168,7 @@ goto 2
 998 nrec=nrec-1
 close (77)
 
-open (77,file=run//'/output/Ages.out',status='old',access='direct',recl=4*(4+14*nsurf+npe*nelemsurf))
+open (77,file=trim(run)//'/output/Ages.out',status='old',access='direct',recl=4*(4+14*nsurf+npe*nelemsurf)) ! Remove 5 charact limitation (XR; 2022/02/23)
 
 allocate (xs(nsurf),ys(nsurf),zs(nsurf),ex(nsurf))
 allocate (a1(nsurf),a2(nsurf),a3(nsurf),a4(nsurf),a5(nsurf))
@@ -192,7 +192,7 @@ if (itime.lt.100) ct(1:1)='0'
 
 iunit=30
 
-open(unit=iunit,file=run//'/VTK/Ages'//cs//'.vtk')
+open(unit=iunit,file=trim(run)//'/VTK/Ages'//cs//'.vtk') ! Remove 5 charact limitation (XR; 2022/02/23)
 write(iunit,'(a)')'# vtk DataFile Version 3.0'
 write(iunit,'(a)')'velocities'
 write(iunit,'(a)')'ASCII'

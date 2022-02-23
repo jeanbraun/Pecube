@@ -36,16 +36,16 @@
       double precision size43He,age43He,dage43He
       double precision doser(1024),d0(1024),radius(1024),et(1024),logs(1024),b(1024),logrho(1024),nn(1024)
 
-      character run*5,fnme*300,obsfile*300,line*1024,c5*5,PecubeFnme*10,cproc*4
+      character run*255,fnme*300,obsfile*300,line*1024,c5*5,PecubeFnme*10,cproc*4 ! Remove 5 charact limitation (XR; 2022/02/23)
 
       real*4 range(2,*),param(*),xf
       integer nd,nd0,nc5
       logical vivi,xyz !VKP
 
       nd = 0
-      call read_input_file (run//'/input/Pecube.in', 0, p, nd, range, param)
+      call read_input_file (trim(run)//'/input/Pecube.in', 0, p, nd, range, param) ! Remove 5 charact limitation (XR; 2022/02/23)
 
-      p%run_name = run
+      p%run_name = trim(run) ! Remove 5 charact limitation (XR; 2022/02/23)
 
       fnme = p%topo_file_name
 
@@ -190,13 +190,13 @@ if (.not.vivi) then !VKP
         if (iproc.lt.100) cproc(1:2)='00'
         if (iproc.lt.1000) cproc(1:1)='0'
         PecubeFnme = trim(fnme(1:nfnme)//cproc)
-        call ExtractDEM (xlon, xlat, nx0, ny0, PecubeFnme = run//'/data/'//trim(PecubeFnme))
-        open (8,file=run//'/data/'//trim(PecubeFnme)//'.dat',status='old')
+        call ExtractDEM (xlon, xlat, nx0, ny0, PecubeFnme = trim(run)//'/data/'//trim(PecubeFnme)) ! Remove 5 charact limitation (XR; 2022/02/23)
+        open (8,file=trim(run)//'/data/'//trim(PecubeFnme)//'.dat',status='old') ! Remove 5 charact limitation (XR; 2022/02/23)
         read (8,*) zNZ
         close (8)
-        call system ('rm '//run//'/data/'//trim(PecubeFnme)//'.dat')
+        call system ('rm '//trim(run)//'/data/'//trim(PecubeFnme)//'.dat') ! Remove 5 charact limitation (XR; 2022/02/23)
         else
-        open (8,file=run//'/data/'//fnme(1:nfnme),status='old')
+        open (8,file=trim(run)//'/data/'//fnme(1:nfnme),status='old') ! Remove 5 charact limitation (XR; 2022/02/23)
           if (xyz) then
             do j=ny0,1,-1
               do i=1,nx0
@@ -230,12 +230,12 @@ if (.not.vivi) then !VKP
       else
 
       allocate (z(-nx0),xz(-nx0),yz(-nx0),iconz(3,-ny0))
-        open (8,file=run//'/data/'//fnme(1:nfnme),status='old')
+        open (8,file=trim(run)//'/data/'//fnme(1:nfnme),status='old') ! Remove 5 charact limitation (XR; 2022/02/23)
           do i=1,-nx0
           read (8,*) z(i)
           enddo
         close (8)
-        open (8,file=run//'/data/'//fnme(1:nfnme)//'.geometry',status='old')
+        open (8,file=trim(run)//'/data/'//fnme(1:nfnme)//'.geometry',status='old') ! Remove 5 charact limitation (XR; 2022/02/23)
           do i=1,-nx0
           read (8,*) xz(i),yz(i)
           enddo
@@ -271,7 +271,7 @@ else !VKP
       else
 
       allocate (z(-nx0),xz(-nx0),yz(-nx0),iconz(3,-ny0))
-        open (8,file=run//'/data/'//fnme(1:nfnme)//'/geometry',status='old')
+        open (8,file=trim(run)//'/data/'//fnme(1:nfnme)//'/geometry',status='old') ! Remove 5 charact limitation (XR; 2022/02/23)
           do i=1,-nx0
           read (8,*) xz(i),yz(i)
           enddo
@@ -333,7 +333,7 @@ endif !VKP
         ddy=yl/sqrt(dble(nsurf))*1.d3
 	endif
 
-      write (7,'(a)') run
+      write (7,'(a)') trim(run) ! Remove 5 charact limitation (XR; 2022/02/23)
         if (vivi) then !VKP
         write (7,*) nne,-nsurf,nz,nelem,zl,diffusivity,heatproduction,friction !VKP
         else !VKP
@@ -400,7 +400,7 @@ endif !VKP
             endif !VKP
             if (nx0.gt.0) then
             allocate (zNZ(nx0,ny0))
-            open (67,file=run//'/data/'//fnme(1:nfnme)//'/topo'//c5(1:nc5),status='old') !VKP
+            open (67,file=trim(run)//'/data/'//fnme(1:nfnme)//'/topo'//c5(1:nc5),status='old') !VKP ! Remove 5 charact limitation (XR; 2022/02/23)
             read (67,*) zNZ !VKP
             ij=0 !VKP
               do j=1,ny0,nskip  !VKP
@@ -412,7 +412,7 @@ endif !VKP
             z=z/1.e3 !VKP
             close (67) !VKP
             else
-            open (67,file=run//'/data/'//fnme(1:nfnme)//'/topo'//c5(1:nc5),status='old') !VKP
+            open (67,file=trim(run)//'/data/'//fnme(1:nfnme)//'/topo'//c5(1:nc5),status='old') !VKP ! Remove 5 charact limitation (XR; 2022/02/23)
             read (67,*) z
             z=z/1.e3
             close (67)
@@ -428,7 +428,7 @@ endif !VKP
           endif
           if (vivi) then !VKP
             if (nx0.gt.0) then
-            open (67,file=run//'/data/'//fnme(1:nfnme)//'/uplift'//c5(1:nc5),status='old') !VKP
+            open (67,file=trim(run)//'/data/'//fnme(1:nfnme)//'/uplift'//c5(1:nc5),status='old') !VKP ! Remove 5 charact limitation (XR; 2022/02/23)
             read (67,*) zNZ !VKP
             ij=0 !VKP
               do j=1,ny0,nskip !VKP
@@ -439,7 +439,7 @@ endif !VKP
               enddo !VKP
             close (67) !VKP
             write (7,*) (z(k),k=1,nsurf) !VKP
-            open (67,file=run//'/data/'//fnme(1:nfnme)//'/temp'//c5(1:nc5),status='old') !VKP
+            open (67,file=trim(run)//'/data/'//fnme(1:nfnme)//'/temp'//c5(1:nc5),status='old') !VKP ! Remove 5 charact limitation (XR; 2022/02/23)
             read (67,*) zNZ !VKP
             ij=0 !VKP
               do j=1,ny0,nskip !VKP
@@ -452,11 +452,11 @@ endif !VKP
             write (7,*) (z(k),k=1,nsurf) !VKP
             deallocate (zNZ)
             else
-            open (67,file=run//'/data/'//fnme(1:nfnme)//'/uplift'//c5(1:nc5),status='old') !VKP
+            open (67,file=trim(run)//'/data/'//fnme(1:nfnme)//'/uplift'//c5(1:nc5),status='old') !VKP ! Remove 5 charact limitation (XR; 2022/02/23)
             read (67,*) z
             close (67)
             write (7,*) (z(k),k=1,nsurf) !VKP
-            open (67,file=run//'/data/'//fnme(1:nfnme)//'/temp'//c5(1:nc5),status='old') !VKP
+            open (67,file=trim(run)//'/data/'//fnme(1:nfnme)//'/temp'//c5(1:nc5),status='old') !VKP ! Remove 5 charact limitation (XR; 2022/02/23)
             read (67,*) z
             close (67)
             write (7,*) (z(k),k=1,nsurf)
@@ -470,7 +470,7 @@ endif !VKP
       nobs=0
       write (7,*) nobs,0,0,0
       else
-      call read_data_folder (run//'/data/'//obsfile(1:nobsfile), .true., xlon1, xlon2, xlat1, xlat2, iproc, nd)
+      call read_data_folder (trim(run)//'/data/'//obsfile(1:nobsfile), .true., xlon1, xlon2, xlat1, xlat2, iproc, nd) ! Remove 5 charact limitation (XR; 2022/02/23)
         if (nx0.lt.0) then
         allocate (neighz(3,nelem))
         call neighbours (iconz,neighz,nelem)
@@ -480,7 +480,7 @@ endif !VKP
       if (iproc.lt.10) cproc(1:3)='000'
       if (iproc.lt.100) cproc(1:2)='00'
       if (iproc.lt.1000) cproc(1:1)='0'
-      open (8,file=run//'/data/'//obsfile(1:nobsfile)//cproc//'.txt',status='old')
+      open (8,file=trim(run)//'/data/'//obsfile(1:nobsfile)//cproc//'.txt',status='old') ! Remove 5 charact limitation (XR; 2022/02/23)
       read (8,*) nobs1
         do i=1,iabs(nobs1)
         read (8,*)
@@ -688,7 +688,7 @@ endif !VKP
         enddo
 
       close (8)
-      call system ('rm '//run//'/data/'//obsfile(1:nobsfile)//cproc//'.txt')
+      call system ('rm '//trim(run)//'/data/'//obsfile(1:nobsfile)//cproc//'.txt') ! Remove 5 charact limitation (XR; 2022/02/23)
       endif
       write (7,*) ageflag
 

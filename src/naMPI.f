@@ -81,7 +81,7 @@ c	real		acells(nit_max)
 
 c added by Jean for compatibility for Pecube
 
-        character*5 run
+        character*255 run  ! Remove 5 charact. limitation (XR; 2022/02/23)
 
         integer         nproc, iproc, ierr
 
@@ -157,11 +157,12 @@ c
 c						
 c						Open NA input files
 c
-	open(lu_na,file=run//'/NA/na.in',status='old')
+	open(lu_na,file=trim(run)//'/NA/na.in',status='old')  ! Remove 5 charact. limitation (XR; 2022/02/23)
 c
 c                                               Open NA output files
 c
-        if(lroot)open(lu_sum, file=run//'/NA/na.sum', status='unknown')
+        if(lroot)open(lu_sum, file=trim(run)//'/NA/na.sum',  ! Remove 5 charact. limitation (XR; 2022/02/23)
+     &   status='unknown') ! Revise length of line (XR; 2022/02/23)
 
 c						write header to standard out
 	if(lroot)write(*,100)
@@ -495,7 +496,7 @@ c                                               as a direct access file
 c						add NA-info to begining
 c						of header file
 c
-        fnme = run//'/NA/na.nad'
+        fnme = trim(run)//'/NA/na.nad'
 	if (lroot) call NA_header
      &       (lu_nad,fnme,header,nh_max,nh,nd,
      &        range,scales,nsamplei,nsample,ncells,nh_user)
@@ -510,7 +511,7 @@ c
 	end if
 c                                               write direct access nad file
  
-        fnme = run//'/NA/na.nad'
+        fnme = trim(run)//'/NA/na.nad'
         if(lroot)call write_nad
      &       (lu_nad,fnme,nd,ntot,
      &        nh,nh_user,header,1,na_models,misfit)
@@ -585,7 +586,7 @@ c
 	logical		lroot
 
 	character*1	yesorno
-        character*5 run
+      character*255 run   ! Remove 5 charact. limitation (XR; 2022/02/23); Revise indentation
 
         common /NA_IO/lu_na,lu_out,lu_sum,lu_det,lu_sob,lu_dis,
      &                lu_nad,verbose,debug,timing,summary
@@ -668,7 +669,7 @@ c					sample from nad file
         if(istype.eq.1)then
 
            len = 16
-           open(lu_nad,file=run//'/NA/na.nad',status='old',
+           open(lu_nad,file=trim(run)//'/NA/na.nad',status='old',
      &          form='unformatted',access='direct',recl=len,err=20)
            read(lu_nad,rec=1)nd_nad,nsamplei,nh,nhu
            close(lu_nad)
@@ -1160,7 +1161,7 @@ c
 
         character       header*(nh_max)
         character*256   fnme
-        character*5 run
+        character*255 run  ! Remove 5 charact. limitation (XR; 2022/02/23)
 
         logical         sobol
         logical         verbose
@@ -1179,7 +1180,7 @@ c                                               read in starting
 c                                               models from a NAD file
         if(istype.eq.1.and..not.monte)then
 
-           fnme = run//'/NA/na.nad'
+           fnme = trim(run)//'/NA/na.nad'  ! Remove 5 charact. limitation (XR; 2022/02/23)
            call read_nad
      &          (lu_nad,fnme,nhi,nhui,iform,nd_nad,nsample,
      &           nh_max,nd_max,nmod_max,
@@ -2057,7 +2058,7 @@ c						initialize some variables
 	ic = ic + 1
         info = .false.
         if(mod(ic,nclean).eq.0)resetlist = .true.
- 	if(mod(ic,nclean).eq.0.and.verbose)info = .true.
+ 	   if(mod(ic,nclean).eq.0.and.verbose)info = .true. ! Revise indentation (XR; 2022/02/23)
         if(timing)t1 = cputime(t2,t3)
         idiff = 0
         ndc = 0
@@ -2086,8 +2087,8 @@ c						initialize some variables
 	end if
 
         icount = 0
- 	if(debug)write(*,*)' nsample     = ',nsample
- 	if(debug)write(*,*)' nsampercell = ',nsampercell
+ 	   if(debug)write(*,*)' nsample     = ',nsample ! Revise indentation
+ 	   if(debug)write(*,*)' nsampercell = ',nsampercell   ! Revise indentation (XR; 2022/02/23)
 	if(debug)write(*,*)' ncells      = ',ncells
 c       write(lu_sum,*)
 c       write(lu_sum,*)
@@ -2333,8 +2334,8 @@ c       write(*,*)'Total time for NNaxis',taxis
      &         ,'         nodes :')
  101   format(1x,10(1x,i6))
 
- 	return
- 	end	
+ 	   return   ! Revise indentation
+ 	   end	! Revise indentation (XR; 2022/02/23)
 c
 c-----------------------------------------------------------------------
 c
@@ -2381,7 +2382,7 @@ c                                       M. Sambridge, RSES, June 1998
 c
 c-----------------------------------------------------------------------
 c
- 	Subroutine NNaxis_intersect
+ 	   Subroutine NNaxis_intersect   ! Revise indentation (XR; 2022/02/23)
      &             (x,dim,dlist,bp,nd,nb,
      &              nodex,xmin,xmax,x1,x2)
 

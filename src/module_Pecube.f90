@@ -23,7 +23,7 @@ module Pecube
 
   type parameters
 
-  character*5 :: run_name = "RUN00"
+  character*255 :: run_name = "RUN00" ! XR (2022.02.22)
   character*128 :: run_name_desc = "Run and corresponding folder name"
 
   character*128 :: topo_file_name = "Nil"

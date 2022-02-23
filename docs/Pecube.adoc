@@ -81,7 +81,7 @@ In the previous version of **Pecube** (version 3), the name of the project was c
 ====
 [NOTE]
 ====
-`$NAME`, the name of the project folder, is exactly 5 characters in length (like RUN01, NZ00A ot TEST1)
+`$NAME`, the name of the project folder. It was exactly 5 characters in length (like RUN01, NZ00A ot TEST1), but since the 2022 version, this limitation has been removed.
 ====
 **Pecube** will echo the content of the input file (if the `echo_input_file` flag has been set) to the default output (screen/terminal) and provide information about the progress of the run as it progresses.
 
@@ -194,7 +194,7 @@ You must be in the main **Pecube** folder to perform this operation and issue th
 
 === project folders
 
-For each project, the user should create a project folder. For backward compatibility, the name of the folder corresponding to any given project must be composed of 5 characters, such as `RUN01` or `KINGC` or `00027`. Each project folder should contain, at minima, an other directory called `input`. In this directory should be a file named `Pecube.in`. This is the main (and only) input file containing the value of all **Pecube** model parameters.
+For each project, the user should create a project folder. Previously, for backward compatibility, the name of the folder corresponding to any given project should be composed of 5 characters, such as `RUN01` or `KINGC` or `00027`, but this limitation was removed in 2022 version. Each project folder should contain, at minima, an other directory called `input`. In this directory should be a file named `Pecube.in`. This is the main (and only) input file containing the value of all **Pecube** model parameters.
 [NOTE]
 ====
 The user should not use space (blank characters) for the project folder names...

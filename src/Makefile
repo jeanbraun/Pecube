@@ -5,7 +5,7 @@
 
 FLAGS = -c -O
 FF90 = gfortran #-fbounds-check
-FF77 = gfortran -fd-lines-as-comments #-fbounds-check
+FF77 = gfortran -fd-lines-as-comments #-Wtabs #-fcheck=all -g -fbacktrace -arch x86_64 -Wall #-fbounds-check -fbounds-check
 CC = gcc #-fbounds-check
 LINK = gfortran -static-libgfortran -static-libgcc -static-libstdc++ #-fbounds-check 
 

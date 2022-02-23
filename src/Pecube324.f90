@@ -33,7 +33,7 @@ goto 1
 rewind (55)
 
 ! run is the name of the run (assumes a directory of that name exists)
-! should be 5 character long
+! (should be 5 character long) Constrain removed by XR (2022.02.22)
 read (55,'(a1024)') line
 
 call system ('mkdir -p '//trim(line))

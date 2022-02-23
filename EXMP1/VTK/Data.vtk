@@ -1,0 +1,35 @@
+# vtk DataFile Version 3.0
+AgeData
+ASCII
+DATASET UNSTRUCTURED_GRID
+POINTS          1 float
+  11.11098710445  11.11100006104  35.00000000000
+CELLS          1         2
+         1         0
+CELL_TYPES          1
+         2
+POINT_DATA          1
+SCALARS ApatiteHeAge float 1
+LOOKUP_TABLE default
+          -1.00000
+SCALARS ApatiteFTAge float 1
+LOOKUP_TABLE default
+          -1.00000
+SCALARS ZirconHeAge float 1
+LOOKUP_TABLE default
+          -1.00000
+SCALARS ZirconFTAge float 1
+LOOKUP_TABLE default
+          -1.00000
+SCALARS KSparArAge float 1
+LOOKUP_TABLE default
+          -1.00000
+SCALARS BiotiteArAge float 1
+LOOKUP_TABLE default
+          -1.00000
+SCALARS MuscoviteArAge float 1
+LOOKUP_TABLE default
+          -1.00000
+SCALARS HornblendeArAge float 1
+LOOKUP_TABLE default
+          -1.00000

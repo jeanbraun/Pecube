@@ -6,7 +6,7 @@ use DEM
 implicit none
 
 type (parameters) p
-character line*1024,run*5,fnme*300,obsfile*300,cs*3
+character line*1024,run*255,fnme*300,obsfile*300,cs*3 ! Remove 5 charact limitation (XR; 2022/02/23)
 integer nx0,ny0,nskip,nstep,istep,isoflag,nxiso,nyiso,nz,i,j,k,ii,jj,nx,ny,nobs,ij,nobs1,nobs2
 integer nfnme,nobsfile,iunit,icon1,icon2,icon3,icon4,itime,fltflag,mftflag,ftlflag
 double precision dx,dy,xlon,xlat,tau,rhoc,rhom,young,poisson,thickness,dum,tprevious
@@ -98,12 +98,12 @@ if (.not.vivi) then
     elseif (fnme(1:nfnme).eq.'Topo30') then
     dx = 360.d0/43200
     dy = dx
-    call ExtractDEM (xlon, xlat, nx0, ny0, PecubeFnme = run//'/data/ExtractedDEM')
-    open (8,file=run//'/data/ExtractedDEM.dat',status='old')
+    call ExtractDEM (xlon, xlat, nx0, ny0, PecubeFnme = trim(run)//'/data/ExtractedDEM') ! Remove 5 charact limitation (XR; 2022/02/23)
+    open (8,file=trim(run)//'/data/ExtractedDEM.dat',status='old') ! Remove 5 charact limitation (XR; 2022/02/23)
     read (8,*) zNZ
     close (8)
     else
-    open (8,file = run//'/data/'//fnme(1:nfnme),status='old')
+    open (8,file = trim(run)//'/data/'//fnme(1:nfnme),status='old') ! Remove 5 charact limitation (XR; 2022/02/23)
       if (xyz) then
         do j=ny0,1,-1
           do i=1,nx0
@@ -265,7 +265,7 @@ itime=int(timesteps(istep+1))
 
 print*,'creating Topo file'
 if (topomag(istep+1).lt.0) call smooth_topo(z, zsmooth, nx, ny, int(-topomag(istep+1)), int(topooffset(istep+1)))
-open(unit=iunit,file=run//'/VTK/Topo'//cs//'.vtk',status='unknown')
+open(unit=iunit,file=trim(run)//'/VTK/Topo'//cs//'.vtk',status='unknown') ! Remove 5 charact limitation (XR; 2022/02/23)
 write(iunit,'(a)')'# vtk DataFile Version 3.0'
 write(iunit,'(a)')'surface'
 write(iunit,'(a)')'ASCII'
@@ -354,10 +354,10 @@ enddo
 
 if (obsfile(1:nobsfile).eq.'Nil') return
 
-call read_data_folder ( run//'/data/'//obsfile(1:nobsfile), .FALSE., xlon1, xlon2, xlat1, xlat2, 0, 0)
+call read_data_folder ( trim(run)//'/data/'//obsfile(1:nobsfile), .FALSE., xlon1, xlon2, xlat1, xlat2, 0, 0) ! Remove 5 charact limitation (XR; 2022/02/23)
 
-open (88, file = run//'/data/'//obsfile(1:nobsfile)//'0000.txt',status='old')
-!open (88,file=run//'/data/'//obsfile(1:nobsfile)//'.txt',status='old')
+open (88, file = trim(run)//'/data/'//obsfile(1:nobsfile)//'0000.txt',status='old') ! Remove 5 charact limitation (XR; 2022/02/23)
+!open (88,file=trim(run)//'/data/'//obsfile(1:nobsfile)//'.txt',status='old') ! Remove 5 charact limitation (XR; 2022/02/23)
 read (88,*) nobs1
 nobs1=iabs(nobs1)
   do i=1,nobs1
@@ -379,7 +379,7 @@ a5=-1.d0
 a6=-1.d0
 a7=-1.d0
 a8=-1.d0
-open(unit=iunit,file=run//'/VTK/Data.vtk')
+open(unit=iunit,file=trim(run)//'/VTK/Data.vtk') ! Remove 5 charact limitation (XR; 2022/02/23)
 write(iunit,'(a)')'# vtk DataFile Version 3.0'
 write(iunit,'(a)')'AgeData'
 write(iunit,'(a)')'ASCII'
