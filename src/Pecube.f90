@@ -9,7 +9,7 @@ integer :: nd
 real*4, dimension(1024) :: par
 real*4, dimension(2,1024) :: range
 real*4 :: misfit
-character*5 run
+character*255 run ! Remove 5 charact limitation (XR; 2022/02/23)
 
 character*9 arg
 integer :: numarg
@@ -34,22 +34,22 @@ endif
 
 ! checks that the run directory exists, otherwise exits
 
-open (7,file=run//'/input/Pecube.in',status='unknown',err=999)
+open (7,file=trim(run)//'/input/Pecube.in',status='unknown',err=999) ! Remove 5 charact limitation (XR; 2022/02/23)
 goto 998
-999 write (*,*) 'Cant open/create '//run//'/input/Pecube.in'
-write (*,*) 'Check that the directory '//run//'/input exists'
+999 write (*,*) 'Cant open/create '//trim(run)//'/input/Pecube.in' ! Remove 5 charact limitation (XR; 2022/02/23)
+write (*,*) 'Check that the directory '//trim(run)//'/input exists' ! Remove 5 charact limitation (XR; 2022/02/23)
 stop
 998 continue
 close (7)
 
-call system ('mkdir "'//run//'/output"')
-call system ('mkdir "'//run//'/data"')
-call system ('mkdir "'//run//'/NA"')
-call system ('mkdir "'//run//'/LOG"')
-call system ('rm '//run//'/output/*')
+call system ('mkdir "'//trim(run)//'/output"') ! Remove 5 charact limitation (XR; 2022/02/23)
+call system ('mkdir "'//trim(run)//'/data"') ! Remove 5 charact limitation (XR; 2022/02/23)
+call system ('mkdir "'//trim(run)//'/NA"') ! Remove 5 charact limitation (XR; 2022/02/23)
+call system ('mkdir "'//trim(run)//'/LOG"') ! Remove 5 charact limitation (XR; 2022/02/23)
+call system ('rm '//trim(run)//'/output/*') ! Remove 5 charact limitation (XR; 2022/02/23)
 
 nd = 0
-call read_input_file (run//'/input/Pecube.in', 0, p0, nd, range, par)
+call read_input_file (trim(run)//'/input/Pecube.in', 0, p0, nd, range, par) ! Remove 5 charact limitation (XR; 2022/02/23)
 
 if (nd.eq.0) write (*,*) '---------------------------------------------------------------------------------'
 if (nd.eq.0) write (*,*) '-------------------------------Pecube--------------------------------------------'
@@ -65,7 +65,7 @@ nd = 0
 par = 0.
 range = 0.
 if (p0%echo_input_file.eq.4) write (*,*) 'Complete list of model parameters'
-call read_input_file (run//'/input/Pecube.in', p0%echo_input_file, p, nd, range, par)
+call read_input_file (trim(run)//'/input/Pecube.in', p0%echo_input_file, p, nd, range, par) ! Remove 5 charact limitation (XR; 2022/02/23)
 if (p0%echo_input_file.eq.4) stop
 
 if (p0%echo_input_file.gt.0) then
@@ -79,10 +79,10 @@ endif
     if (k.lt.100) cparam(k)(6:7)='00'
     if (k.lt.1000) cparam(k)(6:6)='0'
     enddo
-  open (71,file=run//'/NA/NA_int_res.csv',status='unknown')
+  open (71,file=trim(run)//'/NA/NA_int_res.csv',status='unknown') ! Remove 5 charact limitation (XR; 2022/02/23)
   write (71,'(1025a)') 'Misfit',(','//cparam(k),k=1,nd)
   close (71)
-  open  (71,file=run//'/NA/na.in',status='unknown')
+  open  (71,file=trim(run)//'/NA/na.in',status='unknown') ! Remove 5 charact limitation (XR; 2022/02/23)
   write (71,'(a)') '#'
   write (71,'(a)') '#       Neighbourhood Algorithm input options file'
   write (71,'(a)') '#'
@@ -99,42 +99,42 @@ endif
   close (71)
     if (p%save_ages_inversion.eq.1) then
       if (p%age_AHe_flag.ne.0.) then
-      open (71,file=run//'/NA/AgeApatiteHelium.csv',status='unknown',position='rewind')
+      open (71,file=trim(run)//'/NA/AgeApatiteHelium.csv',status='unknown',position='rewind') ! Remove 5 charact limitation (XR; 2022/02/23)
       write (71,'("Predicted Apatite Helium Ages")')
       close (71)
       endif
       if (p%age_AFT_flag.ne.0.) then
-      open (71,file=run//'/NA/AgeApatiteFT.csv',status='unknown',position='rewind')
+      open (71,file=trim(run)//'/NA/AgeApatiteFT.csv',status='unknown',position='rewind') ! Remove 5 charact limitation (XR; 2022/02/23)
       write (71,'("Predicted Apatite FT Ages")')
       close (71)
       endif
       if (p%age_ZHe_flag.ne.0.) then
-      open (71,file=run//'/NA/AgeZirconHelium.csv',status='unknown',position='rewind')
+      open (71,file=trim(run)//'/NA/AgeZirconHelium.csv',status='unknown',position='rewind') ! Remove 5 charact limitation (XR; 2022/02/23)
       write (71,'("Predicted Zircon Helium Ages")')
       close (71)
       endif
       if (p%age_ZFT_flag.ne.0.) then
-      open (71,file=run//'/NA/AgeZirconFT.csv',status='unknown',position='rewind')
+      open (71,file=trim(run)//'/NA/AgeZirconFT.csv',status='unknown',position='rewind') ! Remove 5 charact limitation (XR; 2022/02/23)
       write (71,'("Predicted Zircon FT Ages")')
       close (71)
       endif
       if (p%age_KAr_flag.ne.0.) then
-      open (71,file=run//'/NA/AgeKSparArgon.csv',status='unknown',position='rewind')
+      open (71,file=trim(run)//'/NA/AgeKSparArgon.csv',status='unknown',position='rewind') ! Remove 5 charact limitation (XR; 2022/02/23)
       write (71,'("Predicted K-spar Argon Ages")')
       close (71)
       endif
       if (p%age_BAr_flag.ne.0.) then
-      open (71,file=run//'/NA/AgeBiotiteArgon.csv',status='unknown',position='rewind')
+      open (71,file=trim(trim(run))//'/NA/AgeBiotiteArgon.csv',status='unknown',position='rewind') ! Remove 5 charact limitation (XR; 2022/02/23)
       write (71,'("Predicted Biotite Argon Ages")')
       close (71)
       endif
       if (p%age_MAr_flag.ne.0.) then
-      open (71,file=run//'/NA/AgeMuscoviteArgon.csv',status='unknown',position='rewind')
+      open (71,file=trim(run)//'/NA/AgeMuscoviteArgon.csv',status='unknown',position='rewind') ! Remove 5 charact limitation (XR; 2022/02/23)
       write (71,'("Predicted Muscovite Argon Ages")')
       close (71)
       endif
       if (p%age_HAr_flag.ne.0.) then
-      open (71,file=run//'/NA/AgeHornblendeArgon.csv',status='unknown',position='rewind')
+      open (71,file=trim(run)//'/NA/AgeHornblendeArgon.csv',status='unknown',position='rewind') ! Remove 5 charact limitation (XR; 2022/02/23)
       write (71,'("Predicted Hornblende Argon Ages")')
       close (71)
       endif
@@ -172,7 +172,7 @@ integer :: nd,ntot,ns1,ns2,itmax,nh_max,nh
 real*4 :: models (nd,*)
 real*4 :: misfit (ntot)
 character*(*) :: header
-character*5 run
+character*255 run ! Remove 5 charact limitation (XR; 2022/02/23)
 character*9 cparam(1024)
 
 integer :: i,k
@@ -184,7 +184,7 @@ integer :: i,k
   if (k.lt.1000) cparam(k)(6:6)='0'
   enddo
 
-open (87,file=run//'/NA/NA_results.csv',status='unknown')
+open (87,file=trim(run)//'/NA/NA_results.csv',status='unknown') ! Remove 5 charact limitation (XR; 2022/02/23)
 write (87,'(1025a)') 'Misfit',(','//cparam(k),k=1,nd)
   do i=1,ntot
   write (87,'(g15.9,1024(a,g15.9))') misfit(i),(',',models(k,i),k=1,nd)
@@ -263,7 +263,7 @@ end subroutine writemodels
 
       double precision, dimension(:,:),allocatable::lsf,lsfn,lsfx,lsfy,lsfxn,lsfyn
 
-      character run*5,cstep*3,iq*1
+      character run*255,cstep*3,iq*1 ! Remove 5 charact limitation (XR; 2022/02/23)
 
       real*4 times(1000)
       real*4,dimension(:),allocatable :: age1,age2,age3,age4,age5,age6,age7,age8,grainsize,grainobs
@@ -370,8 +370,8 @@ end subroutine writemodels
 ! (named Pecube.in)
 
       nd=0
-      p%run_name = run
-      call read_input_file (run//'/input/Pecube.in', 0, p, nd, range, param)
+      p%run_name = trim(run) ! Remove 5 charact limitation (XR; 2022/02/23)
+      call read_input_file (trim(run)//'/input/Pecube.in', 0, p, nd, range, param) ! Remove 5 charact limitation (XR; 2022/02/23)
       if (nd.ne.0 .and. iproc.eq.0) then
       write (*,*) '---------------------------------------------------------------------------------'
       write (*,*) '------------------------Pecube inversion mode------------------------------------'
@@ -392,7 +392,7 @@ end subroutine writemodels
 ! read in general information
 
 ! first line:
-! run: 5 character string that will determine the name of the folder where the input file
+! run: 255 character string that will determine the name of the folder where the input file
 !      will be copied to and where the output files (Pecube.ou and Pecube.ptt) will be stored.
 
       read (7,'(a)') run
@@ -444,7 +444,7 @@ end subroutine writemodels
       tempsurf=0.d0 !VKP
       tempsurfp=0.d0 !VKP
 
-      if (nd.eq.0.and.ilog.eq.1) open (9,file=run//'/LOG/Pecube.log',status='unknown')
+      if (nd.eq.0.and.ilog.eq.1) open (9,file=trim(run)//'/LOG/Pecube.log',status='unknown') ! Remove 5 charact limitation (XR; 2022/02/23)
       if (nd.eq.0.and.ilog.eq.1) write (9,*) 'This is Pecube version ',vers%str
       if (nd.eq.0.and.ilog.eq.1) write (9,*) 'Reading Geometry'
 
@@ -693,7 +693,7 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
         enddo
 
         if (p%save_eroded_volume.eq.1) then
-        open (43,file=run//'/output/VolumeEroded.csv',status='unknown')
+        open (43,file=trim(run)//'/output/VolumeEroded.csv',status='unknown') ! Remove 5 charact limitation (XR; 2022/02/23)
         write (43,'(a)') 'Interval_start,Interval_End,Flux,Accumulated_Volume'
         volume_total=0.d0
           do i=nvolume,2,-1
@@ -742,12 +742,12 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
 
 ! Pecube.out contains the temperature field at the end of each stage
 
-      if (iproc.eq.0.and.nd.eq.0) open (8,file=run//'/output/Pecube.out',status='unknown',access='direct', &
+      if (iproc.eq.0.and.nd.eq.0) open (8,file=trim(run)//'/output/Pecube.out',status='unknown',access='direct', & ! Remove 5 charact limitation (XR; 2022/02/23)
             recl=4*(4+12*nnode+mpe*nelem))
 
 ! Ages.out contains the ages at the end of each stage
 
-      if (iproc.eq.0.and.nd.eq.0) open (11,file=run//'/output/Ages.out',status='unknown',access='direct', &
+      if (iproc.eq.0.and.nd.eq.0) open (11,file=trim(run)//'/output/Ages.out',status='unknown',access='direct', & ! Remove 5 charact limitation (XR; 2022/02/23)
             recl=4*(4+14*nsurf+npe*nelemsurf))
 
 ! Pecube.ptt contains the depth-temperture-paths of all surface nodes
@@ -1331,7 +1331,7 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
         if (istep.lt.10) cstep(1:2)='00'
         if (istep.lt.100) cstep(1:1)='0'
         if (nd.eq.0) then
-        open (12,file=run//'/output/Ages'//cstep//'.csv',status='unknown')
+        open (12,file=trim(run)//'/output/Ages'//cstep//'.csv',status='unknown') ! Remove 5 charact limitation (XR; 2022/02/23)
         write (12,'(a)') 'Longitude,Latitude,Height,HeApatite,HeZircon,FTApatite,' &
                              //'FTZircon,ArKFeldspar,ArBiotite,ArMuscovite,ArHornblend,' &
                              //'FTApMeanTL,nN'
@@ -1369,7 +1369,7 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
 
       if (iproc.eq.0.and.nd.eq.0) then
       close (8)
-      open (8,file=run//'/output/Pecube.out',status='unknown',access='direct', &
+      open (8,file=trim(run)//'/output/Pecube.out',status='unknown',access='direct', & ! Remove 5 charact limitation (XR; 2022/02/23)
             recl=4)
       write (8,rec=irec*(4+12*nnode+mpe*nelem)+1) -1
       close (8)
@@ -1377,7 +1377,7 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
 
       if (iproc.eq.0.and.nd.eq.0) then
       close (11)
-      open (11,file=run//'/output/Ages.out',status='unknown',access='direct', &
+      open (11,file=trim(run)//'/output/Ages.out',status='unknown',access='direct', & ! Remove 5 charact limitation (XR; 2022/02/23)
             recl=4)
       write (11,rec=irec*(4+14*nsurf+npe*nelemsurf)+1) -1
       close (11)
@@ -1390,7 +1390,7 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
 !      if (iproc.eq.0) then
 ! added by Jean to change misfit to slope rather than exact ages
 ! (4/6/2008)
-      if (nd.eq.0.and.nobs1.gt.0) open (13,file=run//'/output/CompareAGE.csv',status='unknown')
+      if (nd.eq.0.and.nobs1.gt.0) open (13,file=trim(run)//'/output/CompareAGE.csv',status='unknown') ! Remove 5 charact limitation (XR; 2022/02/23)
       misfit=0.
       nmisfit1=0
       misfit1 = 0.d0
@@ -1429,7 +1429,7 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
                   'FT09OBS','FT09PRED','FT10OBS','FT10PRED','FT11OBS','FT11PRED','FT12OBS','FT12PRED', &
                   'FT13OBS','FT13PRED','FT14OBS','FT14PRED','FT15OBS','FT15PRED','FT16OBS','FT16PRED', &
                   'FT17OBS','FT17PRED','FT18OBS','FT18PRED','FT19OBS','FT19PRED','FT20OBS','FT20PRED'
-      if (saveTt.and.nd.eq.0) open (82,file=run//'/output/TimeTemperaturePaths.csv',status='unknown')
+      if (saveTt.and.nd.eq.0) open (82,file=trim(run)//'/output/TimeTemperaturePaths.csv',status='unknown') ! Remove 5 charact limitation (XR; 2022/02/23)
       ageflagp=1
         do iobs=1,nobs1
         read (7,*) dummy,dummy,dummy,dummy,dummy,dummy, &
@@ -1617,7 +1617,7 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
 ! compute misfit for thermal histories
 
       if (nd.eq.0.and.nobs2.gt.0) then
-      open (13,file=run//'/output/CompareTT.csv',status='unknown')
+      open (13,file=trim(run)//'/output/CompareTT.csv',status='unknown') ! Remove 5 charact limitation (XR; 2022/02/23)
       write (13,'(128(a,","))') 'LON','LAT','TIME','TEMP','TEMPPRED'
       endif
 
@@ -1654,7 +1654,7 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
 ! compute misfit for 43He
 
       if (nd.eq.0.and.nobs3.gt.0) then
-      open (13,file=run//'/output/Compare43HE.csv',status='unknown')
+      open (13,file=trim(run)//'/output/Compare43HE.csv',status='unknown') ! Remove 5 charact limitation (XR; 2022/02/23)
       write (13,'(128(a,","))') 'LON','LAT','AGEHE','AGEHEPRED','%RELEASED','%RELEASEDPRED','AGERELEASED','AGERELEASEDPRED'
       endif
 
@@ -1705,7 +1705,7 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
 ! compute misfit for TL
 
       if (nd.eq.0.and.nobs4.gt.0) then
-      open (13,file=run//'/output/CompareTL.csv',status='unknown')
+      open (13,file=trim(run)//'/output/CompareTL.csv',status='unknown') ! Remove 5 charact limitation (XR; 2022/02/23)
       if (nd.eq.0.and.nobs4.gt.0) write (13,'(128(a,","))') 'LON','LAT','DURATION','TEMPERATURE','NN','NNPRED'
       endif
 
@@ -1775,47 +1775,47 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
         endif
 
         if (nd.ne.0) then
-        open (71,file=run//'/NA/NA_int_res.csv',status='unknown',position='append')
+        open (71,file=trim(run)//'/NA/NA_int_res.csv',status='unknown',position='append') ! Remove 5 charact limitation (XR; 2022/02/23)
         write (71,'(g15.9,99(a1,g15.9))') misfit,(",",param(i),i=1,nd)
         close (71)
           if (p%save_ages_inversion.eq.1) then
             if (p%age_AHe_flag.ne.0.) then
-            open (71,file=run//'/NA/AgeApatiteHelium.csv',status='unknown',position='append')
+            open (71,file=trim(run)//'/NA/AgeApatiteHelium.csv',status='unknown',position='append') ! Remove 5 charact limitation (XR; 2022/02/23)
             write (71,'(g15.9,99(a1,g15.9))') misfit,(",",agehe(i),i=1,nhe)
             close (71)
             endif
             if (p%age_AFT_flag.ne.0.) then
-            open (71,file=run//'/NA/AgeApatiteFT.csv',status='unknown',position='append')
+            open (71,file=trim(run)//'/NA/AgeApatiteFT.csv',status='unknown',position='append') ! Remove 5 charact limitation (XR; 2022/02/23)
             write (71,'(g15.9,99(a1,g15.9))') misfit,(",",ageft(i),i=1,nft)
             close (71)
             endif
             if (p%age_ZHe_flag.ne.0.) then
-            open (71,file=run//'/NA/AgeZirconHelium.csv',status='unknown',position='append')
+            open (71,file=trim(run)//'/NA/AgeZirconHelium.csv',status='unknown',position='append') ! Remove 5 charact limitation (XR; 2022/02/23)
             write (71,'(g15.9,99(a1,g15.9))') misfit,(",",ageheZ(i),i=1,nheZ)
             close (71)
             endif
             if (p%age_ZFT_flag.ne.0.) then
-            open (71,file=run//'/NA/AgeZirconFT.csv',status='unknown',position='append')
+            open (71,file=trim(run)//'/NA/AgeZirconFT.csv',status='unknown',position='append') ! Remove 5 charact limitation (XR; 2022/02/23)
             write (71,'(g15.9,99(a1,g15.9))') misfit,(",",ageftZ(i),i=1,nftZ)
             close (71)
             endif
             if (p%age_KAr_flag.ne.0.) then
-            open (71,file=run//'/NA/AgeKSparArgon.csv',status='unknown',position='append')
+            open (71,file=trim(run)//'/NA/AgeKSparArgon.csv',status='unknown',position='append') ! Remove 5 charact limitation (XR; 2022/02/23)
             write (71,'(g15.9,99(a1,g15.9))') misfit,(",",agearK(i),i=1,narK)
             close (71)
             endif
             if (p%age_BAr_flag.ne.0.) then
-            open (71,file=run//'/NA/AgeBiotiteArgon.csv',status='unknown',position='append')
+            open (71,file=trim(run)//'/NA/AgeBiotiteArgon.csv',status='unknown',position='append') ! Remove 5 charact limitation (XR; 2022/02/23)
             write (71,'(g15.9,99(a1,g15.9))') misfit,(",",agearB(i),i=1,narB)
             close (71)
             endif
             if (p%age_MAr_flag.ne.0.) then
-            open (71,file=run//'/NA/AgeMuscoviteArgon.csv',status='unknown',position='append')
+            open (71,file=trim(run)//'/NA/AgeMuscoviteArgon.csv',status='unknown',position='append') ! Remove 5 charact limitation (XR; 2022/02/23)
             write (71,'(g15.9,99(a1,g15.9))') misfit,(",",agearM(i),i=1,narM)
             close (71)
             endif
             if (p%age_HAr_flag.ne.0.) then
-            open (71,file=run//'/NA/AgeHornblendeArgon.csv',status='unknown',position='append')
+            open (71,file=trim(run)//'/NA/AgeHornblendeArgon.csv',status='unknown',position='append') ! Remove 5 charact limitation (XR; 2022/02/23)
             write (71,'(g15.9,99(a1,g15.9))') misfit,(",",agearH(i),i=1,narH)
             close (71)
             endif

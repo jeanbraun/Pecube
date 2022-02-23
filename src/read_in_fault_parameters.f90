@@ -14,7 +14,7 @@ implicit none
 integer nfault,i,j,k,icol,jcol,kcol,jd
 type(faulttype) fault(nfault)
 type (parameters) p
-character*5 run
+character*255 run ! Remove 5 charact limitation (XR; 2022/02/23)
 
 double precision xn,yn,xyn,x1,y1,x2,y2,timeend
 double precision xlon1,xlat1,xlon2,xlat2,xl,yl,zl
@@ -25,7 +25,7 @@ real*4 range(2,*),param(*)
 integer nd
 
 nd = 0
-call read_input_file (run//'/input/Pecube.in', 0, p, nd, range, param)
+call read_input_file (trim(run)//'/input/Pecube.in', 0, p, nd, range, param) ! Remove 5 charact limitation (XR; 2022/02/23)
 
 logvelo = .false.
 if (p%logarithmic_velocity.ne.0) logvelo = .true.

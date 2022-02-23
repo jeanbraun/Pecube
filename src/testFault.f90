@@ -23,7 +23,7 @@ double precision xmin,xmax,ymin,ymax,zmin,zmax
 double precision dt,time,xl,yl,zl,xlon1,xlat1,xlon2,xlat2
 double precision timesteps(1000)
 integer dosteps(1000)
-character iq*1, run*5
+character iq*1, run*255 ! Remove 5 charact limitation (XR; 2022/02/23)
 real*4 param(1024),range(2,1024)
 
 integer :: numarg
@@ -36,15 +36,15 @@ else
 call getarg (1,run)
 endif
 
-call system ('mkdir -p '//run//'/VTK')
-call system ('rm '//run//'/VTK/*')
+call system ('mkdir -p '//trim(run)//'/VTK') ! Remove 5 charact limitation (XR; 2022/02/23)
+call system ('rm '//trim(run)//'/VTK/*') ! Remove 5 charact limitation (XR; 2022/02/23)
 
 ! read in the number of faults
 
-p%run_name = run
+p%run_name = trim(run) ! Remove 5 charact limitation (XR; 2022/02/23)
 ! Initiate nd (mod. Xavier Robert; 2022/02/11)
 nd=0
-call read_input_file (run//'/input/Pecube.in', 0, p, nd, range, param)
+call read_input_file (trim(run)//'/input/Pecube.in', 0, p, nd, range, param) ! Remove 5 charact limitation (XR; 2022/02/23)
 nfault = p%nfault
 if (nfault.eq.0) nfault=1
 
@@ -166,7 +166,7 @@ double precision x(nx,ny,nz),y(nx,ny,nz),z(nx,ny,nz)
 double precision vx(nx,ny,nz),vy(nx,ny,nz),vz(nx,ny,nz)
 integer nx,ny,nz,nfault
 integer iunit,i1,i2,i,j,k,istep,itime
-character cs*3,cf*1,ct*3,run*5
+character cs*3,cf*1,ct*3,run*255 ! Remove 5 charact limitation (XR; 2022/02/23)
 double precision ymin,ymax,time
 
 write(cs,'(i3)') istep-1
@@ -179,7 +179,7 @@ if (itime.lt.10) ct(1:2)='00'
 if (itime.lt.100) ct(1:1)='0'
 
 iunit=30
-open(unit=iunit,file=run//'/VTK/velo'//cs//'.vtk')
+open(unit=iunit,file=trim(run)//'/VTK/velo'//cs//'.vtk') ! Remove 5 charact limitation (XR; 2022/02/23)
 write(iunit,'(a)')'# vtk DataFile Version 3.0'
 write(iunit,'(a)')'velocities'
 write(iunit,'(a)')'ASCII'
@@ -229,7 +229,7 @@ ymax=maxval(y)
 do i=1,nfault
 cf=char(64+i)
 iunit=30
-open(unit=iunit,file=run//'/VTK/fault'//cf//cs//'.vtk')
+open(unit=iunit,file=trim(run)//'/VTK/fault'//cf//cs//'.vtk') ! Remove 5 charact limitation (XR; 2022/02/23)
 write(iunit,'(a)')'# vtk DataFile Version 3.0'
 write(iunit,'(a)')'surface'
 write(iunit,'(a)')'ASCII'

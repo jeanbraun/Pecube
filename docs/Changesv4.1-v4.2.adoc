@@ -1,0 +1,3 @@
+Fixed bug when running `bin/Test` (in TestFault.f90)
+Adjust default initial mean track length
+Fix typo in documentation
