@@ -41,7 +41,7 @@
         params(6) = TL_logs
         params(7) = TL_b
         params(8) = TL_logrho
-        res = TLModel (ztime, ztemp, nrec, params)
+        res = TLModel (dble(ztime), dble(ztemp), nrec, params)
 
         nN(i) = res
 

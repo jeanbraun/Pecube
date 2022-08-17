@@ -52,6 +52,7 @@ nN=0.d0
 nNf=0.d0
 
   do i = 2,nstep
+  dt = (tim(i-1)-tim(i))*Ma
   inv_tauth = s*exp(-Et/(kb*T(i-1) ))
   xkd = -a*magic_ratio*(1.d0-nN(:,i-1))**(a-1)-b*(nN(:,i-1))**(b-1)*inv_tauth-inv_tauath
   xk = magic_ratio*(1.d0-nN(:,i-1))**a-(nN(:,i-1))**b*inv_tauth-inv_tauath*nN(:,i-1)
