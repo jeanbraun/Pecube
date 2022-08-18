@@ -67,6 +67,7 @@ element_surface.o \
 read_input_file.o \
 scanfile.o \
 read_data_files.o \
+read_table.o \
 ExtractDEM.o \
 initialize_random_seed.o \
 calculate_TL.o \
@@ -113,6 +114,7 @@ element_surface.o \
 read_input_file.o \
 scanfile.o \
 read_data_files.o \
+read_table.o \
 ExtractDEM.o \
 initialize_random_seed.o \
 calculate_TL.o\
@@ -127,6 +129,7 @@ move_fault.o \
 read_in_fault_parameters.o \
 read_input_file.o \
 read_data_files.o \
+read_table.o \
 scanfile.o \
 testTopo.o \
 ExtractDEM.o\

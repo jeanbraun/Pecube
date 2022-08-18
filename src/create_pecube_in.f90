@@ -34,7 +34,7 @@
       double precision thist(1024),temphist(1024),errortemphist(1024)
       double precision theating(1024),released(1024),dreleased(1024),agereleased(1024),dagereleased(1024),duration(1024)
       double precision size43He,age43He,dage43He
-      double precision doser(1024),d0(1024),radius(1024),et(1024),logs(1024),b(1024),logrho(1024),nn(1024)
+      double precision doser,d0,radius,et,logs,b,logrho,nn
 
       character run*5,fnme*300,obsfile*300,line*1024,c5*5,PecubeFnme*10,cproc*4
 
@@ -316,6 +316,7 @@ endif !VKP
       if (nd0.gt.0) nd=nd0
 
       open (7,status='scratch')
+!      open (7,file='JUNK.txt')
 
       ilog=p%debug
       iterative=1
@@ -470,7 +471,8 @@ endif !VKP
       nobs=0
       write (7,*) nobs,0,0,0
       else
-      call read_data_folder (run//'/data/'//obsfile(1:nobsfile), .true., xlon1, xlon2, xlat1, xlat2, iproc, nd)
+      call read_data_folder (run//'/data/'//obsfile(1:nobsfile), .true., xlon1, xlon2, xlat1, xlat2, iproc, nd, &
+                             nobs1, nobs2, nobs3, nobs4)
         if (nx0.lt.0) then
         allocate (neighz(3,nelem))
         call neighbours (iconz,neighz,nelem)
@@ -481,30 +483,6 @@ endif !VKP
       if (iproc.lt.100) cproc(1:2)='00'
       if (iproc.lt.1000) cproc(1:1)='0'
       open (8,file=run//'/data/'//obsfile(1:nobsfile)//cproc//'.txt',status='old')
-      read (8,*) nobs1
-        do i=1,iabs(nobs1)
-        read (8,*)
-        enddo
-      nobs2=0
-      nobs3=0
-      nobs4=0
-      read (8,*,end=1111) nobs2
-        do i=1,iabs(nobs2)
-        read (8,*)
-        enddo
-      nobs3=0
-      read (8,*,end=1111) nobs3
-        do i=1,iabs(nobs3)
-        read (8,*)
-        enddo
-      nobs4=0
-      read (8,*,end=1111) nobs4
-1111  continue
-        do i=1,iabs(nobs4)
-        read (8,*)
-        enddo
-      rewind (8)
-      read (8,*) nobs1
       if (p%save_PTT_paths.ne.0) nobs1 = -nobs1
       write (7,*) nobs1,nobs2,nobs3,nobs4
       if (nobs1.lt.0) nobs1=-nobs1
@@ -552,8 +530,6 @@ endif !VKP
                     ftdist,heightobs,grainsize,ieobs,wobs1,wobs2,wobs3,wobs4
         enddo
 ! cooling curves
-      read (8,*,end=1112) nobs2
-      if (nobs2.lt.0) nobs2=-nobs2
         do i=1,nobs2
         read (8,*) xlonobs,xlatobs,heightobs,nhist, &
                    (thist(j),temphist(j),errortemphist(j),j=1,nhist)
@@ -594,8 +570,6 @@ endif !VKP
                     heightobs,ieobs,wobs1,wobs2,wobs3,wobs4
         enddo
 ! 4-3He data
-      read (8,*,end=1112) nobs3
-      if (nobs3.lt.0) nobs3=-nobs3
         do i=1,nobs3
         read (8,*) xlonobs,xlatobs,heightobs,size43He,age43He,dage43He,nheating, &
                    (theating(j),duration(j),released(j),dreleased(j), &
@@ -641,12 +615,8 @@ endif !VKP
                     heightobs,ieobs,wobs1,wobs2,wobs3,wobs4
         enddo
 ! TSL data
-        read (8,*,end=1112) nobs4
-1112  continue
-        if (nobs4.lt.0) nobs4=-nobs4
         do i=1,nobs4
-        read (8,*) xlonobs,xlatobs,heightobs,nheating,(doser(j),d0(j),radius(j),et(j),logs(j), &
-                   b(j),logrho(j),nn(j),j=1,nheating)
+        read (8,*) xlonobs,xlatobs,heightobs,doser,d0,radius,et,logs,b,logrho,nn
         if (nx0.gt.0) then
         i1=int((xlonobs-xlon)/(dx*nskip))+1 !VKP
         if (i1.eq.nx) i1=nx-1
@@ -682,8 +652,8 @@ endif !VKP
         endif
         dreleased=max(0.01d0,dreleased)
         dagereleased=max(0.1d0,dagereleased)
-        write (7,*) xlonobs,xlatobs,nheating, &
-          (doser(j),d0(j),radius(j),et(j),logs(j),b(j),logrho(j),nn(j),j=1,nheating), &
+        write (7,*) xlonobs,xlatobs, &
+          doser,d0,radius,et,logs,b,logrho,nn, &
           heightobs,ieobs,wobs1,wobs2,wobs3,wobs4
         enddo
 
