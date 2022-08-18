@@ -59,7 +59,8 @@ end module read_string_module
 
 !----------------------------
 
-subroutine read_data_folder ( folder, echo, xlon1, xlon2, xlat1, xlat2, iproc, nd)
+subroutine read_data_folder ( folder, echo, xlon1, xlon2, xlat1, xlat2, iproc, nd, &
+                              nobs1, nobs2, nobs3, nobs4)
 
 ! subroutines goes throuh the files in forlder "folder" and attempts to read the data in each of them
 
@@ -81,6 +82,8 @@ integer :: i,j
 double precision, dimension(:,:), allocatable :: obs
 character*6, dimension(:), allocatable :: field_name
 character*4 :: cproc
+
+integer nobs1, nobs2, nobs3, nobs4
 
 if (nd.eq.0) print*,'-----------------------------Reading data----------------------------------------'
 if (nd.eq.0) print*,'---------------------------------------------------------------------------------'
@@ -156,25 +159,26 @@ if (iproc.eq.0) close (123)
 ! HERE WE WRITE DATA TO PECUBE INPUT FILE
 
 open (111, file = folder//cproc//'.txt')
-write (111,*) nsample
+!write (111,*) nsample
   do i = 1, nsample
   write (111,*) (obs(j,i), j = 1, nfield)
   enddo
 close (111)
+nobs1 = nsample
 
   if (nd.eq.0.and.iproc.eq.0) print*,'Number of Age Samples:',nsample
 
 ! now scans folder for thermal histories
 
-call read_data_files_for_thermal_histories (folder,cproc, xlon1, xlon2, xlat1, xlat2, nd)
+call read_data_files_for_thermal_histories (folder,cproc, xlon1, xlon2, xlat1, xlat2, nd, nobs2)
 
 ! now scans folder for thermal histories
 
-call read_data_files_for_43He (folder,cproc, xlon1, xlon2, xlat1, xlat2, nd)
+call read_data_files_for_43He (folder,cproc, xlon1, xlon2, xlat1, xlat2, nd, nobs3)
 
 ! now scans for TSL data
 
-call read_data_files_for_TSL (folder,cproc, xlon1, xlon2, xlat1, xlat2, nd)
+call read_data_files_for_TSL (folder,cproc, xlon1, xlon2, xlat1, xlat2, nd, nobs4)
 
 deallocate (sample, field_name)
 
@@ -468,7 +472,7 @@ end subroutine read_data_files
 
 !----------------------------
 
-subroutine read_data_files_for_thermal_histories (folder, cproc, xlon1, xlon2, xlat1, xlat2, nd)
+subroutine read_data_files_for_thermal_histories (folder, cproc, xlon1, xlon2, xlat1, xlat2, nd, nobs)
 
 ! this subroutine finds and reads the thermal histories from all files contained in folder
 ! and writes it to unit 111 (the data input file for Pecube)
@@ -541,7 +545,6 @@ if (nd.eq.0) print*,'Number of Thermal Histories:',nobs
 if (nobs.eq.0) return
 
 open (111, file = folder//cproc//'.txt', access = 'append')
-write (111,*) nobs
 
 ! then reads the lat, lon, height and thermal histories of all samples in all files
 
@@ -666,7 +669,7 @@ end subroutine read_data_files_for_thermal_histories
 
 !----------------------------
 
-subroutine read_data_files_for_43He (folder, cproc, xlon1, xlon2, xlat1, xlat2, nd)
+subroutine read_data_files_for_43He (folder, cproc, xlon1, xlon2, xlat1, xlat2, nd, nobs)
 
 ! this subroutine finds and reads the thermal histories from all files contained in folder
 ! and writes it to unit 111 (the data input file for Pecube)
@@ -737,9 +740,8 @@ open (8, file='tmp/data_lst'//cproc//'.txt', status='old', err=996)
 if (nd.eq.0) print*,'Number of 43He Age Data:',nobs
 
 if (nobs.eq.0) return
-
+  
 open (111, file = folder//cproc//'.txt', access = 'append')
-write (111,*) nobs
 
 ! then reads the lat, lon, height and thermal histories of all samples in all files
 
@@ -906,7 +908,7 @@ end subroutine read_data_files_for_43He
 
 !----------------------------
 
-subroutine read_data_files_for_TSL (folder, cproc, xlon1, xlon2, xlat1, xlat2, nd)
+subroutine read_data_files_for_TSL (folder, cproc, xlon1, xlon2, xlat1, xlat2, nd, nobs)
 
 ! this subroutine finds and reads the TSL data from all files contained in folder
 ! and writes it to unit 111 (the data input file for Pecube)
@@ -919,171 +921,83 @@ double precision, intent(in) :: xlon1, xlon2, xlat1, xlat2
 character*(*) :: folder
 integer, intent(in) :: nd
 character(len=1024) :: fnme
-integer :: idoser, jdoser, id0, jd0, ia, ja, iet, jet, ilogs, jlogs, ib, jb, ilogrho, jlogrho, inn, jnn
-integer :: ilat, jlat, ilon, jlon, iheight, jheight, isample, jsample
-integer :: nobs, nhist
-character*100 :: sample, field
-double precision :: lat, lon, height, DoseR(10000), D0(10000), A(10000), Et(10000), logs(10000), b(10000)
-double precision :: logrho(10000), NN(10000)
-integer :: i
+integer :: isample
+integer :: nobs
+double precision :: lat, lon, height, doser, d0, a, et, logs, b, logrho, nn
+integer :: i,j
 character*4 cproc
+character*128 tag0(11)
+character*128 sample_names(10000)
+double precision sample_values(11, 10000)
+integer nsamples
 
 ! first count the number of thermal histories in all files
 
 nobs = 0
 
+tag0(1)='LON'
+tag0(2)='LAT'
+tag0(3)='HEIGHT'
+tag0(4)='DOSER'
+tag0(5)='D0'
+tag0(6)='ATL'
+tag0(7)='ET'
+tag0(8)='LOGS'
+tag0(9)='BTL'
+tag0(10)='LOGRHO'
+tag0(11)='N/N'
+
 open (8, file='tmp/data_lst'//cproc//'.txt', status='old', err=996)
 
 do
-
-read (8,'(a)', end=995) fnme
-open (9, file = folder//'/'//fnme, status = 'old')
-call find_string (9, 'DOSER', idoser, jdoser)
-if (idoser.ne.0) then
-call find_string (9, 'SAMPLE', isample, jsample)
-
-if (isample.ne.0) then
-sample=''
-do while (trim(sample).ne.'NotFound')
-jsample = jsample + 1
-sample = read_string(9, isample, jsample)
-if (sample.ne.''.and.sample.ne.'NotFound') nobs = nobs + 1
-enddo
-endif
-endif
-
-close (9)
+  read (8,'(a)', end=995) fnme
+  call read_table(folder//'/'//fnme, tag0, 11, sample_names, sample_values, nsamples, 10000)
+  do isample = 1, nsamples
+    do j = 1,11
+      if (abs(sample_values(j,isample)+9999).lt.tiny(0.d0) .and. j.ne.3) then
+        if (nd.eq.0) print*,'Sample ',trim(sample_names(isample)),' needs the ',trim(tag0(j)),' field'
+        stop
+      endif
+    enddo
+    lon = sample_values(1,isample)
+    lat = sample_values(2,isample)
+    if ((lon - xlon1)*(lon - xlon2).le.0.d0 .and. (lat - xlat1)*(lat - xlat2).le.0.d0) &
+      nobs = nobs + 1
+  enddo
 enddo
 
 995 close (8)
 996 continue
 
-if (nd.eq.0) print*,'Number of TL Ages Data:',nobs
+if (nd.eq.0) print*,'Number of TL Ages Data:', nobs
 
 if (nobs.eq.0) return
 
 open (111, file = folder//cproc//'.txt', access = 'append')
-write (111,*) nobs
 
 ! then reads the lat, lon, height and TSL data of all samples in all files
 
 open (8, file='tmp/data_lst'//cproc//'.txt', status='old', err=994)
 
 do
-
-read (8,'(a)', end=993) fnme
-
-open (9, file = folder//'/'//fnme, status = 'old')
-call find_string (9, 'SAMPLE', isample, jsample)
-call find_string (9, 'DOSER', idoser, jdoser)
-call find_string (9, 'D0', id0, jd0)
-call find_string (9, 'ATL', ia, ja)
-call find_string (9, 'ET', iet, jet)
-call find_string (9, 'LOGS', ilogs, jlogs)
-call find_string (9, 'BTL', ib, jb)
-call find_string (9, 'LOGRHO', ilogrho, jlogrho)
-call find_string (9, 'N/N', inn, jnn)
-
-if (idoser.ne.0) then
-call find_string (9, 'SAMPLE', isample, jsample)
-
-if (id0.eq.0) then
-print*,'Found DOSER field but not D0 field in file ',trim(folder//'/'//fnme)
-stop
-endif
-if (ia.eq.0) then
-print*,'Found DOSER field but not ATL field in file ',trim(folder//'/'//fnme)
-stop
-endif
-if (iet.eq.0) then
-print*,'Found DOSER field but not ET field in file ',trim(folder//'/'//fnme)
-stop
-endif
-if (ilogs.eq.0) then
-print*,'Found DOSER field but not LOGS field in file ',trim(folder//'/'//fnme)
-stop
-endif
-if (ib.eq.0) then
-print*,'Found DOSER field but not BTL field in file ',trim(folder//'/'//fnme)
-stop
-endif
-if (ilogrho.eq.0) then
-print*,'Found DOSER field but not LOGRHO field in file ',trim(folder//'/'//fnme)
-stop
-endif
-if (inn.eq.0) then
-print*,'Found DOSER field but not n/N field in file ',trim(folder//'/'//fnme)
-stop
-endif
-
-if (isample.ne.0) then
-sample=''
-nhist=0
-
-do while (trim(sample).ne.'NotFound')
-jsample = jsample + 1
-sample = read_string(9, isample, jsample)
-
-if (sample.ne.'') then
-if (nhist.ne.0) then
-if ((lon - xlon1)*(lon - xlon2).le.0.d0 .and. (lat - xlat1)*(lat - xlat2).le.0.d0) &
-write (111,*) lon,lat,height,nhist,(doser(i),d0(i),a(i),et(i),logs(i),b(i),logrho(i),nn(i),i=1,nhist)
-endif
-if (sample.ne.'NotFound') then
-call find_string (9, 'LAT', ilat, jlat)
-if (ilat.eq.0) then
-print*,'Need LAT to locate sample ',sample,' in file ',trim(folder//'/'//fnme)
-stop
-endif
-call find_string (9, 'LON', ilon, jlon)
-if (ilat.eq.0) then
-print*,'Need LON to locate sample ',sample,' in file ',trim(folder//'/'//fnme)
-stop
-endif
-call find_string (9, 'HEIGHT', iheight, jheight)
-field = read_string(9, ilat, jsample+1)
-read(field,*) lat
-field = read_string(9, ilon, jsample+1)
-read(field,*) lon
-!if (lon.lt.0.d0) lon = lon + 360.d0
-height = 0.
-if (iheight.ne.0) then
-field = read_string(9, iheight, jsample+1)
-read(field,*) height
-endif
-nhist = 0
-endif
-endif
-
-field = read_string(9, idoser, jsample)
-if (field.ne.''.and.field.ne.'NotFound') then
-nhist = nhist + 1
-field = read_string(9, idoser, jsample)
-read (field,*,err=896) doser(nhist)
-field = read_string(9, id0, jsample)
-read (field,*,err=895) d0(nhist)
-field = read_string(9, ia, jsample)
-read (field,*,err=894) a(nhist)
-field = read_string(9, iet, jsample)
-read (field,*,err=893) et(nhist)
-field = read_string(9, ilogs, jsample)
-read (field,*,err=891) logs(nhist)
-field = read_string(9, ib, jsample)
-read (field,*,err=890) b(nhist)
-field = read_string(9, ilogrho, jsample)
-read (field,*,err=889) logrho(nhist)
-field = read_string(9, inn, jsample)
-read (field,*,err=888) nn(nhist)
-
-endif
-
-enddo
-
-endif
-
-endif
-
-close (9)
+  read (8,'(a)', end=993) fnme
+  call read_table(folder//'/'//fnme, tag0, 11, sample_names, sample_values, nsamples, 10000)
+  do isample = 1, nsamples
+    lon = sample_values(1,isample)
+    lat = sample_values(2,isample)
+    height = sample_values(3,isample)
+    if (abs(height+9999.).lt.tiny(height)) height = 0
+    doser = sample_values(4,isample)
+    d0 = sample_values(5,isample)
+    a = sample_values(6,isample)
+    et = sample_values(7,isample)
+    logs = sample_values(8,isample)
+    b = sample_values(9,isample)
+    logrho = sample_values(10,isample)
+    nn = sample_values(11,isample)
+    if ((lon - xlon1)*(lon - xlon2).le.0.d0 .and. (lat - xlat1)*(lat - xlat2).le.0.d0) &
+      write (111,*) lon,lat,height,doser,d0,a,et,logs,b,logrho,nn
+  enddo
 enddo
 
 993 close (8)
@@ -1092,38 +1006,6 @@ enddo
 close (111)
 
 return
-
-896 continue
-print*,'Error in reading TSL dose rate in file '//trim(folder//'/'//fnme)//' at line ',jsample
-stop 'Wrong format'
-
-895 continue
-print*,'Error in reading TSL D0 in file '//trim(folder//'/'//fnme)//' at line ',jsample
-stop 'Wrong format'
-
-894 continue
-print*,'Error in reading TSL A in file '//trim(folder//'/'//fnme)//' at line ',jsample
-stop 'Wrong format'
-
-893 continue
-print*,'Error in reading TSL Et in file '//trim(folder//'/'//fnme)//' at line ',jsample
-stop 'Wrong format'
-
-891 continue
-print*,'Error in reading TSL LogS in file '//trim(folder//'/'//fnme)//' at line ',jsample
-stop 'Wrong format'
-
-890 continue
-print*,'Error in reading TSL b in file '//trim(folder//'/'//fnme)//' at line ',jsample
-stop 'Wrong format'
-
-889 continue
-print*,'Error in reading TSL logrho in file '//trim(folder//'/'//fnme)//' at line ',jsample
-stop 'Wrong format'
-
-888 continue
-print*,'Error in reading TSL n/N in file '//trim(folder//'/'//fnme)//' at line ',jsample
-stop 'Wrong format'
 
 end subroutine read_data_files_for_TSL
 

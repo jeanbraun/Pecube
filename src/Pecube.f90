@@ -257,7 +257,7 @@ end subroutine writemodels
       double precision, dimension(:,:), allocatable :: theating,released,dreleased,agereleased,dagereleased,duration
       double precision, dimension(:,:), allocatable :: time43He,temperature43He
       double precision, dimension(:), allocatable :: releasedp,agereleasedp
-      double precision, dimension(:,:), allocatable :: doser,d0,radius,et,logs,b,logrho,nn
+      double precision, dimension(:), allocatable :: doser,d0,radius,et,logs,b,logrho,nn
       double precision, dimension(:,:), allocatable :: timeTSL,temperatureTSL
       double precision age43Hep,nnf,paramsTSL(8)
 
@@ -539,8 +539,8 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
           allocate (nheating(nobs),theating(1024,nobs),released(1024,nobs),dreleased(1024,nobs),duration(1024,nobs))
           allocate (agereleased(1024,nobs),dagereleased(1024,nobs))
           allocate (size43He(nobs),age43He(nobs),dage43He(nobs))
-          allocate (doser(1024,nobs),d0(1024,nobs),radius(1024,nobs),et(1024,nobs),logs(1024,nobs),b(1024,nobs))
-          allocate (logrho(1024,nobs),nn(1024,nobs))
+          allocate (doser(nobs),d0(nobs),radius(nobs),et(nobs),logs(nobs),b(nobs))
+          allocate (logrho(nobs),nn(nobs))
             do i=1,nobs1
             read (7,*) xlonobs,xlatobs,ageheobs,dageheobs,ageftobs,dageftobs, & ! By Xav
                        ageheZobs,dageheZobs,ageftZobs,dageftZobs,agearKobs,dagearKobs, &
@@ -594,9 +594,9 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
                            +we4(i)*zsurf(iconsurf(npe,ieo(i)))+zl+min(0.d0,heightobs/1.e3)
             enddo
             do i=nobs1+nobs2+nobs3+1,nobs1+nobs2+nobs3+nobs4
-            read (7,*) xlonobs,xlatobs,nheating(i), &
-                      (doser(j,i),d0(j,i),radius(j,i),et(j,i), &
-                      logs(j,i),b(j,i),logrho(j,i),nn(j,i),j=1,nheating(i)), &
+            read (7,*) xlonobs,xlatobs, &
+                      doser(i),d0(i),radius(i),et(i), &
+                      logs(i),b(i),logrho(i),nn(i), &
                       heightobs,ieo(i),we1(i),we2(i),we3(i),we4(i)   ! By Xav
             xexhumationo(i)=we1(i)*xsurf(iconsurf(1,ieo(i))) &
                            +we2(i)*xsurf(iconsurf(2,ieo(i))) &
@@ -1421,7 +1421,7 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
       allocate (hei(nobs),agehe(nobs),ageheZ(nobs),ageft(nobs),ageftZ(nobs), &
                 agearB(nobs),agearK(nobs),agearM(nobs),agearH(nobs),ftdisto(20,nobs), &
                 temphistp(1024,nobs))
-      if (nd.eq.0.and.nobs1.gt.0) write (13,'(128(a,","))') 'LON','LAT','HEIGHTOBS','HEIGHTPRED', &
+      if (nd.eq.0.and.nobs1.gt.0) write (13,'(a,59(",",a))') 'LON','LAT','HEIGHTOBS','HEIGHTPRED', &
                   'AHEOBS','AHEPRED','AFTOBS','AFTPRED','ZHEOBS','ZHEPRED','ZFTOBS','ZFTPRED', &
                   'KAROBS','KARPRED','BAROBS','BARPRED','MAROBS','MARPRED','HAROBS','HARPRED', &
                   'FT01OBS','FT01PRED','FT02OBS','FT02PRED','FT03OBS','FT03PRED','FT04OBS','FT04PRED', &
@@ -1509,7 +1509,7 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
         aarMpreg(iobs)=agearM(iobs)
         aarHpreg(iobs)=agearH(iobs)
         hpreg(iobs)=hei(iobs)
-        if (nd.eq.0.and.nobs1.gt.0) write (13,'(128(g12.6,","))') xlonobs,xlatobs,heightobs,hei(iobs), &
+        if (nd.eq.0.and.nobs1.gt.0) write (13,'(g12.6,59(",",g12.6))') xlonobs,xlatobs,heightobs,hei(iobs), &
                           ageheobs,agehe(iobs),ageftobs,ageft(iobs),ageheZobs,ageheZ(iobs), &
                           ageftZobs,ageftZ(iobs), &
                           agearKobs,agearK(iobs),agearBobs,agearB(iobs),agearMobs,agearM(iobs),agearHobs,agearH(iobs), &
@@ -1706,14 +1706,14 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
 
       if (nd.eq.0.and.nobs4.gt.0) then
       open (13,file=run//'/output/CompareTL.csv',status='unknown')
-      if (nd.eq.0.and.nobs4.gt.0) write (13,'(128(a,","))') 'LON','LAT','DURATION','TEMPERATURE','NN','NNPRED'
+      if (nd.eq.0.and.nobs4.gt.0) write (13,'(a,5(",",a))') 'LON','LAT','HEIGHTOBS','HEIGHTPRED','NNOBS','NNPRED'
       endif
 
       nheating=0
         do iobs=nobs1+nobs2+nobs3+1,nobs1+nobs2+nobs3+nobs4
-        read (7,*) xlonobs,xlatobs,nheating(iobs), &
-                  (doser(j,iobs),d0(j,iobs),radius(j,iobs),et(j,iobs), &
-                  logs(j,iobs),b(j,iobs),logrho(j,iobs),nn(j,i),j=1,nheating(iobs)), &
+        read (7,*) xlonobs,xlatobs, &
+                  doser(iobs),d0(iobs),radius(iobs),et(iobs), &
+                  logs(iobs),b(iobs),logrho(iobs),nn(i), &
                   heightobs,ieobs,wobs1,wobs2,wobs3,wobs4   ! By Xav
         hei(iobs)=wobs1*zsurf(iconsurf(1,ieobs)) &
                   +wobs2*zsurf(iconsurf(2,ieobs)) &
@@ -1730,21 +1730,19 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
       misfit4 = 0.
       nmisfit4 = 0
         do iobs=nobs1+nobs2+nobs3+1,nobs1+nobs2+nobs3+nobs4
-        write (13,'(g15.9,",",g15.9)') lonobs(iobs),latobs(iobs)
-          do i=1,nheating(iobs)
-          paramsTSL(1)=doser(i,iobs)
-          paramsTSL(2)=d0(i,iobs)
-          paramsTSL(3)=radius(i,iobs)
-          paramsTSL(4)=et(i,iobs)
-          paramsTSL(5)=0.
-          paramsTSL(6)=logs(i,iobs)
-          paramsTSL(7)=b(i,iobs)
-          paramsTSL(8)=logrho(i,iobs)
-          nnf = TLModel (timeTSL(1,iobs), temperatureTSL(1,iobs), jrec, paramsTSL)
-          misfit4=misfit4+(nn(i,iobs) - nnf)**2/(nn(i,iobs)*0.1d0)**2
-          nmisfit4=nmisfit4+1
-          if (nd.eq.0.and.nobs4.gt.0) write (13,'(",",4(",",g15.9))') timeTSL(i,iobs),temperatureTSL(i,iobs),nn(i,iobs),nnf
-          enddo
+        paramsTSL(1)=doser(iobs)
+        paramsTSL(2)=d0(iobs)
+        paramsTSL(3)=radius(iobs)
+        paramsTSL(4)=et(iobs)
+        paramsTSL(5)=0.
+        paramsTSL(6)=logs(iobs)
+        paramsTSL(7)=b(iobs)
+        paramsTSL(8)=logrho(iobs)
+        nnf = TLModel (timeTSL(1,iobs), temperatureTSL(1,iobs), jrec, paramsTSL)
+        misfit4=misfit4+(nn(iobs) - nnf)**2/(nn(iobs)*0.1d0)**2
+        nmisfit4=nmisfit4+1
+        if (nd.eq.0.and.nobs4.gt.0) write (13,'(g15.9,5(",",g15.9))') & 
+          lonobs(iobs),latobs(iobs),heightobs,hei(iobs),nn(iobs),nnf
         enddo
 
       deallocate (timeTSL,temperatureTSL)
