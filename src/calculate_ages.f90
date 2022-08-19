@@ -20,6 +20,7 @@
       double precision,dimension(:,:),allocatable::mem
       logical saveTt
       character*4 c(9999)
+      character*10000 line
 
       do i = 1, 9999
       write (c(i),'(i4)') i
@@ -117,9 +118,11 @@
       deallocate (ztime,ztime_3,ztemp,ztemp_3,depth)
 
       if (saveTt.and.nd.eq.0) then
-      write (82,'(a,1023(",",a))') "Time",("point"//c(k),k=1,nsurf)
+      write (line,'(a,1023(",",a))') "Time",("point"//c(k),k=1,nsurf)
+      write (82,'(a)') line(:len(trim(line))-1)
         do ij=1,nrec
-        write (82,'(g12.6,1023(",",g12.6))') (mem(ij,i),i=0,nsurf)
+        write (line,'(g12.6,1023(",",g12.6))') (mem(ij,i),i=0,nsurf)
+        write (82,'(a)') line(:len(trim(line))-1)
         enddo
       endif
 
