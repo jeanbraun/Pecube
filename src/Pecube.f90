@@ -1618,7 +1618,7 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
 
       if (nd.eq.0.and.nobs2.gt.0) then
       open (13,file=run//'/output/CompareTT.csv',status='unknown')
-      write (13,'(128(a,","))') 'LON','LAT','TIME','TEMP','TEMPPRED'
+      write (13,'(a,4(",",a))') 'LON','LAT','TIME','TEMP','TEMPPRED'
       endif
 
       nhist=0
@@ -1645,7 +1645,7 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
             misfit2=misfit2+(temphist(j,iobs)-temphistp(j,iobs))**2/errortemphist(j,iobs)**2
             nmisfit2=nmisfit2+1
             endif
-          if (nd.eq.0.and.nobs2.gt.0) write (13,'(",",3(",",g15.9))') thist(j,iobs),temphist(j,iobs),temphistp(j,iobs)
+          if (nd.eq.0.and.nobs2.gt.0) write (13,'(g15.9,2(",",g15.9))') thist(j,iobs),temphist(j,iobs),temphistp(j,iobs)
           enddo
         enddo
 

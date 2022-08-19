@@ -953,16 +953,18 @@ do
   read (8,'(a)', end=995) fnme
   call read_table(folder//'/'//fnme, tag0, 11, sample_names, sample_values, nsamples, 10000)
   do isample = 1, nsamples
-    do j = 1,11
-      if (abs(sample_values(j,isample)+9999).lt.tiny(0.d0) .and. j.ne.3) then
-        if (nd.eq.0) print*,'Sample ',trim(sample_names(isample)),' needs the ',trim(tag0(j)),' field'
-        stop
-      endif
-    enddo
-    lon = sample_values(1,isample)
-    lat = sample_values(2,isample)
-    if ((lon - xlon1)*(lon - xlon2).le.0.d0 .and. (lat - xlat1)*(lat - xlat2).le.0.d0) &
-      nobs = nobs + 1
+    if (abs(sample_values(11,isample)+9999).gt.tiny(0.d0)) then
+      do j = 1,11
+        if (abs(sample_values(j,isample)+9999).lt.tiny(0.d0) .and. j.ne.3) then
+          if (nd.eq.0) print*,'Sample ',trim(sample_names(isample)),' needs the ',trim(tag0(j)),' field'
+          stop
+        endif
+      enddo
+      lon = sample_values(1,isample)
+      lat = sample_values(2,isample)
+      if ((lon - xlon1)*(lon - xlon2).le.0.d0 .and. (lat - xlat1)*(lat - xlat2).le.0.d0) &
+        nobs = nobs + 1
+    endif
   enddo
 enddo
 

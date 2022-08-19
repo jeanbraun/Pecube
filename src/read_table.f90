@@ -65,10 +65,13 @@ ind=0
     enddo
 
     if (ind(1).ne.1) then
-    print*,'ERROR'
-    print*,'The first non-empty column should be the sample name and thus labeled SAMPLE'
-    goto 999
+    nsamples = 0
+    return
     endif
+!    print*,'ERROR'
+!    print*,'The first non-empty column should be the sample name and thus labeled SAMPLE'
+!    goto 999
+!    endif
 
 nsamples = 0
     do
