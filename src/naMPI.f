@@ -224,7 +224,7 @@ c
         tnat = 0.
         ns = nsamplei
          CALL MPI_BCAST
-     &          (na_models(ntot+1), nsamplei,
+     &          (na_models, nd_max*nmod_max,
      &           MPI_REAL, 0, MPI_COMM_WORLD, ierr)
 
 
@@ -368,7 +368,7 @@ c             taxist2 = taxist2 + taxis2
 	   end if
 
             CALL MPI_BCAST
-     &          (na_models(ntot+1), nsample,
+     &          (na_models, nd_max*nmod_max,
      &           MPI_REAL, 0, MPI_COMM_WORLD, ierr)
 
 c
