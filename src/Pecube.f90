@@ -49,6 +49,7 @@ call system ('mkdir "'//run//'/LOG"')
 call system ('rm '//run//'/output/*')
 
 nd = 0
+par = 0.
 call read_input_file (run//'/input/Pecube.in', 0, p0, nd, range, par)
 
 if (nd.eq.0) write (*,*) '---------------------------------------------------------------------------------'
