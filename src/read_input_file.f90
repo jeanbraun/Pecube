@@ -117,7 +117,9 @@ call scanfile (fnme, "shear_heating", p%shear_heating, p%shear_heating_desc, res
 
 call scanfile (fnme, "age_TL_flag", p%age_TL_flag, p%age_TL_flag_desc, res, vocal, nd, range, par)
 
-call scanfile (fnme, "age_TL_flag", p%age_TL_flag, p%age_TL_flag_desc, res, vocal, nd, range, par)
+call scanfile (fnme, "age_OSL_flag", p%age_OSL_flag, p%age_OSL_flag_desc, res, vocal, nd, range, par)
+
+call scanfile (fnme, "age_ESR_flag", p%age_ESR_flag, p%age_ESR_flag_desc, res, vocal, nd, range, par)
 
 call scanfile (fnme, "age_AHe_flag", p%age_AHe_flag, p%age_AHe_flag_desc, res, vocal, nd, range, par)
 
@@ -240,6 +242,10 @@ call scanfile (fnme, "misfit_weight_43He", p%misfit_weight_43He, p%misfit_weight
 
 call scanfile (fnme, "misfit_weight_TL", p%misfit_weight_TL, p%misfit_weight_TL_desc, res, vocal, nd, range, par)
 
+call scanfile (fnme, "misfit_weight_OSL", p%misfit_weight_OSL, p%misfit_weight_OSL_desc, res, vocal, nd, range, par)
+
+call scanfile (fnme, "misfit_weight_ESR", p%misfit_weight_ESR, p%misfit_weight_ESR_desc, res, vocal, nd, range, par)
+
 call scanfile (fnme, "maximum_number_of_iterations", p%maximum_number_of_iterations, &
                       p%maximum_number_of_iterations_desc, res, vocal, nd, range, par)
 
@@ -250,11 +256,47 @@ call scanfile (fnme, "sample_size_for_all_other_iterations", p%sample_size_for_a
                       p%sample_size_for_all_other_iterations_desc, res, vocal, nd, range, par)
 
 call scanfile (fnme, "number_of_cells_to_resample", p%number_of_cells_to_resample, &
-                      p%misfit_weight_TL_desc, res, vocal, nd, range, par)
+                      p%number_of_cells_to_resample_desc, res, vocal, nd, range, par)
 
 call scanfile (fnme, "save_ages_inversion", p%save_ages_inversion, &
                       p%save_ages_inversion_desc, res, vocal, nd, range, par)
 
+call scanfile (fnme, "TL_doser", p%TL_doser, p%TL_doser_desc, res, vocal, nd, range, par)
+
+call scanfile (fnme, "TL_D0", p%TL_D0, p%TL_D0_desc, res, vocal, nd, range, par)
+
+call scanfile (fnme, "TL_a", p%TL_a, p%TL_a_desc, res, vocal, nd, range, par)
+
+call scanfile (fnme, "TL_b", p%TL_b, p%TL_b_desc, res, vocal, nd, range, par)
+
+call scanfile (fnme, "TL_Et", p%TL_Et, p%TL_Et_desc, res, vocal, nd, range, par)
+
+call scanfile (fnme, "TL_logs", p%TL_logs, p%TL_logs_desc, res, vocal, nd, range, par)
+
+call scanfile (fnme, "TL_logrho", p%TL_logrho, p%TL_logrho_desc, res, vocal, nd, range, par)
+
+call scanfile (fnme, "OSL_doser", p%OSL_doser, p%OSL_doser_desc, res, vocal, nd, range, par)
+
+call scanfile (fnme, "OSL_D0", p%OSL_D0, p%OSL_D0_desc, res, vocal, nd, range, par)
+
+call scanfile (fnme, "OSL_Eu", p%OSL_Eu, p%OSL_Eu_desc, res, vocal, nd, range, par)
+
+call scanfile (fnme, "OSL_Et", p%OSL_Et, p%OSL_Et_desc, res, vocal, nd, range, par)
+
+call scanfile (fnme, "OSL_logs", p%OSL_logs, p%OSL_logs_desc, res, vocal, nd, range, par)
+
+call scanfile (fnme, "OSL_logrho", p%OSL_logrho, p%OSL_logrho_desc, res, vocal, nd, range, par)
+
+call scanfile (fnme, "ESR_doser", p%ESR_doser, p%ESR_doser_desc, res, vocal, nd, range, par)
+
+call scanfile (fnme, "ESR_D0", p%ESR_D0, p%ESR_D0_desc, res, vocal, nd, range, par)
+
+call scanfile (fnme, "ESR_logs", p%ESR_logs, p%ESR_logs_desc, res, vocal, nd, range, par)
+
+call scanfile (fnme, "ESR_Et", p%ESR_Et, p%ESR_Et_desc, res, vocal, nd, range, par)
+
+call scanfile (fnme, "ESR_sigmaEt", p%ESR_sigmaEt, p%ESR_sigmaEt_desc, res, vocal, nd, range, par)
+                      
 return
 end
 

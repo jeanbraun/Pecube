@@ -131,6 +131,12 @@ module Pecube
   integer :: age_TL_flag = 0
   character*128 :: age_TL_flag_desc = "Flag for computing TL ages (0=no/1=yes)"
 
+  integer :: age_OSL_flag = 0
+  character*128 :: age_OSL_flag_desc = "Flag for computing OSL ages (0=no/1=yes)"
+
+  integer :: age_ESR_flag = 0
+  character*128 :: age_ESR_flag_desc = "Flag for computing ESR ages (0=no/1=yes)"
+
   integer :: age_AHe_flag = 1
   character*128 :: age_AHe_flag_desc = "Flag for computing helium ages in apatite (0=no/1=yes)"
 
@@ -242,6 +248,12 @@ module Pecube
   double precision :: misfit_weight_TL = 1.d0
   character*128 :: misfit_weight_TL_desc = "Weight that multiplies the Thermoluminescence part of the misfit"
 
+  double precision :: misfit_weight_OSL = 1.d0
+  character*128 :: misfit_weight_OSL_desc = "Weight that multiplies the OSL part of the misfit"
+
+  double precision :: misfit_weight_ESR = 1.d0
+  character*128 :: misfit_weight_ESR_desc = "Weight that multiplies the ESR part of the misfit"
+
   integer :: misfit_corrected = 0
   character*128 :: misfit_corrected_desc = "Flag to divide the misfit function by (N-nd-1) if set to 1"
 
@@ -284,6 +296,39 @@ module Pecube
 
   double precision :: TL_logrho = -5.5d0
   character*128 :: TL_logrho_desc = "Logarithm of dimensionless recombination center density"
+
+  double precision :: OSL_doser = 5.d0
+  character*128 :: OSL_doser_desc = "Dose rate"
+
+  double precision :: OSL_D0 = 800.d0
+  character*128 :: OSL_D0_desc = "Onset of dose saturation"
+
+  double precision :: OSL_Et = 1.4d0
+  character*128 :: OSL_Et_desc = "Activation energy"
+
+  double precision :: OSL_Eu = 12.d0
+  character*128 :: OSL_Eu_desc = "Logarithm of thermal frequency factor"
+
+  double precision :: OSL_logs = 12.d0
+  character*128 :: OSL_logs_desc = "Logarithm of thermal frequency factor"
+
+  double precision :: OSL_logrho = -5.5d0
+  character*128 :: OSL_logrho_desc = "Logarithm of dimensionless recombination center density"
+
+  double precision :: ESR_doser = 4.265d0
+  character*128 :: ESR_doser_desc = "Dose rate"
+
+  double precision :: ESR_D0 = 5186.8d0
+  character*128 :: ESR_D0_desc = "Onset of dose saturation"
+
+  double precision :: ESR_logs = 14.58d0
+  character*128 :: ESR_logs_desc = "Logarithm of frequency factor"
+
+  double precision :: ESR_Et = 1.763d0
+  character*128 :: ESR_Et_desc = "Center of Gaussian distribution of activation energies"
+
+  double precision :: ESR_sigmaEt = 0.096d0
+  character*128 :: ESR_sigmaEt_desc = "Gaussian width of activation energy distribution"
 
   end type parameters
 

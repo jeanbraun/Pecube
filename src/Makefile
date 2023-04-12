@@ -28,6 +28,8 @@ CCMPI = mpicc
 OBJECTS = \
 module_Pecube.o \
 TLModel.o \
+OSLModel.o \
+ESRModel.o \
 Mad_He.o \
 Mad_Trax.o \
 Mad_Trax_Zircon.o \
@@ -71,11 +73,15 @@ read_table.o \
 ExtractDEM.o \
 initialize_random_seed.o \
 calculate_TL.o \
+calculate_OSL.o \
+calculate_ESR.o \
 smooth_topo.o
 
 OBJECTS_MPI = \
 module_Pecube.o \
 TLModel.o \
+OSLModel.o \
+ESRModel.o \
 Mad_He.o \
 Mad_Trax.o \
 Mad_Trax_Zircon.o \
@@ -118,6 +124,8 @@ read_table.o \
 ExtractDEM.o \
 initialize_random_seed.o \
 calculate_TL.o\
+calculate_OSL.o\
+calculate_ESR.o \
 smooth_topo.o
 
 OBJECTS_TEST = \

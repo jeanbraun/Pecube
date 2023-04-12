@@ -3,7 +3,7 @@ program vtk
 implicit none
 
 real,dimension(:),allocatable::x,y,z,t,vx,vy,vz,xinit,yinit,zinit,diffusivity,heat
-real,dimension(:),allocatable::xs,ys,zs,ex,a1,a2,a3,a4,a5,a6,a7,a8,ftlm,nN
+real,dimension(:),allocatable::xs,ys,zs,ex,a1,a2,a3,a4,a5,a6,a7,a8,ftlm,nNtl,nNosl,nNesr
 integer,dimension(:,:),allocatable::icon,iconsurf
 real tim
 integer nnode,nelem,nsurf,nelemsurf,mpe,npe,irec,nrec,itime,i,j,k,iunit,i1,i2,istep
@@ -160,7 +160,7 @@ close (77)
 
 open (77,file=run//'/output/Ages.out',status='old',access='direct',recl=4)
 nrec=1
-2 read (77,rec=(nrec-1)*(4+14*nsurf+npe*nelemsurf)+1) nnx
+2 read (77,rec=(nrec-1)*(4+16*nsurf+npe*nelemsurf)+1) nnx
 if (nnx.lt.0) goto 998
 print*,'Record',nrec
 nrec=nrec+1
@@ -168,11 +168,11 @@ goto 2
 998 nrec=nrec-1
 close (77)
 
-open (77,file=run//'/output/Ages.out',status='old',access='direct',recl=4*(4+14*nsurf+npe*nelemsurf))
+open (77,file=run//'/output/Ages.out',status='old',access='direct',recl=4*(4+16*nsurf+npe*nelemsurf))
 
 allocate (xs(nsurf),ys(nsurf),zs(nsurf),ex(nsurf))
 allocate (a1(nsurf),a2(nsurf),a3(nsurf),a4(nsurf),a5(nsurf))
-allocate (a6(nsurf),a7(nsurf),a8(nsurf),nN(nsurf))
+allocate (a6(nsurf),a7(nsurf),a8(nsurf),nNtl(nsurf),nNosl(nsurf),nNesr(nsurf))
 allocate (ftlm(nsurf))
 allocate (iconsurf(npe,nelemsurf))
 
@@ -180,7 +180,7 @@ do irec=0,nrec-1
 
 print*,'doing record ',irec,'out of',nrec
 
-read (77,rec=irec+1) nsurf,nelemsurf,npe,tim,xs,ys,zs,ex,a1,a2,a3,a4,a5,a6,a7,a8,ftlm,nN,iconsurf
+read (77,rec=irec+1) nsurf,nelemsurf,npe,tim,xs,ys,zs,ex,a1,a2,a3,a4,a5,a6,a7,a8,ftlm,nNtl,nNosl,nNesr,iconsurf
 
 write(cs,'(i3)') irec
 if (irec.lt.10) cs(1:2)='00'
@@ -294,10 +294,22 @@ write(iunit,'(a)')'LOOKUP_TABLE default'
 write(iunit,'(a)')'SCALARS TLnN float 1'
 write(iunit,'(a)')'LOOKUP_TABLE default'
   do i=1,nsurf
-  write(iunit,'(f18.13)') nN(i)
+  write(iunit,'(f18.13)') nNtl(i)
   enddo
 
-close (iunit)
+  write(iunit,'(a)')'SCALARS OSLnN float 1'
+  write(iunit,'(a)')'LOOKUP_TABLE default'
+    do i=1,nsurf
+    write(iunit,'(f18.13)') nNosl(i)
+    enddo
+    
+  write(iunit,'(a)')'SCALARS ESRnN float 1'
+  write(iunit,'(a)')'LOOKUP_TABLE default'
+    do i=1,nsurf
+    write(iunit,'(f18.13)') nNesr(i)
+    enddo
+    
+    close (iunit)
 
 enddo
 
