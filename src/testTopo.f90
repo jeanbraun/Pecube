@@ -7,12 +7,12 @@ implicit none
 
 type (parameters) p
 character line*1024,run*5,fnme*300,obsfile*300,cs*3
-integer nx0,ny0,nskip,nstep,istep,isoflag,nxiso,nyiso,nz,i,j,k,ii,jj,nx,ny,nobs,ij,nobs1,nobs2,nobs3,nobs4
+integer nx0,ny0,nskip,nstep,istep,isoflag,nxiso,nyiso,nz,i,j,k,ii,jj,nx,ny,nobs,ij,nobs1,nobs2,nobs3,nobs4,nobs5,nobs6
 integer nfnme,nobsfile,iunit,icon1,icon2,icon3,icon4,itime,fltflag,mftflag,ftlflag
 double precision dx,dy,xlon,xlat,tau,rhoc,rhom,young,poisson,thickness,dum,tprevious
 double precision crustal_thickness,diffusivity,tmax,tmsl,tlapse,heatproduction
 double precision zl,xl,yl,x,y,h
-double precision,dimension(:),allocatable::timek,topomag,topooffset,a1,a2,a3,a4,a5,a6,a7,a8,a9
+double precision,dimension(:),allocatable::timek,topomag,topooffset,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11
 integer, dimension(:),allocatable::io
 double precision,dimension(:,:),allocatable::zNZ
 double precision,dimension(:),allocatable::z,xz,yz,zsmooth
@@ -355,7 +355,7 @@ enddo
 if (obsfile(1:nobsfile).eq.'Nil') return
 
 call read_data_folder ( run//'/data/'//obsfile(1:nobsfile), .FALSE., xlon1, xlon2, xlat1, xlat2, 0, 0, &
-                      nobs1, nobs2, nobs3, nobs4)
+                      nobs1, nobs2, nobs3, nobs4, nobs5, nobs6)
 
 open (88, file = run//'/data/'//obsfile(1:nobsfile)//'0000.txt',status='old')
 !open (88,file=run//'/data/'//obsfile(1:nobsfile)//'.txt',status='old')
@@ -367,10 +367,10 @@ open (88, file = run//'/data/'//obsfile(1:nobsfile)//'0000.txt',status='old')
 ! nobs2=0
 ! read (88,*,end=1111) nobs2
 ! 1111 nobs2=iabs(nobs2)
-nobs=nobs1+nobs2+nobs3+nobs4
+nobs=nobs1+nobs2+nobs3+nobs4+nobs5+nobs6
 ! rewind (88)
 ! read (88,*)
-allocate (a1(nobs),a2(nobs),a3(nobs),a4(nobs),a5(nobs),a6(nobs),a7(nobs),a8(nobs),a9(nobs))
+allocate (a1(nobs),a2(nobs),a3(nobs),a4(nobs),a5(nobs),a6(nobs),a7(nobs),a8(nobs),a9(nobs),a10(nobs),a11(nobs))
 
 a1=-1.d0
 a2=-1.d0
@@ -410,13 +410,29 @@ a8=max(a8,-1.d0)
   write(iunit,'(3f16.11)') x,y,h/1.e3+zl
   enddo
 
-  do i=nobs1+nobs2+nobs3+1,nobs
+  do i=nobs1+nobs2+nobs3+1,nobs1+nobs2+nobs3+nobs4
     read (88,*) x,y,h,dum,dum,dum,dum,dum,dum,dum,a9(i)
     x=(x-xlon1)/(xlon2-xlon1)*xl
     y=(y-xlat1)/(xlat2-xlat1)*yl
     write(iunit,'(3f16.11)') x,y,h/1.e3+zl
     enddo
 a9=max(a9,-1.d0)
+
+do i=nobs1+nobs2+nobs3+nobs4+1,nobs1+nobs2+nobs3+nobs4+nobs5
+  read (88,*) x,y,h,dum,dum,dum,dum,dum,dum,a10(i)
+  x=(x-xlon1)/(xlon2-xlon1)*xl
+  y=(y-xlat1)/(xlat2-xlat1)*yl
+  write(iunit,'(3f16.11)') x,y,h/1.e3+zl
+  enddo
+a10=max(a10,-1.d0)
+
+do i=nobs1+nobs2+nobs3+nobs4+nobs5+1,nobs1+nobs2+nobs3+nobs4+nobs5+nobs6
+  read (88,*) x,y,h,dum,dum,dum,dum,dum,a11(i)
+  x=(x-xlon1)/(xlon2-xlon1)*xl
+  y=(y-xlat1)/(xlat2-xlat1)*yl
+  write(iunit,'(3f16.11)') x,y,h/1.e3+zl
+  enddo
+a11=max(a11,-1.d0)
 
 write(iunit,'(A6, 2I10)') 'CELLS ',1,nobs+1
 write (iunit,'(256I10)') nobs,(i-1,i=1,nobs)
@@ -463,12 +479,22 @@ write(iunit,'(a)')'LOOKUP_TABLE default'
   do i=1,nobs
   write (iunit,'(f18.5)') a8(i)
   enddo
-write(iunit,'(a)')'SCALARS NN float 1'
+write(iunit,'(a)')'SCALARS NnTL float 1'
 write(iunit,'(a)')'LOOKUP_TABLE default'
   do i=1,nobs
   write (iunit,'(f18.5)') a9(i)
   enddo
-
+write(iunit,'(a)')'SCALARS NnOSL float 1'
+write(iunit,'(a)')'LOOKUP_TABLE default'
+  do i=1,nobs
+  write (iunit,'(f18.5)') a10(i)
+  enddo
+  write(iunit,'(a)')'SCALARS NnESR float 1'
+  write(iunit,'(a)')'LOOKUP_TABLE default'
+    do i=1,nobs
+    write (iunit,'(f18.5)') a11(i)
+    enddo
+      
 close(iunit)
 
 end

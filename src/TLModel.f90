@@ -31,7 +31,6 @@ kb = 8.617343d-5
 Hs = 3.d15 !s value after Huntley (2006) J. Phys. D.
 magic_ratio = ddot/D0
 nrp = 100
-dt = ((maxval(tim)-minval(tim))/(nstep-1))*Ma
 
 ! Define rprime range and tau athermic
 allocate (rprime(nrp), pr(nrp), inv_tauath(nrp), inv_tauth(nrp))

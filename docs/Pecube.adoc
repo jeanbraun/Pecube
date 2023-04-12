@@ -496,31 +496,67 @@ Flag used to specify whether velocities are given as logarithmic values (if set 
 **Pecube** outputs the results of the computations in a variety of formats and files. A full descrition of the output from **Pecube** is given in section <<Output>>. One of these outputs is the computed ages at all points of the surface/topographic grid. The number of these points can be quite large (10,0000 or more) and computation of all ages (i.e. for all thermochronometric systems) will take some time. The user might not be interested in all different types of ages; therefore options exists to restrict the number of thermochronologis systems being computed by **Pecube**.
 
 `age_TL_flag` _(default = `0`)_::
-Flag to impose the computation of Thermoluminescence ages (=1) at all points of the surface/topographic grid or to prevent it (1).
+Flag to impose the computation of Thermoluminescence (TL) ages (=1) at all points of the surface/topographic grid or to prevent it (1).
 
 `age_OSL_flag` _(default = `0`)_::
-Flag to impose the computation of Optical Luminescence ages (=1) at all points of the surface/topographic grid or to prevent it (1).
+Flag to impose the computation of Optical Luminescence (OSL) ages (=1) at all points of the surface/topographic grid or to prevent it (1).
+
+`age_ESR_flag` _(default = `0`)_::
+Flag to impose the computation of Electron Spin Resonance (ESR) ages (=1) at all points of the surface/topographic grid or to prevent it (1).
 
 `TL_doser` _(default = `5`)_::
-Dose rate used for TL/OSL data computation (in Gy/s/ka)
+Dose rate used for TL data computation (in Gy/s/ka)
 
 `TL_D0` _(default = `800`)_::
-Onset of dose saturation for TL/OSL data computation (in Gy)
+Onset of dose saturation for TL data computation (in Gy)
 
 `TL_a` _(default = `1.8`)_::
-Kinetic orders of trapping for TL/OSL data computation
+Kinetic orders of trapping for TL data computation
 
 `TL_b` _(default = `1.8`)_::
-Kinetic orders of detrapping for TL/OSL data computation
+Kinetic orders of detrapping for TL data computation
 
-`TL_Et` _(default = 1.4)_::
-Activation energy for TL/OSL data computation (in eV)
+`TL_Et` _(default = `1.4`)_::
+Activation energy for TL data computation (in eV)
 
-`TL_logs` _(default = 12)_::
-Logarithm of thermal frequency factor for TL/OSL data computation (in 1/s)
+`TL_logs` _(default = `12`)_::
+Logarithm of thermal frequency factor for TL data computation (in 1/s)
 
-`TL_logrho` _(default = -5.5)_::
+`TL_logrho` _(default = `-5.5`)_::
+Logarithm of dimensionless recombination center density for TL data computation
+
+`OSL_doser` _(default = `5`)_::
+Dose rate used for OSL data computation (in Gy/s/ka)
+
+`OSL_D0` _(default = `800`)_::
+Onset of dose saturation for OSL data computation (in Gy)
+
+`OSL_Et` _(default = `1.4`)_::
+Activation energy for OSL data computation (in eV)
+
+`OSL_Eu` _(default = `12`)_::
+Activation energy for OSL data computation (in eV)
+
+`OSL_logs` _(default = '12')_::
+Logarithm of thermal frequency factor for OSL data computation (in 1/s)
+
+`OSL_logrho` _(default = '-5.5')_::
 Logarithm of dimensionless recombination center density for TL/OSL data computation
+
+`ESR_doser` _(default = `4.265`)_::
+Dose rate used for OSL data computation (in Gy/s/ka)
+
+`ESR_D0` _(default = `5186.8`)_::
+Onset of dose saturation for ESR data computation (in Gy)
+
+`ESR_Et` _(default = `1.763`)_::
+Activation energy for ESR data computation (in eV)
+
+`ESR_sigmaEt` _(default = `0.096`)_::
+Activation energy for ESR data computation (in eV)
+
+`ESR_logs` _(default = '14.58')_::
+Logarithm of thermal frequency factor for ESR data computation (in 1/s)
 
 `age_AHe_flag` _(default = `0`)_::
 Flag to impose the computation of Helium ages in Apatite (=1) at all points of the surface/topographic grid or to prevent it (1).
@@ -736,6 +772,8 @@ sed sed 's/,/;/g' English.csv | sed 's/./,/g' > French.csv
 - `CompareTT.csv`, for the thermal histories
 - `Compare43HE.csv`, for the ^43^He data
 - `CompareTL.csv`, for the TL data
+- `CompareOSL.csv`, for the OSL data
+- `CompareESR.csv`, for the ESR data
 
 These files have a simple structure made of columns that, in addition to latitude and longitude, give the observed (`OBS`) and predicted (`PRED`) quantities. Each row corresponds to an observation/sample.
 
@@ -859,51 +897,52 @@ In the following table, we give the list of tags that are expected (&#8730;) or 
 [[Data types]]
 [%header,format=csv]
 |===
-Data type,Tag,A_files,FTL_files,TH_files,43_files,TL_files
-Sample name,*SAMPLE*,&#8730;,&#8730;,&#8730;,&#8730;,&#8730;
-Sample longitude,*LON*,&#8730;,&#8730;,&#8730;,&#8730;,&#8730;
-Sample latitude,*LAT*,&#8730;,&#8730;,&#8730;,&#8730;,&#8730;
-Sample height,*HEIGHT*,+,+,+,+,+
-Apatite Helium age,*AHE*,+,,,,
-Uncertainty on Apatite Helium age,*DAHE*,+,,,,
-Apatite fission track age,*AFT*,+,,,,
-Uncertainty on Apatite fission track age,*DAFT*,+,,,,
-Zircon Helium age,*ZHE*,+,,,,
-Uncertainty on Zircon Helium age,*DZHE*,+,,,,
-Zircon fission track age,*ZFT*,+,,,,
-Uncertainty on Zircon fission track age,*DZFT*,+,,,,
-K-feldspar K-Ar age,*KAR*,+,,,,
-Uncertainty in K-feldspar K-Ar age,*DKAR*,+,,,,
-Biotite K-Ar age,*BAR*,+,,,,
-Uncertainty in Biotite K-Ar age,*DBAR*,+,,,,
-Muscovite K-Ar age,*MAR*,+,,,,
-Uncertainty in Muscovite K-Ar age,*DMAR*,+,,,,
-Hornblende K-Ar age,*HAR*,+,,,,
-Uncertainty in Hornblende K-Ar age,*DHAR*,+,,,,
-Grain size,*SIZE*,+,,,&#8730;,
-Relative proportion of FT lengths in 0-1 &#181;m range,*TL1*,+,,,,
-Relative proportion of FT lengths in --- &#181;m range,*TL--*,+,,,,
-Relative proportion of FT lengths in 19-20 &#181;m range,*TL20*,+,,,,
-Fission track lengths, *FTL*,,&#8730;,,,
-Time point,*TIMEH*,,,&#8730;,,
-Temperature point,*TEMPH*,,,&#8730;,,
-Uncertainty on temperature,*DTEMPH*,,,&#8730;,,
-^43^Helium age,*AGE43*,,,,&#8730;,
-Uncertainty on ^43^Helium age,*DAGE43*,,,,&#8730;,
-Heating step duration,*DUR43*,,,,&#8730;,
-Heating step temperature,*TEMP43*,,,,&#8730;,
-Relative gas release,*%REL*,,,,&#8730;,
-Relative gas release,*D%REL*,,,,&#8730;,
-Age gas release,*AREL*,,,,&#8730;,
-Relative gas release,*DAREL*,,,,&#8730;,
-Dose rate,*DOSER*,,,,,&#8730;
-Onset of dose saturation,*D0*,,,,,&#8730;
-Kinetic orders of trapping,*ATL*,,,,,&#8730;
-Kinetic orders of detrapping,*BTL*,,,,,&#8730;
-Activation energy,*ET*,,,,,&#8730;
-Logarithm of thermal frequency factor,*LOGS*,,,,,&#8730;
-Logarithm of dimensionless recombination center density,*LOGRHO*,,,,,&#8730;
-Relative number of trapped electrons,*N/N*,,,,,&#8730;
+Data type,Tag,A_files,FTL_files,TH_files,43_files,TL_files,OSL_files,ESR_files
+Sample name,*SAMPLE*,&#8730;,&#8730;,&#8730;,&#8730;,&#8730;,&#8730;,&#8730;
+Sample longitude,*LON*,&#8730;,&#8730;,&#8730;,&#8730;,&#8730;,&#8730;,&#8730;
+Sample latitude,*LAT*,&#8730;,&#8730;,&#8730;,&#8730;,&#8730;,&#8730;,&#8730;
+Sample height,*HEIGHT*,+,+,+,+,+,+,+
+Apatite Helium age,*AHE*,+,,,,,,
+Uncertainty on Apatite Helium age,*DAHE*,+,,,,,,
+Apatite fission track age,*AFT*,+,,,,,,
+Uncertainty on Apatite fission track age,*DAFT*,+,,,,,,
+Zircon Helium age,*ZHE*,+,,,,,,
+Uncertainty on Zircon Helium age,*DZHE*,+,,,,,,
+Zircon fission track age,*ZFT*,+,,,,,,
+Uncertainty on Zircon fission track age,*DZFT*,+,,,,,,
+K-feldspar K-Ar age,*KAR*,+,,,,,,
+Uncertainty in K-feldspar K-Ar age,*DKAR*,+,,,,,,
+Biotite K-Ar age,*BAR*,+,,,,,,
+Uncertainty in Biotite K-Ar age,*DBAR*,+,,,,,,
+Muscovite K-Ar age,*MAR*,+,,,,,,
+Uncertainty in Muscovite K-Ar age,*DMAR*,+,,,,,,
+Hornblende K-Ar age,*HAR*,+,,,,,,
+Uncertainty in Hornblende K-Ar age,*DHAR*,+,,,,,,
+Grain size,*SIZE*,+,,,&#8730;,,,
+Relative proportion of FT lengths in 0-1 &#181;m range,*TL1*,+,,,,,,
+Relative proportion of FT lengths in --- &#181;m range,*TL--*,+,,,,,,
+Relative proportion of FT lengths in 19-20 &#181;m range,*TL20*,+,,,,,,
+Fission track lengths, *FTL*,,&#8730;,,,,,
+Time point,*TIMEH*,,,&#8730;,,,,
+Temperature point,*TEMPH*,,,&#8730;,,,,
+Uncertainty on temperature,*DTEMPH*,,,&#8730;,,,,
+^43^Helium age,*AGE43*,,,,&#8730;,,,
+Uncertainty on ^43^Helium age,*DAGE43*,,,,&#8730;,,,
+Heating step duration,*DUR43*,,,,&#8730;,,,
+Heating step temperature,*TEMP43*,,,,&#8730;,,,
+Relative gas release,*%REL*,,,,&#8730;,,,
+Relative gas release,*D%REL*,,,,&#8730;,,,
+Age gas release,*AREL*,,,,&#8730;,,,
+Relative gas release,*DAREL*,,,,&#8730;,,,
+Dose rate,*DOSER*,,,,,&#8730;,&#8730;,&#8730;
+Onset of dose saturation,*D0*,,,,,&#8730;,&#8730;,&#8730;
+Kinetic orders of trapping,*ATL*,,,,,&#8730;,,
+Kinetic orders of detrapping,*BTL*,,,,,&#8730;,,
+Activation energy,*ET*,,,,,&#8730;,&#8730;,&#8730;
+Width of Activation energy distribution,*SIGMAET*,,,,,,,&#8730;
+Logarithm of thermal frequency factor,*LOGS*,,,,,&#8730;,&#8730;,&#8730;
+Logarithm of dimensionless recombination center density,*LOGRHO*,,,,,&#8730;,&#8730;,
+Relative number of trapped electrons,*N/N*,,,,,&#8730;,&#8730;,&#8730;
 |===
 All ages and times are in Myr, all temperatures are in &#176;C, all longitudes and latitudes are in decimal degrees, heights are in meters, fission track lengths and grain sizes are in microns, Step durations are in minutes, dose rates are in Gyr/kyr, onset of dose saturation in Gyr, and energies are in eV.
 
@@ -979,9 +1018,9 @@ DO NOT specify NIL UNCERTAINTY as the uncertainty appears in the denominator in 
 
 Experimental (not fully tested)
 
-==== TL_files
+==== TL_files, OSL_files, ESR_files
 
-Experimental (not fully tested)
+These three types of files are very similar in their structure and must contain columns that include ALL of the required parameters (see Table above) except for the height.  Note that **Pecube** will differentiate between TL, OSL and ESR data by interogating the various datasets/files whether they contain a column providing *ATL* for TL data, *EU* for ESR data and *SIGMAET* for ESR, as these fields are unique to these systems.
 
 === Checking the data
 
@@ -1042,11 +1081,11 @@ where To, dT and Tp are the observed, uncertainty in and predicted temperature, 
 M3 = sqrt(sum [(Ro-Rp)^2^/(0.1*Ro)^2^]/N3)
 ----
 where Ro and Rp are the observed, uncertainty and predicted percent gas release, N3 is the total number of steps in the step heating procedure
-- the Thermo Luminescence part
+- the Thermo Luminescence/ OSL and ESR part
 ----
 M4 = sqrt(sum [(NNo-NNp)^2^/dNN^2^]/N4)
 ----
-where NNo, dNN and NNp are the observed, uncertainty in and predicted NN, N4 is the total number of TL observations
+where NNo, dNN and NNp are the observed, uncertainty (assumed to be 0.1) in and predicted NN, N4 is the total number of TL+OSL+ESR observations
 
 === NA behaviour
 

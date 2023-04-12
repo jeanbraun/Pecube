@@ -258,9 +258,11 @@ end subroutine writemodels
       double precision, dimension(:,:), allocatable :: theating,released,dreleased,agereleased,dagereleased,duration
       double precision, dimension(:,:), allocatable :: time43He,temperature43He
       double precision, dimension(:), allocatable :: releasedp,agereleasedp
-      double precision, dimension(:), allocatable :: doser,d0,radius,et,logs,b,logrho,nn
+      double precision, dimension(:), allocatable :: doser,d0,radius,et,logs,b,logrho,nn,eu,sigmaet,heighto
       double precision, dimension(:,:), allocatable :: timeTSL,temperatureTSL
-      double precision age43Hep,nnf,paramsTSL(8)
+      double precision, dimension(:,:), allocatable :: timeOSL,temperatureOSL
+      double precision, dimension(:,:), allocatable :: timeESR,temperatureESR
+      double precision age43Hep,nnf,paramsTSL(8),paramsOSL(8),paramsESR(8)
 
       double precision, dimension(:,:),allocatable::lsf,lsfn,lsfx,lsfy,lsfxn,lsfyn
 
@@ -273,7 +275,7 @@ end subroutine writemodels
       integer nproc,iproc,nfault,npe,mpe,nsurf,nz,nelemsurf,nstep,ilog,iterative,interpol
       integer isoflag,nx,ny,nxiso,nyiso,niteradvec,istep,kstep
       integer i1,i2,i3,i4,iout,istatic,ntime,nnode,nelem,ie,iesurf,i,j,k,kk,ido,nelemloc,je
-      integer irec,jrec,in,itime,ij,iu,ic,ieobs,inp,iobs,krec,ktime,niter,nobs,nobs1,nobs2,nobs3,nobs4 !VKP
+      integer irec,jrec,in,itime,ij,iu,ic,ieobs,inp,iobs,krec,ktime,niter,nobs,nobs1,nobs2,nobs3,nobs4,nobs5,nobs6 !VKP
       integer ftlflag,mftflag,fltflag
       double precision x1,x2,x3,x4,x5,dt,time,alpha,zsurfmax,fact,tsurf,zh,ftime,ftimep,tprevious,tfake
       double precision eps,zl,diffusivity,heatproduction,zsurf1,zsurf2
@@ -291,7 +293,7 @@ end subroutine writemodels
       double precision agearMobs,dagearMobs
       double precision agearHobs,dagearHobs
       double precision tlobs(20),length(20)
-      real*4,dimension(:),allocatable::ageft,agehe,ageheZ,ageftZ,agearK,agearB,agearM,agearH,hei,nNs
+      real*4,dimension(:),allocatable::ageft,agehe,ageheZ,ageftZ,agearK,agearB,agearM,agearH,hei,nNtl,nNosl,nNesr
       real*4,dimension(:),allocatable::lonobs,latobs
       double precision wobs1,wobs2,wobs3,wobs4,x1f,x2f,y1f,y2f
       double precision def,dif,heightobs,friction
@@ -328,14 +330,14 @@ end subroutine writemodels
 
       logical interpol_success,vivi,saveTt
 
-      integer nd,nmisfit,nmisfitp,nmisfit1,nmisfit2,nmisfit3,nmisfit4,nmisfit1a,nmisfit3a
+      integer nd,nmisfit,nmisfitp,nmisfit1,nmisfit2,nmisfit3,nmisfit4,nmisfit5,nmisfit6,nmisfit1a,nmisfit3a
       real*4 param(nd)
       real*4 misfit,misfitp
       real*4 range(2,1024)
-      real*4 misfit1, misfit2, misfit3, misfit4,misfit1a,misfit3a
+      real*4 misfit1, misfit2, misfit3, misfit4,misfit5,misfit6,misfit1a,misfit3a
 
-      external hinterpolate,thermal_diffusivity,heat_production,TLModel
-      double precision hinterpolate,zmax,zlsf,thermal_diffusivity,heat_production,TLModel,dummy
+      external hinterpolate,thermal_diffusivity,heat_production,TLModel,OSLModel,ESRModel
+      double precision hinterpolate,zmax,zlsf,thermal_diffusivity,heat_production,TLModel,OSLModel,ESRModel,dummy
 
       call cpu_time (times(1))
       nproc=1
@@ -522,7 +524,7 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
         if (vivi) read (7,*) (usurf(i),i=1,nsurf) !VKP
         if (vivi) read (7,*) (tempsurf(i),i=1,nsurf) !VKP
           if (istep.eq.nstep) then
-          read (7,*) nobs1,nobs2,nobs3,nobs4
+          read (7,*) nobs1,nobs2,nobs3,nobs4,nobs5,nobs6
           saveTt=.FALSE.
             if (nobs1.lt.0.and.nd.eq.0) then
             saveTt=.TRUE.
@@ -531,7 +533,9 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
           if (nobs2.lt.0) nobs2=-nobs2
           if (nobs3.lt.0) nobs3=-nobs3
           if (nobs4.lt.0) nobs4=-nobs4
-          nobs=nobs1+nobs2+nobs3+nobs4
+          if (nobs5.lt.0) nobs5=-nobs5
+          if (nobs6.lt.0) nobs6=-nobs6
+          nobs=nobs1+nobs2+nobs3+nobs4+nobs5+nobs6
           allocate (xdeptho(nobs),ydeptho(nobs),zdeptho(nobs))
           allocate (zsurfo(nobs),zsurfpo(nobs))
           allocate (xexhumationo(nobs),yexhumationo(nobs),zexhumationo(nobs),grainobs(nobs))
@@ -541,7 +545,7 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
           allocate (agereleased(1024,nobs),dagereleased(1024,nobs))
           allocate (size43He(nobs),age43He(nobs),dage43He(nobs))
           allocate (doser(nobs),d0(nobs),radius(nobs),et(nobs),logs(nobs),b(nobs))
-          allocate (logrho(nobs),nn(nobs))
+          allocate (logrho(nobs),nn(nobs),eu(nobs),sigmaet(nobs),heighto(nobs))
             do i=1,nobs1
             read (7,*) xlonobs,xlatobs,ageheobs,dageheobs,ageftobs,dageftobs, & ! By Xav
                        ageheZobs,dageheZobs,ageftZobs,dageftZobs,agearKobs,dagearKobs, &
@@ -612,8 +616,46 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
                            +we3(i)*zsurf(iconsurf(3,ieo(i))) &
                            +we4(i)*zsurf(iconsurf(npe,ieo(i)))+zl+min(0.d0,heightobs/1.e3)
             enddo
+            do i=nobs1+nobs2+nobs3+nobs4+1,nobs1+nobs2+nobs3+nobs4+nobs5
+              read (7,*) xlonobs,xlatobs, &
+                        doser(i),d0(i),et(i), &
+                        logs(i),logrho(i),eu(i),nn(i), &
+                        heightobs,ieo(i),we1(i),we2(i),we3(i),we4(i)   ! By Xav
+              xexhumationo(i)=we1(i)*xsurf(iconsurf(1,ieo(i))) &
+                             +we2(i)*xsurf(iconsurf(2,ieo(i))) &
+                             +we3(i)*xsurf(iconsurf(3,ieo(i))) &
+                             +we4(i)*xsurf(iconsurf(npe,ieo(i)))
+              yexhumationo(i)=we1(i)*ysurf(iconsurf(1,ieo(i))) &
+                             +we2(i)*ysurf(iconsurf(2,ieo(i))) &
+                             +we3(i)*ysurf(iconsurf(3,ieo(i))) &
+                             +we4(i)*ysurf(iconsurf(npe,ieo(i)))
+              zexhumationo(i)=we1(i)*zsurf(iconsurf(1,ieo(i))) &
+                             +we2(i)*zsurf(iconsurf(2,ieo(i))) &
+                             +we3(i)*zsurf(iconsurf(3,ieo(i))) &
+                             +we4(i)*zsurf(iconsurf(npe,ieo(i)))+zl+min(0.d0,heightobs/1.e3)
+              enddo
+              do i=nobs1+nobs2+nobs3+nobs4+nobs5+1,nobs1+nobs2+nobs3+nobs4+nobs5+nobs6
+                read (7,*) xlonobs,xlatobs, &
+                          doser(i),d0(i), &
+                          logs(i),et(i),sigmaet(i),nn(i), &
+                          heightobs,ieo(i),we1(i),we2(i),we3(i),we4(i)   ! By Xav
+                xexhumationo(i)=we1(i)*xsurf(iconsurf(1,ieo(i))) &
+                               +we2(i)*xsurf(iconsurf(2,ieo(i))) &
+                               +we3(i)*xsurf(iconsurf(3,ieo(i))) &
+                               +we4(i)*xsurf(iconsurf(npe,ieo(i)))
+                yexhumationo(i)=we1(i)*ysurf(iconsurf(1,ieo(i))) &
+                               +we2(i)*ysurf(iconsurf(2,ieo(i))) &
+                               +we3(i)*ysurf(iconsurf(3,ieo(i))) &
+                               +we4(i)*ysurf(iconsurf(npe,ieo(i)))
+                zexhumationo(i)=we1(i)*zsurf(iconsurf(1,ieo(i))) &
+                               +we2(i)*zsurf(iconsurf(2,ieo(i))) &
+                               +we3(i)*zsurf(iconsurf(3,ieo(i))) &
+                               +we4(i)*zsurf(iconsurf(npe,ieo(i)))+zl+min(0.d0,heightobs/1.e3)
+                enddo
+    
           read (7,*) ageflag
           endif
+
 ! isostatic rebound
         topoa=zsurfp
         topob=zsurf
@@ -749,7 +791,7 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
 ! Ages.out contains the ages at the end of each stage
 
       if (iproc.eq.0.and.nd.eq.0) open (11,file=run//'/output/Ages.out',status='unknown',access='direct', &
-            recl=4*(4+14*nsurf+npe*nelemsurf))
+            recl=4*(4+16*nsurf+npe*nelemsurf))
 
 ! Pecube.ptt contains the depth-temperture-paths of all surface nodes
 
@@ -1250,13 +1292,13 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
 
         if (nd.eq.0.and.ilog.eq.1) write (9,*) 'Calculate ages'
 
-        allocate (age1(nsurf),age2(nsurf),age3(nsurf),age4(nsurf),age5(nsurf),nNs(nsurf))
+        allocate (age1(nsurf),age2(nsurf),age3(nsurf),age4(nsurf),age5(nsurf),nNtl(nsurf),nNosl(nsurf),nNesr(nsurf))
         allocate (age6(nsurf),age7(nsurf),age8(nsurf),ftdist(20,nsurf),grainsize(nsurf))
 
         if (istep.eq.0.or.iout.eq.0) then
 
         age1=tprevious;age2=tprevious;age3=tprevious;age4=tprevious;age5=tprevious
-        age6=tprevious;age7=tprevious;age8=tprevious;ftdist=0.;nNs=0.
+        age6=tprevious;age7=tprevious;age8=tprevious;ftdist=0.;nNtl=0.;nNosl=0.;nNesr=0.
 
         else
 
@@ -1271,10 +1313,22 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
 
         if (nd.eq.0.and.p%age_TL_flag.ne.0) then
         write (6,*) ''
-        write (6,*) 'Calculating TL/OSL'
-        call calculate_TL (jrec,nsurf,nz,istep,nNs,p%TL_doser,p%TL_D0,p%TL_a,p%TL_b,p%TL_Et,p%TL_logs,p%TL_logrho)
+        write (6,*) 'Calculating TL'
+        call calculate_TL (jrec,nsurf,nz,istep,nNtl,p%TL_doser,p%TL_D0,p%TL_a,p%TL_b,p%TL_Et,p%TL_logs,p%TL_logrho)
         endif
 
+        if (nd.eq.0.and.p%age_OSL_flag.ne.0) then
+        write (6,*) ''
+        write (6,*) 'Calculating OSL'
+        call calculate_OSL (jrec,nsurf,nz,istep,nNosl,p%OSL_doser,p%OSL_D0,p%OSL_Et,p%OSL_Eu,p%OSL_logs,p%OSL_logrho)
+        endif
+
+        if (nd.eq.0.and.p%age_ESR_flag.ne.0) then
+          write (6,*) ''
+          write (6,*) 'Calculating ESR'
+          call calculate_ESR (jrec,nsurf,nz,istep,nNesr,p%ESR_doser,p%ESR_D0,p%ESR_logs,p%ESR_Et,p%ESR_sigmaEt)
+          endif
+  
         endif
 
 ! write output
@@ -1325,7 +1379,7 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
           enddo
         if (nd.eq.0) write (11,rec=irec) nsurf,nelemsurf,npe,sngl(tfinal-time),sngl(xsurf),sngl(ysurf),sngl(zl+zsurf), &
                             exhumation,age1,age2,age3,age4,age5,age6,age7,age8, &
-                            (sngl(sum(length*ftdist(:,j))),j=1,nsurf),nNs,iconsurf
+                            (sngl(sum(length*ftdist(:,j))),j=1,nsurf),nNtl,nNosl,nNesr,iconsurf
         deallocate (exhumation)
 
         write (cstep,'(i3)') istep
@@ -1335,12 +1389,12 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
         open (12,file=run//'/output/Ages'//cstep//'.csv',status='unknown')
         write (12,'(a)') 'Longitude,Latitude,Height,HeApatite,HeZircon,FTApatite,' &
                              //'FTZircon,ArKFeldspar,ArBiotite,ArMuscovite,ArHornblend,' &
-                             //'FTApMeanTL,nN'
+                             //'FTApMeanTL,nNtl,nNosl,nNesr'
           do i=1,nsurf
           xxx=xlonmin+(xlonmax-xlonmin)*(xsurf(i)-xmin)/(xmax-xmin)
           yyy=xlatmin+(xlatmax-xlatmin)*(ysurf(i)-ymin)/(ymax-ymin)
-          write (12,'(g12.6,12(",",g12.6))') xxx,yyy,zsurf(i)*1000,age1(i),age2(i),age3(i),age4(i),age5(i), &
-                                       age6(i),age7(i),age8(i),sngl(sum(length*ftdist(:,i))),nNs(i)
+          write (12,'(g12.6,14(",",g12.6))') xxx,yyy,zsurf(i)*1000,age1(i),age2(i),age3(i),age4(i),age5(i), &
+                                       age6(i),age7(i),age8(i),sngl(sum(length*ftdist(:,i))),nNtl(i),nNosl(i),nNesr(i)
           enddo
         close (12)
   !      call vtkp (lsf,nx,ny,nz,xmax-xmin,ymax-ymin,zl+zmax,istep)
@@ -1348,7 +1402,7 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
 
         endif
 
-      if (istep.ne.nstep) deallocate (age1,age2,age3,age4,age5,age6,age7,age8,ftdist,grainsize,nNs)
+      if (istep.ne.nstep) deallocate (age1,age2,age3,age4,age5,age6,age7,age8,ftdist,grainsize,nNtl,nNosl,nNesr)
 
 ! end of surface stepping
 
@@ -1380,7 +1434,7 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
       close (11)
       open (11,file=run//'/output/Ages.out',status='unknown',access='direct', &
             recl=4)
-      write (11,rec=irec*(4+14*nsurf+npe*nelemsurf)+1) -1
+      write (11,rec=irec*(4+16*nsurf+npe*nelemsurf)+1) -1
       close (11)
       endif
 
@@ -1403,12 +1457,14 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
       narB=0
       narM=0
       narH=0
-      read (7,*) nobs1,nobs2,nobs3,nobs4
+      read (7,*) nobs1,nobs2,nobs3,nobs4,nobs5,nobs6
       if (nobs1.lt.0) nobs1=-nobs1
       if (nobs2.lt.0) nobs2=-nobs2
       if (nobs3.lt.0) nobs3=-nobs3
       if (nobs4.lt.0) nobs4=-nobs4
-      nobs=nobs1+nobs2+nobs3+nobs4
+      if (nobs5.lt.0) nobs5=-nobs5
+      if (nobs6.lt.0) nobs6=-nobs6
+      nobs=nobs1+nobs2+nobs3+nobs4+nobs5+nobs6
       allocate (lonobs(nobs),latobs(nobs))
       allocate (aheoreg(nobs),ahepreg(nobs),hheoreg(nobs))
       allocate (aftoreg(nobs),aftpreg(nobs),hftoreg(nobs))
@@ -1714,13 +1770,13 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
         do iobs=nobs1+nobs2+nobs3+1,nobs1+nobs2+nobs3+nobs4
         read (7,*) xlonobs,xlatobs, &
                   doser(iobs),d0(iobs),radius(iobs),et(iobs), &
-                  logs(iobs),b(iobs),logrho(iobs),nn(i), &
-                  heightobs,ieobs,wobs1,wobs2,wobs3,wobs4   ! By Xav
+                  logs(iobs),b(iobs),logrho(iobs),nn(iobs), &
+                  heighto(iobs),ieobs,wobs1,wobs2,wobs3,wobs4   ! By Xav
         hei(iobs)=wobs1*zsurf(iconsurf(1,ieobs)) &
                   +wobs2*zsurf(iconsurf(2,ieobs)) &
                   +wobs3*zsurf(iconsurf(3,ieobs)) &
                   +wobs4*zsurf(iconsurf(npe,ieobs))
-        hei(iobs)=hei(iobs)*1000.+min(0.d0,heightobs)
+        hei(iobs)=hei(iobs)*1000.+min(0.d0,heighto(iobs))
         lonobs(iobs)=xlonobs
         latobs(iobs)=xlatobs
         enddo
@@ -1743,13 +1799,102 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
         misfit4=misfit4+(nn(iobs) - nnf)**2/(nn(iobs)*0.1d0)**2
         nmisfit4=nmisfit4+1
         if (nd.eq.0.and.nobs4.gt.0) write (13,'(g15.9,5(",",g15.9))') & 
-          lonobs(iobs),latobs(iobs),heightobs,hei(iobs),nn(iobs),nnf
+          lonobs(iobs),latobs(iobs),heighto(iobs),hei(iobs),nn(iobs),nnf
         enddo
 
       deallocate (timeTSL,temperatureTSL)
 
       if (nd.eq.0.and.nobs4.gt.0) close (13)
 
+! compute misfit for OSL
+
+      if (nd.eq.0.and.nobs5.gt.0) then
+        open (13,file=run//'/output/CompareOSL.csv',status='unknown')
+        if (nd.eq.0.and.nobs5.gt.0) write (13,'(a,5(",",a))') 'LON','LAT','HEIGHTOBS','HEIGHTPRED','NNOBS','NNPRED'
+        endif
+  
+        nheating=0
+          do iobs=nobs1+nobs2+nobs3+nobs4+1,nobs1+nobs2+nobs3+nobs4+nobs5
+          read (7,*) xlonobs,xlatobs, &
+                    doser(iobs),d0(iobs),et(iobs), &
+                    logs(iobs),logrho(iobs),eu(iobs),nn(iobs), &
+                    heighto(iobs),ieobs,wobs1,wobs2,wobs3,wobs4   ! By Xav
+          hei(iobs)=wobs1*zsurf(iconsurf(1,ieobs)) &
+                    +wobs2*zsurf(iconsurf(2,ieobs)) &
+                    +wobs3*zsurf(iconsurf(3,ieobs)) &
+                    +wobs4*zsurf(iconsurf(npe,ieobs))
+          hei(iobs)=hei(iobs)*1000.+min(0.d0,heighto(iobs))
+          lonobs(iobs)=xlonobs
+          latobs(iobs)=xlatobs
+          enddo
+  
+        allocate (timeOSL(jrec,nobs),temperatureOSL(jrec,nobs))
+        call extract_ttpath (jrec,nobs,nz,400,timeOSL,temperatureOSL,iproc,nd)
+  
+        misfit5 = 0.
+        nmisfit5 = 0
+          do iobs=nobs1+nobs2+nobs3+nobs4+1,nobs1+nobs2+nobs3+nobs4+nobs5
+          paramsOSL(1)=doser(iobs)
+          paramsOSL(2)=d0(iobs)
+          paramsOSL(3)=et(iobs)
+          paramsOSL(4)=eu(iobs)
+          paramsOSL(5)=logs(iobs)
+          paramsOSL(6)=logrho(iobs)
+          nnf = OSLModel (timeOSL(1,iobs), temperatureOSL(1,iobs), jrec, paramsOSL)
+          misfit5=misfit5+(nn(iobs) - nnf)**2/(nn(iobs)*0.1d0)**2
+          nmisfit5=nmisfit5+1
+          if (nd.eq.0.and.nobs5.gt.0) write (13,'(g15.9,5(",",g15.9))') & 
+            lonobs(iobs),latobs(iobs),heighto(iobs),hei(iobs),nn(iobs),nnf
+          enddo
+  
+        deallocate (timeOSL,temperatureOSL)
+  
+        if (nd.eq.0.and.nobs4.gt.0) close (13)
+        
+! compute misfit for ESR
+
+        if (nd.eq.0.and.nobs6.gt.0) then
+          open (13,file=run//'/output/CompareESR.csv',status='unknown')
+          if (nd.eq.0.and.nobs6.gt.0) write (13,'(a,5(",",a))') 'LON','LAT','HEIGHTOBS','HEIGHTPRED','NNOBS','NNPRED'
+          endif
+    
+          nheating=0
+            do iobs=nobs1+nobs2+nobs3+nobs4+nobs5+1,nobs1+nobs2+nobs3+nobs4+nobs5+nobs6
+            read (7,*) xlonobs,xlatobs, &
+                      doser(iobs),d0(iobs), &
+                      logs(iobs),et(iobs),sigmaet(iobs),nn(iobs), &
+                      heighto(iobs),ieobs,wobs1,wobs2,wobs3,wobs4   ! By Xav
+            hei(iobs)=wobs1*zsurf(iconsurf(1,ieobs)) &
+                      +wobs2*zsurf(iconsurf(2,ieobs)) &
+                      +wobs3*zsurf(iconsurf(3,ieobs)) &
+                      +wobs4*zsurf(iconsurf(npe,ieobs))
+            hei(iobs)=hei(iobs)*1000.+min(0.d0,heighto(iobs))
+            lonobs(iobs)=xlonobs
+            latobs(iobs)=xlatobs
+            enddo
+    
+          allocate (timeESR(jrec,nobs),temperatureESR(jrec,nobs))
+          call extract_ttpath (jrec,nobs,nz,400,timeESR,temperatureESR,iproc,nd)
+    
+          misfit6 = 0.
+          nmisfit6 = 0
+            do iobs=nobs1+nobs2+nobs3+nobs4+nobs5+1,nobs1+nobs2+nobs3+nobs4+nobs5+nobs6
+            paramsESR(1)=doser(iobs)
+            paramsESR(2)=d0(iobs)
+            paramsESR(3)=logs(iobs)
+            paramsESR(4)=et(iobs)
+            paramsESR(5)=sigmaet(iobs)
+            nnf = ESRModel (timeESR(1,iobs), temperatureESR(1,iobs), jrec, paramsESR)
+            misfit6=misfit6+(nn(iobs) - nnf)**2/(nn(iobs)*0.1d0)**2
+            nmisfit6=nmisfit6+1
+            if (nd.eq.0.and.nobs6.gt.0) write (13,'(g15.9,5(",",g15.9))') & 
+              lonobs(iobs),latobs(iobs),heighto(iobs),hei(iobs),nn(iobs),nnf
+            enddo
+    
+          deallocate (timeESR,temperatureESR)
+    
+          if (nd.eq.0.and.nobs4.gt.0) close (13)
+          
       deallocate (lonobs,latobs)
 
       if (nmisfit1.ne.0) misfit1 = sqrt(misfit1/nmisfit1)
@@ -1758,16 +1903,20 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
       if (nmisfit3.ne.0) misfit3 = sqrt(misfit3/nmisfit3)
       if (nmisfit3a.ne.0) misfit3a = sqrt(misfit3a/nmisfit3a)
       if (nmisfit4.ne.0) misfit4 = sqrt(misfit4/nmisfit4)
+      if (nmisfit5.ne.0) misfit5 = sqrt(misfit5/nmisfit5)
+      if (nmisfit6.ne.0) misfit6 = sqrt(misfit6/nmisfit6)
+  
       misfit = misfit1*p%misfit_weight_AGE + misfit1a * p%misfit_weight_FTLD + misfit2*p%misfit_weight_TH + &
-            (misfit3 + misfit3a)*p%misfit_weight_43HE + misfit4*p%misfit_weight_TL
+            (misfit3 + misfit3a)*p%misfit_weight_43HE + misfit4*p%misfit_weight_TL + misfit5*p%misfit_weight_OSL + &
+            misfit6*p%misfit_weight_ESR
         if (p%misfit_corrected.eq.1) then
-          if (nmisfit1 + nmisfit1a + nmisfit2 + nmisfit3 + nmisfit3a + nmisfit4 - nd -1 .gt. 0) then
-          misfit = misfit/(nmisfit1 + nmisfit1a + nmisfit2 + nmisfit3 + nmisfit3a + nmisfit4 - nd - 1)
+          if (nmisfit1 + nmisfit1a + nmisfit2 + nmisfit3 + nmisfit3a + nmisfit4 + nmisfit5 + nmisfit6 - nd -1 .gt. 0) then
+          misfit = misfit/(nmisfit1 + nmisfit1a + nmisfit2 + nmisfit3 + nmisfit3a + nmisfit4 + nmisfit5 + nmisfit6 - nd - 1)
           else
             if (iproc.eq.0) then
             write (*,*) 'Warning - Pecube will not correct the misfit (misfit_corrected = 1) when the total number'
             write (*,*) 'of data points is smaller than the number of parameters being inverted  + 1'
-            write (*,*) 'Currently it is:',nmisfit1 + nmisfit1a + nmisfit2 + nmisfit3 + nmisfit3a + nmisfit4
+            write (*,*) 'Currently it is:',nmisfit1 + nmisfit1a + nmisfit2 + nmisfit3 + nmisfit3a + nmisfit4 + nmisfit5 + nmisfit6
             write (*,*) 'and the number of parameters is ',nd
             endif
           endif
@@ -1821,7 +1970,7 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
           endif
         endif
       if (nd.eq.0) write (6,*) 'Misfit : ',misfit
-      if (nd.ne.0) write (*,*) 'Misfit:',misfit,misfit1,misfit2,misfit3,misfit4,' - Params',param(1:nd)
+      if (nd.ne.0) write (*,*) 'Misfit:',misfit,misfit1,misfit2,misfit3,misfit4,misfit5,misfit6,' - Params',param(1:nd)
       close (13)
 ! added by Jean to change misfit to slope rather than exact ages
 ! (4/6/2008)

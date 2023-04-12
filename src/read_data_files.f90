@@ -60,7 +60,7 @@ end module read_string_module
 !----------------------------
 
 subroutine read_data_folder ( folder, echo, xlon1, xlon2, xlat1, xlat2, iproc, nd, &
-                              nobs1, nobs2, nobs3, nobs4)
+                              nobs1, nobs2, nobs3, nobs4, nobs5, nobs6)
 
 ! subroutines goes throuh the files in forlder "folder" and attempts to read the data in each of them
 
@@ -83,7 +83,7 @@ double precision, dimension(:,:), allocatable :: obs
 character*6, dimension(:), allocatable :: field_name
 character*4 :: cproc
 
-integer nobs1, nobs2, nobs3, nobs4
+integer nobs1, nobs2, nobs3, nobs4,nobs5,nobs6
 
 if (nd.eq.0) print*,'-----------------------------Reading data----------------------------------------'
 if (nd.eq.0) print*,'---------------------------------------------------------------------------------'
@@ -179,6 +179,12 @@ call read_data_files_for_43He (folder,cproc, xlon1, xlon2, xlat1, xlat2, nd, nob
 ! now scans for TSL data
 
 call read_data_files_for_TSL (folder,cproc, xlon1, xlon2, xlat1, xlat2, nd, nobs4)
+
+! now scans for OSL data
+call read_data_files_for_OSL (folder,cproc, xlon1, xlon2, xlat1, xlat2, nd, nobs5)
+
+! now scans for ESR data
+call read_data_files_for_ESR (folder,cproc, xlon1, xlon2, xlat1, xlat2, nd, nobs6)
 
 deallocate (sample, field_name)
 
@@ -953,10 +959,10 @@ do
   read (8,'(a)', end=995) fnme
   call read_table(folder//'/'//fnme, tag0, 11, sample_names, sample_values, nsamples, 10000)
   do isample = 1, nsamples
-    if (abs(sample_values(11,isample)+9999).gt.tiny(0.d0)) then
+    if (abs(sample_values(6,isample)+9999).gt.tiny(0.d0)) then
       do j = 1,11
         if (abs(sample_values(j,isample)+9999).lt.tiny(0.d0) .and. j.ne.3) then
-          if (nd.eq.0) print*,'Sample ',trim(sample_names(isample)),' needs the ',trim(tag0(j)),' field'
+          if (nd.eq.0) print*,'TLSample ',trim(sample_names(isample)),' needs the ',trim(tag0(j)),' field'
           stop
         endif
       enddo
@@ -985,20 +991,22 @@ do
   read (8,'(a)', end=993) fnme
   call read_table(folder//'/'//fnme, tag0, 11, sample_names, sample_values, nsamples, 10000)
   do isample = 1, nsamples
-    lon = sample_values(1,isample)
-    lat = sample_values(2,isample)
-    height = sample_values(3,isample)
-    if (abs(height+9999.).lt.tiny(height)) height = 0
-    doser = sample_values(4,isample)
-    d0 = sample_values(5,isample)
-    a = sample_values(6,isample)
-    et = sample_values(7,isample)
-    logs = sample_values(8,isample)
-    b = sample_values(9,isample)
-    logrho = sample_values(10,isample)
-    nn = sample_values(11,isample)
-    if ((lon - xlon1)*(lon - xlon2).le.0.d0 .and. (lat - xlat1)*(lat - xlat2).le.0.d0) &
+    if (abs(sample_values(6,isample)+9999).gt.tiny(0.d0)) then
+      lon = sample_values(1,isample)
+      lat = sample_values(2,isample)
+      height = sample_values(3,isample)
+      if (abs(height+9999.).lt.tiny(height)) height = 0
+      doser = sample_values(4,isample)
+      d0 = sample_values(5,isample)
+      a = sample_values(6,isample)
+      et = sample_values(7,isample)
+      logs = sample_values(8,isample)
+      b = sample_values(9,isample)
+      logrho = sample_values(10,isample)
+      nn = sample_values(11,isample)
+      if ((lon - xlon1)*(lon - xlon2).le.0.d0 .and. (lat - xlat1)*(lat - xlat2).le.0.d0) &
       write (111,*) lon,lat,height,doser,d0,a,et,logs,b,logrho,nn
+    endif
   enddo
 enddo
 
@@ -1013,7 +1021,215 @@ end subroutine read_data_files_for_TSL
 
 !----------------------------
 
-function read_string (unit, istring, jstring) result (out)
+subroutine read_data_files_for_OSL (folder, cproc, xlon1, xlon2, xlat1, xlat2, nd, nobs)
+
+  ! this subroutine finds and reads the TSL data from all files contained in folder
+  ! and writes it to unit 111 (the data input file for Pecube)
+  
+  use read_string_module
+  
+  implicit none
+  
+  double precision, intent(in) :: xlon1, xlon2, xlat1, xlat2
+  character*(*) :: folder
+  integer, intent(in) :: nd
+  character(len=1024) :: fnme
+  integer :: isample
+  integer :: nobs
+  double precision :: lat, lon, height, doser, d0, et, logs, logrho, eu, nn
+  integer :: i,j
+  character*4 cproc
+  character*128 tag0(11)
+  character*128 sample_names(10000)
+  double precision sample_values(11, 10000)
+  integer nsamples
+  
+  ! first count the number of thermal histories in all files
+  
+  nobs = 0
+  
+  tag0(1)='LON'
+  tag0(2)='LAT'
+  tag0(3)='HEIGHT'
+  tag0(4)='DOSER'
+  tag0(5)='D0'
+  tag0(6)='ET'
+  tag0(7)='LOGS'
+  tag0(8)='LOGRHO'
+  tag0(9)='EU'
+  tag0(10)='N/N'
+  
+  open (8, file='tmp/data_lst'//cproc//'.txt', status='old', err=996)
+  
+  do
+    read (8,'(a)', end=995) fnme
+    call read_table(folder//'/'//fnme, tag0, 10, sample_names, sample_values, nsamples, 10000)
+    do isample = 1, nsamples
+      if (abs(sample_values(9,isample)+9999).gt.tiny(0.d0)) then
+        do j = 1,10
+          if (abs(sample_values(j,isample)+9999).lt.tiny(0.d0) .and. j.ne.3) then
+            if (nd.eq.0) print*,'OSLSample ',trim(sample_names(isample)),' needs the ',trim(tag0(j)),' field'
+            stop
+          endif
+        enddo
+        lon = sample_values(1,isample)
+        lat = sample_values(2,isample)
+        if ((lon - xlon1)*(lon - xlon2).le.0.d0 .and. (lat - xlat1)*(lat - xlat2).le.0.d0) &
+          nobs = nobs + 1
+      endif
+    enddo
+  enddo
+  
+  995 close (8)
+  996 continue
+  
+  if (nd.eq.0) print*,'Number of OSL Ages Data:', nobs
+  
+  if (nobs.eq.0) return
+  
+  open (111, file = folder//cproc//'.txt', access = 'append')
+  
+  ! then reads the lat, lon, height and TSL data of all samples in all files
+  
+  open (8, file='tmp/data_lst'//cproc//'.txt', status='old', err=994)
+  
+  do
+    read (8,'(a)', end=993) fnme
+    call read_table(folder//'/'//fnme, tag0, 10, sample_names, sample_values, nsamples, 10000)
+    do isample = 1, nsamples
+      if (abs(sample_values(9,isample)+9999).gt.tiny(0.d0)) then
+        lon = sample_values(1,isample)
+        lat = sample_values(2,isample)
+        height = sample_values(3,isample)
+        if (abs(height+9999.).lt.tiny(height)) height = 0
+        doser = sample_values(4,isample)
+        d0 = sample_values(5,isample)
+        et = sample_values(6,isample)
+        logs = sample_values(7,isample)
+        logrho = sample_values(8,isample)
+        eu = sample_values(9,isample)
+        nn = sample_values(10,isample)
+        if ((lon - xlon1)*(lon - xlon2).le.0.d0 .and. (lat - xlat1)*(lat - xlat2).le.0.d0) &
+          write (111,*) lon,lat,height,doser,d0,et,logs,logrho,eu,nn
+      endif
+    enddo
+  enddo
+  
+  993 close (8)
+  994 continue
+  
+  close (111)
+  
+  return
+  
+  end subroutine read_data_files_for_OSL
+  
+  !----------------------------
+
+  subroutine read_data_files_for_ESR (folder, cproc, xlon1, xlon2, xlat1, xlat2, nd, nobs)
+
+    ! this subroutine finds and reads the TSL data from all files contained in folder
+    ! and writes it to unit 111 (the data input file for Pecube)
+    
+    use read_string_module
+    
+    implicit none
+    
+    double precision, intent(in) :: xlon1, xlon2, xlat1, xlat2
+    character*(*) :: folder
+    integer, intent(in) :: nd
+    character(len=1024) :: fnme
+    integer :: isample
+    integer :: nobs
+    double precision :: lat, lon, height, doser, d0, logs, et, sigmaet, nn
+    integer :: i,j
+    character*4 cproc
+    character*128 tag0(11)
+    character*128 sample_names(10000)
+    double precision sample_values(11, 10000)
+    integer nsamples
+    
+    ! first count the number of thermal histories in all files
+    
+    nobs = 0
+    
+    tag0(1)='LON'
+    tag0(2)='LAT'
+    tag0(3)='HEIGHT'
+    tag0(4)='DOSER'
+    tag0(5)='D0'
+    tag0(6)='LOGS'
+    tag0(7)='ET'
+    tag0(8)='SIGMAET'
+    tag0(9)='N/N'
+    
+    open (8, file='tmp/data_lst'//cproc//'.txt', status='old', err=996)
+    
+    do
+      read (8,'(a)', end=995) fnme
+      call read_table(folder//'/'//fnme, tag0, 9, sample_names, sample_values, nsamples, 10000)
+      do isample = 1, nsamples
+        if (abs(sample_values(8,isample)+9999).gt.tiny(0.d0)) then
+          do j = 1,9
+            if (abs(sample_values(j,isample)+9999).lt.tiny(0.d0) .and. j.ne.3) then
+              if (nd.eq.0) print*,'ESR Sample ',trim(sample_names(isample)),' needs the ',trim(tag0(j)),' field'
+              stop
+            endif
+          enddo
+          lon = sample_values(1,isample)
+          lat = sample_values(2,isample)
+          if ((lon - xlon1)*(lon - xlon2).le.0.d0 .and. (lat - xlat1)*(lat - xlat2).le.0.d0) &
+            nobs = nobs + 1
+        endif
+      enddo
+    enddo
+    
+    995 close (8)
+    996 continue
+    
+    if (nd.eq.0) print*,'Number of ESR Ages Data:', nobs
+    
+    if (nobs.eq.0) return
+    
+    open (111, file = folder//cproc//'.txt', access = 'append')
+    
+    ! then reads the lat, lon, height and TSL data of all samples in all files
+    
+    open (8, file='tmp/data_lst'//cproc//'.txt', status='old', err=994)
+    
+    do
+      read (8,'(a)', end=993) fnme
+      call read_table(folder//'/'//fnme, tag0, 10, sample_names, sample_values, nsamples, 10000)
+      do isample = 1, nsamples
+        if (abs(sample_values(8,isample)+9999).gt.tiny(0.d0)) then
+          lon = sample_values(1,isample)
+          lat = sample_values(2,isample)
+          height = sample_values(3,isample)
+          if (abs(height+9999.).lt.tiny(height)) height = 0
+          doser = sample_values(4,isample)
+          d0 = sample_values(5,isample)
+          logs = sample_values(6,isample)
+          et = sample_values(7,isample)
+          sigmaet = sample_values(8,isample)
+          nn = sample_values(9,isample)
+          if ((lon - xlon1)*(lon - xlon2).le.0.d0 .and. (lat - xlat1)*(lat - xlat2).le.0.d0) &
+            write (111,*) lon,lat,height,doser,d0,logs,et,sigmaet,nn
+        endif
+      enddo
+    enddo
+    
+    993 close (8)
+    994 continue
+    
+    close (111)
+    
+    return
+    
+    end subroutine read_data_files_for_ESR
+    
+    !----------------------------
+    
+    function read_string (unit, istring, jstring) result (out)
 
 ! Returns the string located at location istring,jstring in a csv file
 ! istring is column number and jstring is line or row number

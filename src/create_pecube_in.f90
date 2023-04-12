@@ -21,7 +21,7 @@
       integer,dimension(:),allocatable::iout
       integer,dimension(:,:),allocatable::iconz,neighz
       integer i,j,k,nfnme,nx0,ny0,nskip,nstep,istep,isoflag,nxiso,nyiso,nz,ij,it
-      integer nx,ny,nsurf,nelem,nne,nobsfile,iterative,interpol,icon1,icon2,icon3,icon4,nobs,nobs1,nobs2,nobs3,nobs4
+      integer nx,ny,nsurf,nelem,nne,nobsfile,iterative,interpol,icon1,icon2,icon3,icon4,nobs,nobs1,nobs2,nobs3,nobs4,nobs5,nobs6
       integer ftlflag,mftflag,fltflag,ageflag(9),nhist,nheating
       double precision dx,dy,ddx,ddy,xlon,xlat,tau,rhoc,rhom,young,poisson,thickness,tprevious
       double precision crustal_thickness,diffusivity,tmax,tmsl,tlapse,heatproduction,friction
@@ -34,7 +34,7 @@
       double precision thist(1024),temphist(1024),errortemphist(1024)
       double precision theating(1024),released(1024),dreleased(1024),agereleased(1024),dagereleased(1024),duration(1024)
       double precision size43He,age43He,dage43He
-      double precision doser,d0,radius,et,logs,b,logrho,nn
+      double precision doser,d0,radius,et,logs,b,logrho,nn,eu,sigmaet
 
       character run*5,fnme*300,obsfile*300,line*1024,c5*5,PecubeFnme*10,cproc*4
 
@@ -472,7 +472,7 @@ endif !VKP
       write (7,*) nobs,0,0,0
       else
       call read_data_folder (run//'/data/'//obsfile(1:nobsfile), .true., xlon1, xlon2, xlat1, xlat2, iproc, nd, &
-                             nobs1, nobs2, nobs3, nobs4)
+                             nobs1, nobs2, nobs3, nobs4, nobs5, nobs6)
         if (nx0.lt.0) then
         allocate (neighz(3,nelem))
         call neighbours (iconz,neighz,nelem)
@@ -484,7 +484,7 @@ endif !VKP
       if (iproc.lt.1000) cproc(1:1)='0'
       open (8,file=run//'/data/'//obsfile(1:nobsfile)//cproc//'.txt',status='old')
       if (p%save_PTT_paths.ne.0) nobs1 = -nobs1
-      write (7,*) nobs1,nobs2,nobs3,nobs4
+      write (7,*) nobs1,nobs2,nobs3,nobs4,nobs5,nobs6
       if (nobs1.lt.0) nobs1=-nobs1
         do i=1,nobs1
         read (8,*) xlonobs,xlatobs,heightobs,ageheobs,dageheobs,ageftobs,dageftobs, &
@@ -657,6 +657,93 @@ endif !VKP
           heightobs,ieobs,wobs1,wobs2,wobs3,wobs4
         enddo
 
+! OSL data
+        do i=1,nobs5
+          read (8,*) xlonobs,xlatobs,heightobs,doser,d0,et,logs,logrho,eu,nn
+          if (nx0.gt.0) then
+          i1=int((xlonobs-xlon)/(dx*nskip))+1 !VKP
+          if (i1.eq.nx) i1=nx-1
+          j1=int((xlatobs-xlat)/(dy*nskip))+1 !VKP
+          if (j1.eq.ny) j1=ny-1
+          ieobs=i1+(j1-1)*(nx-1)
+          r=(xlonobs-(i1-1)*dx*nskip-xlon)/(dx*nskip) !VKP
+          r=-1.+2.*r
+          s=(xlatobs-(j1-1)*dy*nskip-xlat)/(dy*nskip) !VKP
+          s=-1.+2.*s
+          wobs1=(1.-r)*(1.-s)/4.
+          wobs2=(1.+r)*(1.-s)/4.
+          wobs3=(1.+r)*(1.+s)/4.
+          wobs4=(1.-r)*(1.+s)/4.
+          else
+          call find_triangle (xlonobs,xlatobs,xz,yz,iconz,neighz,nelem,nsurf,it)
+          ieobs=it
+          surf2=xz(iconz(1,it))*yz(iconz(2,it))+xz(iconz(2,it))*yz(iconz(3,it))+xz(iconz(3,it))*yz(iconz(1,it)) &
+            -yz(iconz(1,it))*xz(iconz(2,it))-yz(iconz(2,it))*xz(iconz(3,it))-yz(iconz(3,it))*xz(iconz(1,it))
+          a1=xz(iconz(2,it))*yz(iconz(3,it))-xz(iconz(3,it))*yz(iconz(2,it))
+          b1=yz(iconz(2,it))-yz(iconz(3,it))
+          c1=xz(iconz(3,it))-xz(iconz(2,it))
+          a2=xz(iconz(3,it))*yz(iconz(1,it))-xz(iconz(1,it))*yz(iconz(3,it))
+          b2=yz(iconz(3,it))-yz(iconz(1,it))
+          c2=xz(iconz(1,it))-xz(iconz(3,it))
+          a3=xz(iconz(1,it))*yz(iconz(2,it))-xz(iconz(2,it))*yz(iconz(1,it))
+          b3=yz(iconz(1,it))-yz(iconz(2,it))
+          c3=xz(iconz(2,it))-xz(iconz(1,it))
+          wobs1=(a1+b1*xlonobs+c1*xlatobs)/surf2
+          wobs2=(a2+b2*xlonobs+c2*xlatobs)/surf2
+          wobs3=(a3+b3*xlonobs+c3*xlatobs)/surf2
+          wobs4=0.
+          endif
+          dreleased=max(0.01d0,dreleased)
+          dagereleased=max(0.1d0,dagereleased)
+          write (7,*) xlonobs,xlatobs, &
+            doser,d0,et,logs,logrho,eu,nn, &
+            heightobs,ieobs,wobs1,wobs2,wobs3,wobs4
+          enddo
+  
+! ESR data
+          do i=1,nobs6
+            read (8,*) xlonobs,xlatobs,heightobs,doser,d0,logs,et,sigmaet,nn
+            if (nx0.gt.0) then
+            i1=int((xlonobs-xlon)/(dx*nskip))+1 !VKP
+            if (i1.eq.nx) i1=nx-1
+            j1=int((xlatobs-xlat)/(dy*nskip))+1 !VKP
+            if (j1.eq.ny) j1=ny-1
+            ieobs=i1+(j1-1)*(nx-1)
+            r=(xlonobs-(i1-1)*dx*nskip-xlon)/(dx*nskip) !VKP
+            r=-1.+2.*r
+            s=(xlatobs-(j1-1)*dy*nskip-xlat)/(dy*nskip) !VKP
+            s=-1.+2.*s
+            wobs1=(1.-r)*(1.-s)/4.
+            wobs2=(1.+r)*(1.-s)/4.
+            wobs3=(1.+r)*(1.+s)/4.
+            wobs4=(1.-r)*(1.+s)/4.
+            else
+            call find_triangle (xlonobs,xlatobs,xz,yz,iconz,neighz,nelem,nsurf,it)
+            ieobs=it
+            surf2=xz(iconz(1,it))*yz(iconz(2,it))+xz(iconz(2,it))*yz(iconz(3,it))+xz(iconz(3,it))*yz(iconz(1,it)) &
+              -yz(iconz(1,it))*xz(iconz(2,it))-yz(iconz(2,it))*xz(iconz(3,it))-yz(iconz(3,it))*xz(iconz(1,it))
+            a1=xz(iconz(2,it))*yz(iconz(3,it))-xz(iconz(3,it))*yz(iconz(2,it))
+            b1=yz(iconz(2,it))-yz(iconz(3,it))
+            c1=xz(iconz(3,it))-xz(iconz(2,it))
+            a2=xz(iconz(3,it))*yz(iconz(1,it))-xz(iconz(1,it))*yz(iconz(3,it))
+            b2=yz(iconz(3,it))-yz(iconz(1,it))
+            c2=xz(iconz(1,it))-xz(iconz(3,it))
+            a3=xz(iconz(1,it))*yz(iconz(2,it))-xz(iconz(2,it))*yz(iconz(1,it))
+            b3=yz(iconz(1,it))-yz(iconz(2,it))
+            c3=xz(iconz(2,it))-xz(iconz(1,it))
+            wobs1=(a1+b1*xlonobs+c1*xlatobs)/surf2
+            wobs2=(a2+b2*xlonobs+c2*xlatobs)/surf2
+            wobs3=(a3+b3*xlonobs+c3*xlatobs)/surf2
+            wobs4=0.
+            endif
+            dreleased=max(0.01d0,dreleased)
+            dagereleased=max(0.1d0,dagereleased)
+            write (7,*) xlonobs,xlatobs, &
+              doser,d0,logs,et,sigmaet,nn, &
+              heightobs,ieobs,wobs1,wobs2,wobs3,wobs4
+            enddo
+    
+  
       close (8)
       call system ('rm '//run//'/data/'//obsfile(1:nobsfile)//cproc//'.txt')
       endif
