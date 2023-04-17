@@ -469,7 +469,7 @@ endif !VKP
 
       if (obsfile(1:nobsfile).eq.'Nil') then
       nobs=0
-      write (7,*) nobs,0,0,0
+      write (7,*) nobs,0,0,0,0,0
       else
       call read_data_folder (run//'/data/'//obsfile(1:nobsfile), .true., xlon1, xlon2, xlat1, xlat2, iproc, nd, &
                              nobs1, nobs2, nobs3, nobs4, nobs5, nobs6)
