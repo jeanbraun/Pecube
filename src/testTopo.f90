@@ -244,7 +244,7 @@ itime=int(timesteps(istep+1))
       nc5=5 !VKP
       endif !VKP
     if (nx0.gt.0) then
-    open (67,file='data/'//fnme(1:nfnme)//'/topo'//c5(1:nc5),status='old') !VKP
+    open (67,file=run//'/data/'//fnme(1:nfnme)//'/topo'//c5(1:nc5),status='old') !VKP
     read (67,*) zNZ !VKP
     ij=0
       do j=1,ny0,nskip  !VKP
@@ -256,7 +256,7 @@ itime=int(timesteps(istep+1))
     z=z/1.e3 !VKP
     close (67) !VKP
     else
-    open (67,file='data/'//fnme(1:nfnme)//'/topo'//c5(1:nc5),status='old') !VKP
+    open (67,file=run//'/data/'//fnme(1:nfnme)//'/topo'//c5(1:nc5),status='old') !VKP
     read (67,*) z
     z=z/1.e3
     close (67)
