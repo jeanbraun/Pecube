@@ -65,9 +65,9 @@ p%output(:) = 1
   j = i
   call scanfile (fnme, "time_topo"//trim(adjustl(ci)), p%time_topo(j), p%time_topo_desc, res, vocal, nd, range, par)
   call scanfile (fnme, "amplification"//trim(adjustl(ci)), p%amplification(j), p%amplification_desc, res, vocal, nd, range, par)
-  if (res.eq.999) p%amplification(j)=p%amplification(i)
+  if (res.eq.999) p%amplification(j)=p%amplification(i+1)
   call scanfile (fnme, "offset"//trim(adjustl(ci)), p%offset(j), p%offset_desc, res, vocal, nd, range, par)
-  if (res.eq.999) p%offset(j)=p%offset(i)
+  if (res.eq.999) p%offset(j)=p%offset(i+1)
   call scanfile (fnme, "output"//trim(adjustl(ci)), p%output(j), p%output_desc, res, vocal, nd, range, par)
   enddo
 
