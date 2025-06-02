@@ -34,7 +34,7 @@
       double precision thist(1024),temphist(1024),errortemphist(1024)
       double precision theating(1024),released(1024),dreleased(1024),agereleased(1024),dagereleased(1024),duration(1024)
       double precision size43He,age43He,dage43He
-      double precision doser,d0,radius,et,logs,b,logrho,nn,eu,sigmaet
+      double precision doser,d0,radius,et,logs,b,logrho,nn,dnn,eu,sigmaet
 
       character run*5,fnme*300,obsfile*300,line*1024,c5*5,PecubeFnme*10,cproc*4
 
@@ -616,7 +616,7 @@ endif !VKP
         enddo
 ! TSL data
         do i=1,nobs4
-        read (8,*) xlonobs,xlatobs,heightobs,doser,d0,radius,et,logs,b,logrho,nn
+        read (8,*) xlonobs,xlatobs,heightobs,doser,d0,radius,et,logs,b,logrho,nn,dnn
         if (nx0.gt.0) then
         i1=int((xlonobs-xlon)/(dx*nskip))+1 !VKP
         if (i1.eq.nx) i1=nx-1
@@ -653,13 +653,13 @@ endif !VKP
         dreleased=max(0.01d0,dreleased)
         dagereleased=max(0.1d0,dagereleased)
         write (7,*) xlonobs,xlatobs, &
-          doser,d0,radius,et,logs,b,logrho,nn, &
+          doser,d0,radius,et,logs,b,logrho,nn,dnn, &
           heightobs,ieobs,wobs1,wobs2,wobs3,wobs4
         enddo
 
 ! OSL data
         do i=1,nobs5
-          read (8,*) xlonobs,xlatobs,heightobs,doser,d0,et,logs,logrho,eu,nn
+          read (8,*) xlonobs,xlatobs,heightobs,doser,d0,et,logs,logrho,eu,nn,dnn
           if (nx0.gt.0) then
           i1=int((xlonobs-xlon)/(dx*nskip))+1 !VKP
           if (i1.eq.nx) i1=nx-1
@@ -696,13 +696,13 @@ endif !VKP
           dreleased=max(0.01d0,dreleased)
           dagereleased=max(0.1d0,dagereleased)
           write (7,*) xlonobs,xlatobs, &
-            doser,d0,et,logs,logrho,eu,nn, &
+            doser,d0,et,logs,logrho,eu,nn,dnn, &
             heightobs,ieobs,wobs1,wobs2,wobs3,wobs4
           enddo
   
 ! ESR data
           do i=1,nobs6
-            read (8,*) xlonobs,xlatobs,heightobs,doser,d0,logs,et,sigmaet,nn
+            read (8,*) xlonobs,xlatobs,heightobs,doser,d0,logs,et,sigmaet,nn,dnn
             if (nx0.gt.0) then
             i1=int((xlonobs-xlon)/(dx*nskip))+1 !VKP
             if (i1.eq.nx) i1=nx-1
@@ -739,7 +739,7 @@ endif !VKP
             dreleased=max(0.01d0,dreleased)
             dagereleased=max(0.1d0,dagereleased)
             write (7,*) xlonobs,xlatobs, &
-              doser,d0,logs,et,sigmaet,nn, &
+              doser,d0,logs,et,sigmaet,nn,dnn, &
               heightobs,ieobs,wobs1,wobs2,wobs3,wobs4
             enddo
     

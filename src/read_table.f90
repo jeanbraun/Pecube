@@ -16,7 +16,7 @@ subroutine read_table(fnme, tag0, ntags0, sample_names, sample_values, nsamples,
 
 character*1024 line
 character*128 fnme, tag0(ntags0), sample_names(nsample_max)
-double precision sample_values(11, nsample_max)
+double precision sample_values(12, nsample_max)
 integer nsamples
 
 integer, dimension(:), allocatable :: ind

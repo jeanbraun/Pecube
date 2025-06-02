@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-screen_counter_(i,n,m)
+int screen_counter_(i,n,m)
 
 int  *i;
 int  *n;

@@ -505,7 +505,7 @@ Flag to impose the computation of Optical Luminescence (OSL) ages (=1) at all po
 Flag to impose the computation of Electron Spin Resonance (ESR) ages (=1) at all points of the surface/topographic grid or to prevent it (1).
 
 `TL_doser` _(default = `5`)_::
-Dose rate used for TL data computation (in Gy/s/ka)
+Dose rate used for TL data computation (in Gy/kyr)
 
 `TL_D0` _(default = `800`)_::
 Onset of dose saturation for TL data computation (in Gy)
@@ -526,7 +526,7 @@ Logarithm of thermal frequency factor for TL data computation (in 1/s)
 Logarithm of dimensionless recombination center density for TL data computation
 
 `OSL_doser` _(default = `5`)_::
-Dose rate used for OSL data computation (in Gy/s/ka)
+Dose rate used for OSL data computation (in Gy/kyr)
 
 `OSL_D0` _(default = `800`)_::
 Onset of dose saturation for OSL data computation (in Gy)
@@ -544,7 +544,7 @@ Logarithm of thermal frequency factor for OSL data computation (in 1/s)
 Logarithm of dimensionless recombination center density for TL/OSL data computation
 
 `ESR_doser` _(default = `4.265`)_::
-Dose rate used for OSL data computation (in Gy/s/ka)
+Dose rate used for OSL data computation (in Gy/kyr)
 
 `ESR_D0` _(default = `5186.8`)_::
 Onset of dose saturation for ESR data computation (in Gy)
@@ -943,8 +943,9 @@ Width of Activation energy distribution,*SIGMAET*,,,,,,,&#8730;
 Logarithm of thermal frequency factor,*LOGS*,,,,,&#8730;,&#8730;,&#8730;
 Logarithm of dimensionless recombination center density,*LOGRHO*,,,,,&#8730;,&#8730;,
 Relative number of trapped electrons,*N/N*,,,,,&#8730;,&#8730;,&#8730;
+Uncertainty in Relative number of trapped electrons,*DN/N*,,,,,&#8730;,&#8730;,&#8730;
 |===
-All ages and times are in Myr, all temperatures are in &#176;C, all longitudes and latitudes are in decimal degrees, heights are in meters, fission track lengths and grain sizes are in microns, Step durations are in minutes, dose rates are in Gyr/kyr, onset of dose saturation in Gyr, and energies are in eV.
+All ages and times are in Myr, all temperatures are in &#176;C, all longitudes and latitudes are in decimal degrees, heights are in meters, fission track lengths and grain sizes are in microns, Step durations are in minutes, dose rates are in Gy/ky, onset of dose saturation in Gy, and energies are in eV.
 
 ==== A_files
 
@@ -1080,12 +1081,12 @@ where To, dT and Tp are the observed, uncertainty in and predicted temperature, 
 ----
 M3 = sqrt(sum [(Ro-Rp)^2^/(0.1*Ro)^2^]/N3)
 ----
-where Ro and Rp are the observed, uncertainty and predicted percent gas release, N3 is the total number of steps in the step heating procedure
+where Ro and Rp are the observed and predicted percent gas release, N3 is the total number of steps in the step heating procedure
 - the Thermo Luminescence/ OSL and ESR part
 ----
 M4 = sqrt(sum [(NNo-NNp)^2^/dNN^2^]/N4)
 ----
-where NNo, dNN and NNp are the observed, uncertainty (assumed to be 0.1) in and predicted NN, N4 is the total number of TL+OSL+ESR observations
+where NNo, dNN and NNp are the observed, uncertainty in and predicted NN, N4 is the total number of TL+OSL+ESR observations
 
 === NA behaviour
 

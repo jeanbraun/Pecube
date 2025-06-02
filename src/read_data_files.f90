@@ -929,12 +929,12 @@ integer, intent(in) :: nd
 character(len=1024) :: fnme
 integer :: isample
 integer :: nobs
-double precision :: lat, lon, height, doser, d0, a, et, logs, b, logrho, nn
+double precision :: lat, lon, height, doser, d0, a, et, logs, b, logrho, nn, dnn
 integer :: i,j
 character*4 cproc
-character*128 tag0(11)
+character*128 tag0(12)
 character*128 sample_names(10000)
-double precision sample_values(11, 10000)
+double precision sample_values(12, 10000)
 integer nsamples
 
 ! first count the number of thermal histories in all files
@@ -952,15 +952,16 @@ tag0(8)='LOGS'
 tag0(9)='BTL'
 tag0(10)='LOGRHO'
 tag0(11)='N/N'
+tag0(12)='DN/N'
 
 open (8, file='tmp/data_lst'//cproc//'.txt', status='old', err=996)
 
 do
   read (8,'(a)', end=995) fnme
-  call read_table(folder//'/'//fnme, tag0, 11, sample_names, sample_values, nsamples, 10000)
+  call read_table(folder//'/'//fnme, tag0, 12, sample_names, sample_values, nsamples, 10000)
   do isample = 1, nsamples
     if (abs(sample_values(6,isample)+9999).gt.tiny(0.d0)) then
-      do j = 1,11
+      do j = 1,12
         if (abs(sample_values(j,isample)+9999).lt.tiny(0.d0) .and. j.ne.3) then
           if (nd.eq.0) print*,'TLSample ',trim(sample_names(isample)),' needs the ',trim(tag0(j)),' field'
           stop
@@ -989,7 +990,7 @@ open (8, file='tmp/data_lst'//cproc//'.txt', status='old', err=994)
 
 do
   read (8,'(a)', end=993) fnme
-  call read_table(folder//'/'//fnme, tag0, 11, sample_names, sample_values, nsamples, 10000)
+  call read_table(folder//'/'//fnme, tag0, 12, sample_names, sample_values, nsamples, 10000)
   do isample = 1, nsamples
     if (abs(sample_values(6,isample)+9999).gt.tiny(0.d0)) then
       lon = sample_values(1,isample)
@@ -1004,8 +1005,9 @@ do
       b = sample_values(9,isample)
       logrho = sample_values(10,isample)
       nn = sample_values(11,isample)
+      dnn = sample_values(12,isample)
       if ((lon - xlon1)*(lon - xlon2).le.0.d0 .and. (lat - xlat1)*(lat - xlat2).le.0.d0) &
-      write (111,*) lon,lat,height,doser,d0,a,et,logs,b,logrho,nn
+      write (111,*) lon,lat,height,doser,d0,a,et,logs,b,logrho,nn,dnn
     endif
   enddo
 enddo
@@ -1036,12 +1038,12 @@ subroutine read_data_files_for_OSL (folder, cproc, xlon1, xlon2, xlat1, xlat2, n
   character(len=1024) :: fnme
   integer :: isample
   integer :: nobs
-  double precision :: lat, lon, height, doser, d0, et, logs, logrho, eu, nn
+  double precision :: lat, lon, height, doser, d0, et, logs, logrho, eu, nn, dnn
   integer :: i,j
   character*4 cproc
-  character*128 tag0(11)
+  character*128 tag0(12)
   character*128 sample_names(10000)
-  double precision sample_values(11, 10000)
+  double precision sample_values(12, 10000)
   integer nsamples
   
   ! first count the number of thermal histories in all files
@@ -1058,15 +1060,16 @@ subroutine read_data_files_for_OSL (folder, cproc, xlon1, xlon2, xlat1, xlat2, n
   tag0(8)='LOGRHO'
   tag0(9)='EU'
   tag0(10)='N/N'
+  tag0(11)='DN/N'
   
   open (8, file='tmp/data_lst'//cproc//'.txt', status='old', err=996)
   
   do
     read (8,'(a)', end=995) fnme
-    call read_table(folder//'/'//fnme, tag0, 10, sample_names, sample_values, nsamples, 10000)
+    call read_table(folder//'/'//fnme, tag0, 11, sample_names, sample_values, nsamples, 10000)
     do isample = 1, nsamples
       if (abs(sample_values(9,isample)+9999).gt.tiny(0.d0)) then
-        do j = 1,10
+        do j = 1,11
           if (abs(sample_values(j,isample)+9999).lt.tiny(0.d0) .and. j.ne.3) then
             if (nd.eq.0) print*,'OSLSample ',trim(sample_names(isample)),' needs the ',trim(tag0(j)),' field'
             stop
@@ -1095,7 +1098,7 @@ subroutine read_data_files_for_OSL (folder, cproc, xlon1, xlon2, xlat1, xlat2, n
   
   do
     read (8,'(a)', end=993) fnme
-    call read_table(folder//'/'//fnme, tag0, 10, sample_names, sample_values, nsamples, 10000)
+    call read_table(folder//'/'//fnme, tag0, 11, sample_names, sample_values, nsamples, 10000)
     do isample = 1, nsamples
       if (abs(sample_values(9,isample)+9999).gt.tiny(0.d0)) then
         lon = sample_values(1,isample)
@@ -1109,8 +1112,9 @@ subroutine read_data_files_for_OSL (folder, cproc, xlon1, xlon2, xlat1, xlat2, n
         logrho = sample_values(8,isample)
         eu = sample_values(9,isample)
         nn = sample_values(10,isample)
+        dnn = sample_values(11,isample)
         if ((lon - xlon1)*(lon - xlon2).le.0.d0 .and. (lat - xlat1)*(lat - xlat2).le.0.d0) &
-          write (111,*) lon,lat,height,doser,d0,et,logs,logrho,eu,nn
+          write (111,*) lon,lat,height,doser,d0,et,logs,logrho,eu,nn,dnn
       endif
     enddo
   enddo
@@ -1141,12 +1145,12 @@ subroutine read_data_files_for_OSL (folder, cproc, xlon1, xlon2, xlat1, xlat2, n
     character(len=1024) :: fnme
     integer :: isample
     integer :: nobs
-    double precision :: lat, lon, height, doser, d0, logs, et, sigmaet, nn
+    double precision :: lat, lon, height, doser, d0, logs, et, sigmaet, nn, dnn
     integer :: i,j
     character*4 cproc
-    character*128 tag0(11)
+    character*128 tag0(12)
     character*128 sample_names(10000)
-    double precision sample_values(11, 10000)
+    double precision sample_values(12, 10000)
     integer nsamples
     
     ! first count the number of thermal histories in all files
@@ -1162,15 +1166,16 @@ subroutine read_data_files_for_OSL (folder, cproc, xlon1, xlon2, xlat1, xlat2, n
     tag0(7)='ET'
     tag0(8)='SIGMAET'
     tag0(9)='N/N'
+    tag0(10)='DN/N'
     
     open (8, file='tmp/data_lst'//cproc//'.txt', status='old', err=996)
     
     do
       read (8,'(a)', end=995) fnme
-      call read_table(folder//'/'//fnme, tag0, 9, sample_names, sample_values, nsamples, 10000)
+      call read_table(folder//'/'//fnme, tag0, 10, sample_names, sample_values, nsamples, 10000)
       do isample = 1, nsamples
         if (abs(sample_values(8,isample)+9999).gt.tiny(0.d0)) then
-          do j = 1,9
+          do j = 1,10
             if (abs(sample_values(j,isample)+9999).lt.tiny(0.d0) .and. j.ne.3) then
               if (nd.eq.0) print*,'ESR Sample ',trim(sample_names(isample)),' needs the ',trim(tag0(j)),' field'
               stop
@@ -1212,8 +1217,9 @@ subroutine read_data_files_for_OSL (folder, cproc, xlon1, xlon2, xlat1, xlat2, n
           et = sample_values(7,isample)
           sigmaet = sample_values(8,isample)
           nn = sample_values(9,isample)
+          dnn = sample_values(10,isample)
           if ((lon - xlon1)*(lon - xlon2).le.0.d0 .and. (lat - xlat1)*(lat - xlat2).le.0.d0) &
-            write (111,*) lon,lat,height,doser,d0,logs,et,sigmaet,nn
+            write (111,*) lon,lat,height,doser,d0,logs,et,sigmaet,nn,dnn
         endif
       enddo
     enddo
