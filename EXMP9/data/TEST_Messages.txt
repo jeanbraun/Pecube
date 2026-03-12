@@ -1,1 +1,0 @@
-Warning: No Height provided, set to zero for sample 1
