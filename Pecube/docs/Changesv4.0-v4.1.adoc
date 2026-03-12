@@ -1,0 +1,2 @@
+Fixed bug that prevented the computation of the Tt paths for some points
+Changed user guide (Pecube.html) to explain the shape of the misfit when the slope of the age-elevation relationship is used
