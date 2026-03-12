@@ -1,2 +1,2 @@
-# Pecube
-Thermo-kinematic model to invert thermochronological data
+# PecubeGUI
+PecubeGUI package including the Python graphical user interface and Pecube
