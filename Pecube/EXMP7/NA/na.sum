@@ -1,0 +1,50 @@
+
+   Summary information of Neighbourhood algorithm performance
+
+------------------------------------------------------------------------
+
+  Options set:
+
+  Neighbourhood Algorithm
+  Initial sample size           :            8
+  Sample size                   :            8
+  Total number of iterations    :            4
+  Number of cells re-sampled    :            4
+  Total number of models        :           40
+  Random seed value             :       210728
+  Pseudo-random sequence 
+  Starting models generated randomly 
+
+------------------------------------------------------------------------
+
+Parameter space details:
+
+  Number of dimensions           :            2
+  
+  Parameter ranges
+    Number   Minimum     Maximum    A-prior cov Scaled min  Scaled max
+      1      70.0000    100.0000     30.0000      0.0000      1.0000
+      2       0.0000      0.0500      0.0500      0.0000      1.0000
+
+------------------------------------------------------------------------
+
+
+
+
+ Performance statistics
+  
+ Total number of full dlist evaluations            16
+ Total number of partial dlist updates             48
+ Lowest misfit found                        26.3653717    
+ Average misfit over all models             27.6766224    
+ Index of lowest misfit model                      36
+
+ Total time spent updating dlist                   0.00000000    
+ Total time spent evaluating dlist                 0.00000000    
+ Total time spent finding Voronoi intersections    0.00000000    
+ Total time spent calculating random deviates      0.00000000    
+ Total time resetting random walks                 0.00000000    
+ Total time for ordering misfits                   0.00000000    
+ Total time for NA-algorithm (without forward)     0.00000000    
+ Total time for forward modeling                   2963.15625    
+
