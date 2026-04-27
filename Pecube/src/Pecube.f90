@@ -527,6 +527,7 @@ subroutine forward (nd,param,misfit,run, iproc)
 
   call cpu_time (times(1))
   nproc=1
+  misfit=9999.d0
 
   eps=tiny(eps)
 
@@ -1668,7 +1669,7 @@ subroutine forward (nd,param,misfit,run, iproc)
               D0z,Eaz,RDmodelz,ZUppm,ZThppm,ZSize,sampleID,EdgeAge,durationHeating,&
               temp_heat,He43_flag,D0k,Eak,D0b,Eab,D0m,Eam,D0h,Eah)
                              
-          ! Thermoluminescence calculation
+      ! Thermoluminescence calculation
       if (nd.eq.0.and.p%age_TL_flag.ne.0) then
         write (6,*) ''
         write (6,*) 'Calculating TL'
@@ -2680,6 +2681,7 @@ subroutine forward (nd,param,misfit,run, iproc)
       if (nmisfit1 + nmisfit1a + nmisfit2 + nmisfit3 + nmisfit3a + nmisfit4 + nmisfit5 + nmisfit6 - nd -1 .gt. 0) then
         misfit = misfit/(nmisfit1 + nmisfit1a + nmisfit2 + nmisfit3 + nmisfit3a + nmisfit4 + nmisfit5 + nmisfit6 - nd - 1)
       else
+		misfit = 9999.d0
         if (iproc.eq.0) then
           write (*,*) 'Warning - Pecube will not correct the misfit (misfit_corrected = 1) when the total number'
           write (*,*) 'of data points is smaller than the number of parameters being inverted  + 1'
