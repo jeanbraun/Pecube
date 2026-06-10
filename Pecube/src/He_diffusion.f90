@@ -123,6 +123,7 @@ subroutine Hediff(time, temperature, ntime, duration, temp_heat, ndur, Apatite_a
  if (He_flag.eq.0.and.Pecube.eq.0) then
     print '(/,"     eU (ppm) = ",f7.2)', eU
  elseif (He_flag.gt.1) then
+    print *, 'He43_flag = ', He_flag
     stop 'option not supported in Hediff.f90 - 4He/3He flag'
  endif
  allocate (radius(nrad), U238_array(nrad), U235_array(nrad), Th232_array(nrad), Uppm_array(nrad), Thppm_array(nrad))

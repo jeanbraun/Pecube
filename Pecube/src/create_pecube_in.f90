@@ -744,6 +744,7 @@ endif !VKP
       if (iproc.lt.100) cproc(1:2)='00'
       if (iproc.lt.1000) cproc(1:1)='0'
 
+      
       open (8,file=run//'/data/'//obsfile(1:nobsfile)//cproc//'.txt',status='old')
       open (112,file=run//'/data/'//obsfile(1:nobsfile)//cproc//'samples.txt',status='old') ! Maxime
 

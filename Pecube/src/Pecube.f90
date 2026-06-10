@@ -429,6 +429,7 @@ subroutine forward (nd,param,misfit,run, iproc)
   double precision xlonmin,xlonmax,xlatmin,xlatmax,xxx,yyy,zzz,vx,vy,vz,dxxx,dyyy,dzzz
   double precision xmin,xmax,ymin,ymax,timesurf,timesurfp,tfinal,dtimesurf
   double precision xlonobs,xlatobs,tnow,fmeano,dfmeano
+  real *4 MFTL_unc,MFTL_std_unc
   real *4 ageheobs,dageheobs
   real *4 ageftobs,dageftobs
   real *4 ageheZobs,dageheZobs
@@ -443,32 +444,32 @@ subroutine forward (nd,param,misfit,run, iproc)
   real*4,dimension(:),allocatable::lonobs,latobs
   double precision wobs1,wobs2,wobs3,wobs4,x1f,x2f,y1f,y2f
   double precision def,dif,heightobs,friction
-  double precision,dimension(:),allocatable::aheoreg,hheoreg,ahepreg
-  double precision,dimension(:),allocatable::aftoreg,hftoreg,aftpreg
-  double precision,dimension(:),allocatable::aheZoreg,hheZoreg,aheZpreg
-  double precision,dimension(:),allocatable::aftZoreg,hftZoreg,aftZpreg
-  double precision,dimension(:),allocatable::aarKoreg,harKoreg,aarKpreg
-  double precision,dimension(:),allocatable::aarBoreg,harBoreg,aarBpreg
-  double precision,dimension(:),allocatable::aarMoreg,harMoreg,aarMpreg
-  double precision,dimension(:),allocatable::aarHoreg,harHoreg,aarHpreg
-  double precision,dimension(:),allocatable::hpreg
+  real*4,dimension(:),allocatable::aheoreg,hheoreg,ahepreg
+  real*4,dimension(:),allocatable::aftoreg,hftoreg,aftpreg
+  real*4,dimension(:),allocatable::aheZoreg,hheZoreg,aheZpreg
+  real*4,dimension(:),allocatable::aftZoreg,hftZoreg,aftZpreg
+  real*4,dimension(:),allocatable::aarKoreg,harKoreg,aarKpreg
+  real*4,dimension(:),allocatable::aarBoreg,harBoreg,aarBpreg
+  real*4,dimension(:),allocatable::aarMoreg,harMoreg,aarMpreg
+  real*4,dimension(:),allocatable::aarHoreg,harHoreg,aarHpreg
+  real*4,dimension(:),allocatable::hpreg
   integer nhe,nft,nheZ,nftZ,narK,narB,narM,narH,ageflag(9),ageflagp(9)
-  double precision aheom,hheom,heoi,heos
-  double precision aftom,hftom,ftoi,ftos
-  double precision aheZom,hheZom,heZoi,heZos
-  double precision aftZom,hftZom,ftZoi,ftZos
-  double precision aarKom,harKom,arKoi,arKos
-  double precision aarBom,harBom,arBoi,arBos
-  double precision aarMom,harMom,arMoi,arMos
-  double precision aarHom,harHom,arHoi,arHos
-  double precision ahepm,hhepm,hepi,heps
-  double precision aftpm,hftpm,ftpi,ftps
-  double precision aheZpm,hheZpm,heZpi,heZps
-  double precision aftZpm,hftZpm,ftZpi,ftZps
-  double precision aarKpm,harKpm,arKpi,arKps
-  double precision aarBpm,harBpm,arBpi,arBps
-  double precision aarMpm,harMpm,arMpi,arMps
-  double precision aarHpm,harHpm,arHpi,arHps
+  real*4 aheom,hheom,heoi,heos
+  real*4 aftom,hftom,ftoi,ftos
+  real*4 aheZom,hheZom,heZoi,heZos
+  real*4 aftZom,hftZom,ftZoi,ftZos
+  real*4 aarKom,harKom,arKoi,arKos
+  real*4 aarBom,harBom,arBoi,arBos
+  real*4 aarMom,harMom,arMoi,arMos
+  real*4 aarHom,harHom,arHoi,arHos
+  real*4 ahepm,hhepm,hepi,heps
+  real*4 aftpm,hftpm,ftpi,ftps
+  real*4 aheZpm,hheZpm,heZpi,heZps
+  real*4 aftZpm,hftZpm,ftZpi,ftZps
+  real*4 aarKpm,harKpm,arKpi,arKps
+  real*4 aarBpm,harBpm,arBpi,arBps
+  real*4 aarMpm,harMpm,arMpi,arMps
+  real*4 aarHpm,harHpm,arHpi,arHps
   double precision volume_eroded(10000),surf_element,time_eroded(10000)
   integer nvolume
   double precision element_surface,volume_total
@@ -488,7 +489,7 @@ subroutine forward (nd,param,misfit,run, iproc)
   ! Maxime - 4He/3He thermochronometer parameters
   real *4, dimension(:), allocatable :: age43He,dage43He, Uppm43_array, Thppm43_array, dummy43
   double precision, dimension(:), allocatable :: rmr043_array
-  real *4, dimension(:), allocatable :: size43He_array
+  real *4, dimension(:), allocatable :: size43He_array, ageTimeAHe
   real*4 size43He, Thppm43, Uppm43
   double precision  rmr043
   double precision, dimension(:,:), allocatable :: theating,duration
@@ -527,7 +528,7 @@ subroutine forward (nd,param,misfit,run, iproc)
 
   call cpu_time (times(1))
   nproc=1
-  misfit=9999.d0
+  misfit = 9999.d0
 
   eps=tiny(eps)
 
@@ -563,7 +564,7 @@ subroutine forward (nd,param,misfit,run, iproc)
   check = 0
   p%run_name = run
   call read_input_file (run//'/input/Pecube.in', 0, p, nd, range, param)
-
+ 
   if (nd.ne.0 .and. iproc.eq.0 .and. p%echo_input_file.gt.0 .and. p%inversion_mode.lt.1) then
    write (*,*) '---------------------------------------------------------------------------------'
    write (*,*) '------------------------Pecube inversion mode------------------------------------'
@@ -787,11 +788,9 @@ subroutine forward (nd,param,misfit,run, iproc)
                         +we3(i)*zsurf(iconsurf(3,ieo(i))) &
                         +we4(i)*zsurf(iconsurf(npe,ieo(i)))
                 if (heightobs.lt.0.d0) then
-                zexhumationo(i)= zexhumationo(i) -&
-                        (min(0.d0,heightobs/1.e3) + (we1(i)*zsurf(iconsurf(1,ieo(i))) &
-                +we2(i)*zsurf(iconsurf(2,ieo(i))) &
-                +we3(i)*zsurf(iconsurf(3,ieo(i))) &
-                +we4(i)*zsurf(iconsurf(npe,ieo(i)))))
+                  ! for negative elevation (i.e., borehole/tunnel samples), substract depth below surface 
+                zexhumationo(i)= zexhumationo(i) - &
+                (zexhumationo(i) +min(0.d0,heightobs/1.e3))
               endif
                zexhumationo(i)= zexhumationo(i) + zl
       enddo
@@ -812,11 +811,8 @@ subroutine forward (nd,param,misfit,run, iproc)
                         +we3(i)*zsurf(iconsurf(3,ieo(i))) &
                         +we4(i)*zsurf(iconsurf(npe,ieo(i)))
               if (heightobs.lt.0.d0) then
-                  zexhumationo(i)= zexhumationo(i) -&
-                           (min(0.d0,heightobs/1.e3) + (we1(i)*zsurf(iconsurf(1,ieo(i))) &
-                      +we2(i)*zsurf(iconsurf(2,ieo(i))) &
-                      +we3(i)*zsurf(iconsurf(3,ieo(i))) &
-                      +we4(i)*zsurf(iconsurf(npe,ieo(i)))))
+                  zexhumationo(i)= zexhumationo(i) - &
+                  (zexhumationo(i) +min(0.d0,heightobs/1.e3))
               endif
               zexhumationo(i)= zexhumationo(i) + zl
       enddo
@@ -840,11 +836,8 @@ subroutine forward (nd,param,misfit,run, iproc)
                     +we3(i)*zsurf(iconsurf(3,ieo(i))) &
                     +we4(i)*zsurf(iconsurf(npe,ieo(i))) 
               if (heightobs.lt.0.d0) then
-                  zexhumationo(i)= zexhumationo(i) -&
-                          (min(0.d0,heightobs/1.e3) + (we1(i)*zsurf(iconsurf(1,ieo(i))) &
-                    +we2(i)*zsurf(iconsurf(2,ieo(i))) &
-                    +we3(i)*zsurf(iconsurf(3,ieo(i))) &
-                    +we4(i)*zsurf(iconsurf(npe,ieo(i)))))
+                  zexhumationo(i)= zexhumationo(i) - &
+                  (zexhumationo(i) +min(0.d0,heightobs/1.e3))
         endif
               zexhumationo(i)= zexhumationo(i) + zl
       enddo
@@ -868,11 +861,8 @@ subroutine forward (nd,param,misfit,run, iproc)
                     +we3(i)*zsurf(iconsurf(3,ieo(i))) &
                     +we4(i)*zsurf(iconsurf(npe,ieo(i)))
               if (heightobs.lt.0.d0) then
-                  zexhumationo(i)= zexhumationo(i) -&
-                           (min(0.d0,heightobs/1.e3) + (we1(i)*zsurf(iconsurf(1,ieo(i))) &
-                  +we2(i)*zsurf(iconsurf(2,ieo(i))) &
-                  +we3(i)*zsurf(iconsurf(3,ieo(i))) &
-                  +we4(i)*zsurf(iconsurf(npe,ieo(i)))))
+                  zexhumationo(i)= zexhumationo(i) - &
+                  (zexhumationo(i) +min(0.d0,heightobs/1.e3))
               endif
               zexhumationo(i)= zexhumationo(i) + zl
       enddo
@@ -896,10 +886,7 @@ subroutine forward (nd,param,misfit,run, iproc)
                     +we4(i)*zsurf(iconsurf(npe,ieo(i)))
                 if (heightobs.lt.0.d0) then
                   zexhumationo(i)= zexhumationo(i) - &
-                           (min(0.d0,heightobs/1.e3) + (we1(i)*zsurf(iconsurf(1,ieo(i))) &
-                    +we2(i)*zsurf(iconsurf(2,ieo(i))) &
-                    +we3(i)*zsurf(iconsurf(3,ieo(i))) &
-                    +we4(i)*zsurf(iconsurf(npe,ieo(i)))))
+                  (zexhumationo(i) +min(0.d0,heightobs/1.e3))
               endif
               zexhumationo(i)= zexhumationo(i) + zl
       enddo
@@ -922,11 +909,8 @@ subroutine forward (nd,param,misfit,run, iproc)
                       +we3(i)*zsurf(iconsurf(3,ieo(i))) &
                       +we4(i)*zsurf(iconsurf(npe,ieo(i)))
                 if (heightobs.lt.0.d0) then
-                  zexhumationo(i)= zexhumationo(i) -&
-                           (min(0.d0,heightobs/1.e3) + (we1(i)*zsurf(iconsurf(1,ieo(i))) &
-                    +we2(i)*zsurf(iconsurf(2,ieo(i))) &
-                    +we3(i)*zsurf(iconsurf(3,ieo(i))) &
-                    +we4(i)*zsurf(iconsurf(npe,ieo(i)))))
+                  zexhumationo(i)= zexhumationo(i) - &
+                   (zexhumationo(i) +min(0.d0,heightobs/1.e3))
               endif
               zexhumationo(i)= zexhumationo(i) + zl
       enddo  
@@ -1831,7 +1815,7 @@ subroutine forward (nd,param,misfit,run, iproc)
   ! added by Jean to change misfit to slope rather than exact ages
   ! (4/6/2008)
   if (nd.eq.0.and.nobs1.gt.0) open (13,file=run//'/output/CompareAGE.csv',status='unknown')
-  misfit=9999.d0
+  misfit = 9999.d0
   nmisfit1=0
   misfit1 = 0.d0
   nhe=0
@@ -1950,7 +1934,6 @@ subroutine forward (nd,param,misfit,run, iproc)
     deallocate (ASize)
        
     ! compute misfit for ages
-
     nmisfit1 = 0
     misfit1 = 0.
     misfitAHE = 0.
@@ -1969,13 +1952,13 @@ subroutine forward (nd,param,misfit,run, iproc)
     nmisfitMAR = 0
     misfitHAR = 0.
     nmisfitHAR = 0
-      misfitMFTL = 0.
-      nmisfitMFTL = 0
-      misfitDMFTL = 0.
+    misfitMFTL = 0.
+    nmisfitMFTL = 0
+    misfitDMFTL = 0.
     misfitres = 0.
-      LL_ThL = 0.
-      LL_OSL = 0.
-      LL_ESR = 0.
+    LL_ThL = 0.
+    LL_OSL = 0.
+    LL_ESR = 0.
     LL_AHE = 0.
     LL_AFT = 0.
     LL_ZHE = 0.
@@ -1984,8 +1967,8 @@ subroutine forward (nd,param,misfit,run, iproc)
     LL_BAR = 0.
     LL_MAR = 0.
     LL_HAR = 0.
-      LL_MFTL = 0.
-      LL_DMFTL = 0.
+    LL_MFTL = 0.
+    LL_DMFTL = 0.
     LL_total = 0.
     
     do iobs=1,nobs1
@@ -1994,62 +1977,65 @@ subroutine forward (nd,param,misfit,run, iproc)
           ageheZobs,dageheZobs,ageftZobs,dageftZobs,agearKobs,dagearKobs, &
           agearBobs,dagearBobs,agearMobs,dagearMobs,agearHobs,dagearHobs, &
           tlobs,heightobs,fmeano,dfmeano,dummy,ieobs,wobs1,wobs2,wobs3,wobs4   ! By Xav
-      ! Observed elevation
+      ! Observed elevation on input DEM
       hei(iobs)= real(wobs1*zsurf(iconsurf(1,ieobs)) &
           +wobs2*zsurf(iconsurf(2,ieobs)) &
           +wobs3*zsurf(iconsurf(3,ieobs)) &
           +wobs4*zsurf(iconsurf(npe,ieobs)), kind=sp)
-      hei(iobs)= real(hei(iobs)*1000.+min(0.d0,heightobs), kind=sp)
+      if (heightobs.lt.0.0) then
+        hei(iobs)= real(hei(iobs)*1000.- (hei(iobs)*1000+min(0.d0,heightobs)), kind=sp)
+      endif
       lonobs(iobs)= real(xlonobs, kind=sp)
       latobs(iobs)= real(xlatobs, kind=sp)
       if (ageheobs.gt.0.) then
         nhe=nhe+1
+        ahepreg(nhe)=agehe(iobs)
         aheoreg(nhe)=ageheobs
         hheoreg(nhe)=hei(iobs)
       endif
       if (ageftobs.gt.0.) then
         nft=nft+1
+        aftpreg(nft)=ageft(iobs)
         aftoreg(nft)=ageftobs
         hftoreg(nft)=hei(iobs)
       endif
       if (ageheZobs.gt.0.) then
         nheZ=nheZ+1
+        aheZpreg(nheZ)=ageheZ(iobs)
         aheZoreg(nheZ)=ageheZobs
         hheZoreg(nheZ)=hei(iobs)
       endif
       if (ageftZobs.gt.0.) then
         nftZ=nftZ+1
+        aftZpreg(nftZ)=ageftZ(iobs)
         aftZoreg(nftZ)=ageftZobs
         hftZoreg(nftZ)=hei(iobs)
       endif
       if (agearKobs.gt.0.) then
         narK=narK+1
+        aarKpreg(narK)=agearK(iobs)
         aarKoreg(narK)=agearKobs
         harKoreg(narK)=hei(iobs)
       endif
       if (agearBobs.gt.0.) then
         narB=narB+1
+        aarBpreg(narB)=agearB(iobs)
         aarBoreg(narB)=agearBobs
         harBoreg(narB)=hei(iobs)
       endif
       if (agearMobs.gt.0.) then
         narM=narM+1
+        aarMpreg(narM)=agearM(iobs)
         aarMoreg(narM)=agearMobs
         harMoreg(narM)=hei(iobs)
       endif
       if (agearHobs.gt.0.) then
         narH=narH+1
+        aarHpreg(narH)=agearH(iobs)
         aarHoreg(narH)=agearHobs
         harHoreg(narH)=hei(iobs)
       endif
-      ahepreg(iobs)=agehe(iobs)
-      aftpreg(iobs)=ageft(iobs)
-      aheZpreg(iobs)=ageheZ(iobs)
-      aftZpreg(iobs)=ageftZ(iobs)
-      aarKpreg(iobs)=agearK(iobs)
-      aarBpreg(iobs)=agearB(iobs)
-      aarMpreg(iobs)=agearM(iobs)
-      aarHpreg(iobs)=agearH(iobs)
+      
       hpreg(iobs)=hei(iobs)
       ! Write observed and predicted ages
       if (p%lon0.lt.0) xlonobs = xlonobs - 360 
@@ -2085,21 +2071,23 @@ subroutine forward (nd,param,misfit,run, iproc)
           ! on MFTL ?
           if (ageflag(9).eq.1.and.fmeano.gt.0.) then
         ! print *, 'MFTL obs = ', fmeano, dfmeano, fmeanp(iobs)+1e-6, dfmeanp(iobs)
+            MFTL_unc = real(p%MFTL_error) * real(fmeano)
+            MFTL_std_unc = real(p%MFTL_std_error) * real(dfmeano)
             call misfit_calculation (misfitflag,real(fmeano),real(fmeanp(iobs))+1e-6,&
-                                          real(p%MFTL_error),misfitres,error_pred,datafit)
+                                          MFTL_unc,misfitres,error_pred,datafit)
             misfitMFTL=misfitMFTL+misfitres
             misfit1=misfit1+misfitres
            call misfit_calculation (misfitflag,real(dfmeano),real(dfmeanp(iobs))+1e-6,&
-                                          real(p%MFTL_std_error),misfitres,error_pred,datafit)
+                                          MFTL_std_unc,misfitres,error_pred,datafit)
             misfitDMFTL=misfitDMFTL+misfitres
             misfit1=misfit1+misfitres
             nmisfitMFTL = nmisfitMFTL + 1
                 
                 call LL_calculation (misfitflag,real(fmeano),real(fmeanp(iobs))+1e-6,&
-                                       real(p%MFTL_error),LL_results,error_pred)
+                                       MFTL_unc,LL_results,error_pred)
                 LL_MFTL = LL_MFTL + LL_results
                 call LL_calculation (misfitflag,real(dfmeano),real(dfmeanp(iobs))+1e-6,&
-                                         real(p%MFTL_std_error),LL_results,error_pred)
+                                         MFTL_std_unc,LL_results,error_pred)
                 LL_DMFTL = LL_DMFTL + LL_results
                 nmisfit1=nmisfit1+2
               endif
@@ -2196,7 +2184,7 @@ subroutine forward (nd,param,misfit,run, iproc)
       if (nobs.gt.1) call regression (aarBpreg,hpreg,nobs,aarBpm,harBpm,arBpi,arBps)
       if (nobs.gt.1) call regression (aarMpreg,hpreg,nobs,aarMpm,harMpm,arMpi,arMps)
       if (nobs.gt.1) call regression (aarHpreg,hpreg,nobs,aarHpm,harHpm,arHpi,arHps)
-      misfit=9999.d0
+      misfit = 9999.d0
       if (nhe.gt.1) then
         misfitAHE = real(misfitAHE+(abs(heos-heps)**2/abs(heos)**2+abs(aheom-ahepm)**2/abs(aheom)**2), kind=sp)
         misfit1= real(misfit1+(abs(heos-heps)**2/abs(heos)**2+abs(aheom-ahepm)**2/abs(aheom)**2), kind=sp)
@@ -2256,7 +2244,9 @@ subroutine forward (nd,param,misfit,run, iproc)
                  +wobs2*zsurf(iconsurf(2,ieobs)) &
                  +wobs3*zsurf(iconsurf(3,ieobs)) &
                  +wobs4*zsurf(iconsurf(npe,ieobs)), kind=sp)
-      hei(iobs)=real(hei(iobs)*1000.+min(0.d0,heightobs), kind=sp)
+      if (heightobs.lt.0.0) then
+        hei(iobs)= real(hei(iobs)*1000.- (hei(iobs)*1000+min(0.d0,heightobs)), kind=sp)
+      endif
       lonobs(iobs)=real(xlonobs, kind=sp)
       latobs(iobs)=real(xlatobs, kind=sp)
     enddo
@@ -2300,7 +2290,10 @@ subroutine forward (nd,param,misfit,run, iproc)
                  +wobs2*zsurf(iconsurf(2,ieobs)) &
                  +wobs3*zsurf(iconsurf(3,ieobs)) &
                  +wobs4*zsurf(iconsurf(npe,ieobs)), kind=sp)
-      hei(iobs)=real(hei(iobs)*1000.+min(0.d0,heightobs), kind=sp)
+      if (heightobs.lt.0.0) then
+        hei(iobs)= real(hei(iobs)*1000.- (hei(iobs)*1000+min(0.d0,heightobs)), kind=sp)
+      endif
+
       lonobs(iobs)=real(xlonobs, kind=sp)
       latobs(iobs)=real(xlatobs, kind=sp)
     enddo
@@ -2315,7 +2308,7 @@ subroutine forward (nd,param,misfit,run, iproc)
     ! Loop over 4He/3He data
     do iobs=nobs1+nobs2+1,nobs1+nobs2+nobs3
       nheating = nheating_array(iobs) 
-      allocate (releasedp(nheating),agereleasedp(nheating),He43_Ejec(nheating))
+      allocate (releasedp(nheating),agereleasedp(nheating),He43_Ejec(nheating),ageTimeAHe(jrec))
       rmr043 = rmr043_array(iobs)
       size43He = size43He_array(iobs)
       Thppm43 = Thppm43_array(iobs)
@@ -2323,7 +2316,8 @@ subroutine forward (nd,param,misfit,run, iproc)
       kinFTL_AHe = p%Kinetic_FTL_Parameter_value_AHe
       if (ageflag(1).eq.1) then ! If AHe prediction
           He43_inv_flag = p%He43_inv_flag
-          
+          He43_flag = p%He43_flag
+
           call Compute_rmr0(rmr043, kinFTLID)
           ! print *, 'print values'
           ! print *, age43He(iobs), dage43He(iobs)
@@ -2335,7 +2329,7 @@ subroutine forward (nd,param,misfit,run, iproc)
           ! print *, 'end print values'
           call Hediff(time43He(:,iobs), temperature43He(:,iobs), jrec, duration(1:nheating,iobs), &
                 theating(1:nheating,iobs), nheating,age43Hep, size43He, Alpha_Ejec_Flag,&
-                RDmodel,Uppm43,Thppm43,D0_spec,Ea_spec,rmr043,1,agereleasedp,releasedp,&
+                RDmodel,Uppm43,Thppm43,D0_spec,Ea_spec,rmr043,ageTimeAHe,He43_flag,agereleasedp,releasedp,&
                 He43_Ejec,agereleased(1:nheating,iobs),released(1:nheating,iobs),&
                 He43_inv_flag,data_ADAM_array,1,0)
       else ! Farley et al. (2000)
@@ -2383,7 +2377,7 @@ subroutine forward (nd,param,misfit,run, iproc)
         deallocate (StepAgeObs,StepAgePred,relError)
       endif
 
-      deallocate (releasedp,agereleasedp,He43_Ejec)
+      deallocate (releasedp,agereleasedp,He43_Ejec,ageTimeAHe)
     enddo
 
     deallocate (time43He,nheating_array,temperature43He,duration,theating)
@@ -2681,7 +2675,7 @@ subroutine forward (nd,param,misfit,run, iproc)
       if (nmisfit1 + nmisfit1a + nmisfit2 + nmisfit3 + nmisfit3a + nmisfit4 + nmisfit5 + nmisfit6 - nd -1 .gt. 0) then
         misfit = misfit/(nmisfit1 + nmisfit1a + nmisfit2 + nmisfit3 + nmisfit3a + nmisfit4 + nmisfit5 + nmisfit6 - nd - 1)
       else
-		misfit = 9999.d0
+        misfit = 9999.d0
         if (iproc.eq.0) then
           write (*,*) 'Warning - Pecube will not correct the misfit (misfit_corrected = 1) when the total number'
           write (*,*) 'of data points is smaller than the number of parameters being inverted  + 1'
@@ -2764,68 +2758,58 @@ subroutine forward (nd,param,misfit,run, iproc)
         ! close (71)
 
         ! write Ages
-        if (p%age_ESR_flag.ne.0.) then
-          open (71,file=run//'/NA/AgeESR.csv',status='old',position='append', action='write')
-          write (71,'(g15.9,99(a1,g15.9))') misfit,(",",hei(i),i=1,nmisfit6)
-          write (71,'(g15.9,99(a1,g15.9))') misfit,(",",ageESRf(i),i=1,nmisfit6)
-          close (71)
-        endif
+        ! if (p%age_ESR_flag.ne.0.) then
+        !   open (71,file=run//'/NA/AgeESR.csv',status='old',position='append', action='write')
+        !   write (71,'(g15.9,99(a1,g15.9))') misfit,(",",hei(i),i=1,nmisfit6)
+        !   write (71,'(g15.9,99(a1,g15.9))') misfit,(",",ageESRf(i),i=1,nmisfit6)
+        !   close (71)
+        ! endif
         if (p%age_AHe_flag.ne.0.) then
           open (71,file=run//'/NA/AgeApatiteHelium.csv',status='old',position='append', action='write')
-          write (71,'(g15.9,99(a1,g15.9))') misfit,(",",hei(i),i=1+nmisfit6,nmisfit6+nhe)
-          write (71,'(g15.9,99(a1,g15.9))') misfit,(",",agehe(i),i=1+nmisfit6,nmisfit6+nhe)
+          write (71,'(g15.9,99(a1,g15.9))') misfit,(",",hheoreg(i),i=1,nhe)
+          write (71,'(g15.9,99(a1,g15.9))') misfit,(",",ahepreg(i),i=1,nhe)
           close (71)
         endif
         if (p%age_AFT_flag.ne.0.) then
           open (71,file=run//'/NA/AgeApatiteFT.csv',status='old',position='append', action='write')   
-          write (71,'(g15.9,99(a1,g15.9))') misfit,(",",hei(i),i=1+nmisfit6+nhe,nmisfit6+nhe+nft) 
-          write (71,'(g15.9,99(a1,g15.9))') misfit,(",",ageft(i),i=1+nmisfit6+nhe,nmisfit6+nhe+nft)
+          write (71,'(g15.9,99(a1,g15.9))') misfit,(",",hftoreg(i),i=1,nft) 
+          write (71,'(g15.9,99(a1,g15.9))') misfit,(",",aftpreg(i),i=1,nft)
           close (71)
         endif
          if (p%age_ZHe_flag.ne.0.) then
           open (71,file=run//'/NA/AgeZirconHelium.csv',status='old',position='append', action='write')
-          write (71,'(g15.9,99(a1,g15.9))') misfit,(",",hei(i),i=1+nmisfit6+nhe+nft,nmisfit6+nhe+nft+nheZ)
-          write (71,'(g15.9,99(a1,g15.9))') misfit,(",",ageheZ(i),i=1+nmisfit6+nhe+nft,nmisfit6+nhe+nft+nheZ)
+          write (71,'(g15.9,99(a1,g15.9))') misfit,(",",hheZoreg(i),i=1,nhez)
+          write (71,'(g15.9,99(a1,g15.9))') misfit,(",",aheZpreg(i),i=1,nhez)
           close (71)
         endif
         if (p%age_ZFT_flag.ne.0.) then
           open (71,file=run//'/NA/AgeZirconFT.csv',status='old',position='append', action='write')
-          write (71,'(g15.9,99(a1,g15.9))') misfit,(",",hei(i),i=1+nmisfit6+nhe+nft+nheZ,&
-                                                     nmisfit6+nhe+nft+nheZ+nftZ)
-          write (71,'(g15.9,99(a1,g15.9))') misfit,(",",ageftZ(i),i=1+nmisfit6+nhe+nft+nheZ,&
-                                                     nmisfit6+nhe+nft+nheZ+nftZ)
+          write (71,'(g15.9,99(a1,g15.9))') misfit,(",",hftZoreg(i),i=1,nftz)
+          write (71,'(g15.9,99(a1,g15.9))') misfit,(",",aftZpreg(i),i=1,nftz)
           close (71)
         endif
         if (p%age_KAr_flag.ne.0.) then
           open (71,file=run//'/NA/AgeKSparArgon.csv',status='old',position='append', action='write')
-          write (71,'(g15.9,99(a1,g15.9))') misfit,(",",hei(i),i=1+nmisfit6+nhe+nft+nheZ+nftZ,&
-                                                    nmisfit6+nhe+nft+nheZ+nftZ+narK)
-          write (71,'(g15.9,99(a1,g15.9))') misfit,(",",agearK(i),i=1+nmisfit6+nhe+nft+nheZ+nftZ,&
-                                                    nmisfit6+nhe+nft+nheZ+nftZ+narK)
+          write (71,'(g15.9,99(a1,g15.9))') misfit,(",",harKoreg(i),i=1,narK)
+          write (71,'(g15.9,99(a1,g15.9))') misfit,(",",aarKpreg(i),i=1,narK)
           close (71)
         endif
         if (p%age_BAr_flag.ne.0.) then
           open (71,file=run//'/NA/AgeBiotiteArgon.csv',status='old',position='append', action='write')
-          write (71,'(g15.9,99(a1,g15.9))') misfit,(",",hei(i),i=1+nmisfit6+nhe+nft+nheZ+nftZ+narK,&
-                                                      nmisfit6+nhe+nft+nheZ+nftZ+narK+narB)
-          write (71,'(g15.9,99(a1,g15.9))') misfit,(",",agearB(i),i=1+nmisfit6+nhe+nft+nheZ+nftZ+narK,&
-                                                      nmisfit6+nhe+nft+nheZ+nftZ+narK+narB)
+          write (71,'(g15.9,99(a1,g15.9))') misfit,(",",harBoreg(i),i=1,narB)
+          write (71,'(g15.9,99(a1,g15.9))') misfit,(",",aarBpreg(i),i=1,narB)
           close (71)
         endif
         if (p%age_MAr_flag.ne.0.) then
           open (71,file=run//'/NA/AgeMuscoviteArgon.csv',status='old',position='append', action='write')
-          write (71,'(g15.9,99(a1,g15.9))') misfit,(",",hei(i),i=1+nmisfit6+nhe+nft+nheZ+nftZ+narK+narB,&
-                                                     nmisfit6+nhe+nft+nheZ+nftZ+narK+narB+narM)
-          write (71,'(g15.9,99(a1,g15.9))') misfit,(",",agearM(i),i=1+nmisfit6+nhe+nft+nheZ+nftZ+narK+narB,&
-                                                     nmisfit6+nhe+nft+nheZ+nftZ+narK+narB+narM)
+          write (71,'(g15.9,99(a1,g15.9))') misfit,(",",harMoreg(i),i=1,narM)
+          write (71,'(g15.9,99(a1,g15.9))') misfit,(",",aarMpreg(i),i=1,narM)
           close (71)
         endif
         if (p%age_HAr_flag.ne.0.) then
           open (71,file=run//'/NA/AgeHornblendeArgon.csv',status='old',position='append', action='write')
-          write (71,'(g15.9,99(a1,g15.9))') misfit,(",",hei(i),i=1+nmisfit6+nhe+nft+nheZ+nftZ+narK+&
-                                                    narB+narM,nmisfit6+nhe+nft+nheZ+nftZ+narK+narB+narM+narH)
-          write (71,'(g15.9,99(a1,g15.9))') misfit,(",",agearH(i),i=1+nmisfit6+nhe+nft+nheZ+nftZ+narK+&
-                                                    narB+narM,nmisfit6+nhe+nft+nheZ+nftZ+narK+narB+narM+narH)
+          write (71,'(g15.9,99(a1,g15.9))') misfit,(",",harHoreg(i),i=1,narH)
+          write (71,'(g15.9,99(a1,g15.9))') misfit,(",",aarHpreg(i),i=1,narH)
           close (71)
         endif                                 
     endif
@@ -2903,7 +2887,7 @@ subroutine regression (x,y,n,xmean,ymean,intercept,slope)
   implicit none
 
   integer n
-  double precision x(n),y(n),xmean,ymean,intercept,slope
+  real*4 x(n),y(n),xmean,ymean,intercept,slope
 
   xmean=sum(x)/n
   ymean=sum(y)/n

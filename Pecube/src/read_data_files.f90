@@ -195,7 +195,7 @@ if (is_unix) then
     if (iproc.eq.0) open (123, file = folder//'_Messages.txt', status = 'unknown')
 else
     if (iproc.eq.0) call CheckFileExistence(trim(folder2)//'_Messages.txt')
-    if (iproc.eq.0) open (123, file = trim(folder2)//'_Messages.txt', status = 'new')
+    if (iproc.eq.0) open (123, file = trim(folder2)//'_Messages.txt', status = 'unknown')
 endif
 call check_obs (nsample, sample, obs, field_name, nfield, xlon1, xlon2, xlat1, xlat2, iproc)
 if (iproc.eq.0) close (123)
