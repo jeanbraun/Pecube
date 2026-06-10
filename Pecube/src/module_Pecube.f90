@@ -208,10 +208,12 @@ module Pecube
   character*128 :: Kinetic_FTL_Parameter_value_AFT_desc = "Value for the kinetic parameter for fission track annealing."
   
   double precision :: MFTL_error = 0.1
-  character*128 :: MFTL_error_desc = "Relative uncertainty on the MFTL (non-dimensional, i.e., 0-1) to apply in the misfit calculation (inversion)."
+  character*128 :: MFTL_error_desc = "Relative uncertainty on the MFTL (non-dimensional, i.e., 0-1)&
+						to apply in the misfit calculation (inversion)."
   
   double precision :: MFTL_std_error = 0.1
-  character*128 :: MFTL_std_error_desc = "Relative uncertainty on the std of MFTL (non-dimensional, i.e., 0-1) to apply in the misfit calculation (inversion)."
+  character*128 :: MFTL_std_error_desc = "Relative uncertainty on the std of MFTL&
+				(non-dimensional, i.e., 0-1) to apply in the misfit calculation (inversion)."
 
   integer :: age_ZFT_flag = 0
   character*128 :: age_ZFT_flag_desc = "Flag for computing FT ages in zircon (0=no/1=yes)"
