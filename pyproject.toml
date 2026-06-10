@@ -1,0 +1,28 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pecube"
+version = "4.3.7"
+description = "Thermo-kinematic model to invert thermochronological data"
+license = {text = "GPL-3.0-or-later"}
+requires-python = ">=3.9"
+
+[tool.hatch.build.hooks.custom]
+path = "hatch_build.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["pecube"]          # only this dir — src/ is invisible to hatchling
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "pecube/",
+    "src/",                    # Fortran sources must be in the sdist
+    "bin/.gitkeep",            # keep the empty bin/ dir
+    "docs/",
+    "EXMP*/",
+    "hatch_build.py",
+    "LICENSE",
+    "README.md",
+]
