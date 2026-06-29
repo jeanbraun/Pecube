@@ -1,243 +1,254 @@
-.SUFFIXES:.out .o .s .c .F .f .f90 .F90 .f95 .f77 /mpif90.e .r .y .yr .ye .l .p .sh .csh .h
+# ═══════════════════════════════════════════════════════════════════════════════
+# Pecube Makefile — cross-platform (Linux, macOS, Windows)
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# Usage:
+#   make all          build all binaries (serial + MPI)
+#   make Pecube       serial Pecube only
+#   make MPI          MPI-enabled PecubeMPI only
+#   make clean        remove object files and binaries
+#
+# Compiler selection (in order of priority):
+#   1. Command-line:   make FC=ifort MPIFC=mpiifort all
+#   2. Environment:    set automatically by conda-forge build environments
+#                      and HPC environment modules (module load gcc openmpi)
+#   3. Defaults below: used only when make's built-in defaults are in effect
+# ═══════════════════════════════════════════════════════════════════════════════
 
-# Check system
-ifeq ($(OS), Windows_NT)
-    SYSTEM := Windows
+# ── Compilers ──────────────────────────────────────────────────────────────────
+# $(origin VAR) returns 'default' when make's built-in value is in effect
+# (e.g. FC=f77, CC=cc). We replace these with sensible defaults while
+# respecting any value set by the environment (conda-forge, module system)
+# or on the command line.
+
+ifeq ($(origin FC), default)
+    FC := gfortran
+endif
+ifeq ($(origin F77), default)
+    F77 := $(FC)
+endif
+ifeq ($(origin CC), default)
+    CC := gcc
+endif
+
+MPIFC  ?= mpif90
+MPIF77 ?= mpif77
+MPICC  ?= mpicc
+
+# Internal aliases (keep targets readable)
+FF90     = $(FC)
+FF77     = $(F77)
+LINK     = $(FC)
+FF90MPI  = $(MPIFC)
+FF77MPI  = $(MPIF77)
+CCMPI    = $(MPICC)
+
+# ── Compiler flags ─────────────────────────────────────────────────────────────
+# Flags are selected based on the compiler family, not the platform.
+#
+# F77FLAGS:    used for serial .f/.f77 compilation
+#              -fd-lines-as-comments: treats lines starting with 'd' as comments,
+#              which disables the MPI calls in the serial NA code (naScalar.f)
+#
+# F77MPIFLAGS: used for MPI .f compilation (naMPI.f only)
+#              -fd-lines-as-code: treats 'd' lines as active code,
+#              enabling the MPI calls in naMPI.f
+#
+# This 'd'-line mechanism is how the same source selectively includes/excludes
+# MPI calls for serial vs parallel builds.
+
+OPT     ?= -O
+LDFLAGS ?=
+CFLAGS  ?=
+
+# FFLAGS is also passed at link time so that driver flags set by conda-forge
+# activation scripts (e.g. -fuse-ld=lld, -fms-runtime-lib=dll on Windows)
+# take effect during linking.
+
+ifneq (,$(findstring gfortran, $(FC)))
+    FFLAGS      ?= -fbounds-check -fallow-invalid-boz
+    F77FLAGS    := $(FFLAGS) -fd-lines-as-comments
+    F77MPIFLAGS := $(FFLAGS) -fd-lines-as-code
+else ifneq (,$(findstring ifort, $(FC)))
+    FFLAGS      ?= -check bounds
+    F77FLAGS    := $(FFLAGS)
+    F77MPIFLAGS := $(FFLAGS)
 else
-    UNAME_S := $(shell uname -s)
-    ifeq ($(UNAME_S), Linux)
-        SYSTEM := Linux
-    else ifeq ($(UNAME_S), Darwin)
-        SYSTEM := MacOS
-    else
-        SYSTEM := Unknown
+    # flang or unknown compiler: no special flags
+    # (conda-forge sets FFLAGS via activation scripts, respected via ?=)
+    FFLAGS      ?=
+    F77FLAGS    := $(FFLAGS)
+    F77MPIFLAGS := $(FFLAGS)
+    # Use clang for C when using flang — same LLVM toolchain, MSVC-ABI compatible
+    CC := clang
+    # Locate and link the flang Fortran runtime (provides dtime_ and other intrinsics)
+    FLANG_RT := $(firstword $(wildcard \
+        $(subst \,/,$(CONDA_PREFIX))/Library/lib/clang/*/lib/x86_64-pc-windows-msvc/flang_rt.runtime.dynamic.lib))
+    ifneq ($(FLANG_RT),)
+        LDFLAGS += -Wl,-defaultlib:$(FLANG_RT)
     endif
 endif
 
-# Check if windows or unix system
+# ── Object lists ───────────────────────────────────────────────────────────────
+# OBJECTS_MPI: same as OBJECTS but without naScalar.o — the MPI build
+# replaces it with naMPI.o (compiled separately in the MPI target).
 
-# use these lines to produce a scalar version using the gfortran compiler
-# this removes the mpi commands in NA
-
-FLAGS = -c -O
-FLAGS = -c -O -g
-#FF90 = gfortran -fsanitize=address -fbounds-check -fcheck=all -fbacktrace -Wextra
-FF90 = gfortran -fbounds-check
-FF77 = gfortran -fd-lines-as-comments -fbounds-check
-CC = gcc -fbounds-check -static-libgcc -static-libstdc++ -lquadmath
-LINK = gfortran -fbounds-check -static-libgfortran -static-libgcc -static-libstdc++
-
-# use these lines to produce a parallel (mpi) version to parallelize the inversion
-# Note that some compilers will not allow to have an "include" command preceded by a "d" as an indication
-#   of a commented line; if this is the case for your compiler, the routine na.f will not compile properly
-#   You will need to edit the na.f file and remove the "d" in the first column of three lines that
-#   start with include 'mpif.h'
-
-FLAGSMPI = -c -O
-ifeq ($(SYSTEM), Windows)
-	FF90MPI := mpif90 -fallow-invalid-boz
-	FF77MPI = mpif77 -fd-lines-as-code 
+# Compiler-specific compatibility shims
+ifneq (,$(findstring flang, $(FC)))
+    EXTRA_OBJS = dtime_compat.o
 else
-	FF90MPI := mpif90
-	FF77MPI = mpif77 -fd-lines-as-code
+    EXTRA_OBJS =
 endif
-CCMPI = mpicc
-
-#FLAGS = -c -O
-#FF90 = ifort
-#FF77 = ifort
-#CC = icc
 
 OBJECTS = \
-module_Pecube.o \
-Pecube_utils.o \
-Trapped_charge.o \
-Mad_He.o \
-Mad_Trax.o \
-Mad_Trax_Zircon.o \
-Pecube.o \
-calculate_fault_parameters.o \
-calculate_ages.o \
-create_pecube_in.o \
-find_distance.o \
-find_dt.o \
-find_element.o \
-find_neighbours.o \
-find_temp.o \
-find_triangle.o \
-find_velo.o \
-find_velocity.o \
-four1.o \
-heat_production.o \
-hinterpolate.o \
-interpol3d.o \
-interpolate.o \
-isostatic_rebound.o \
-make_matrix.o \
-move_fault.o \
-naScalar.o \
-read_in_fault_parameters.o \
-realft.o \
-screen_counter.o \
-sinft.o \
-solve_iterative.o \
-thermal_diffusivity.o \
-tridag.o \
-KETCH.o \
-calculate_Ttpath.o \
-extract_Ttpath.o \
-Diffusion1D.o \
-element_surface.o \
-read_input_file.o \
-He_diffusion.o \
-scanfile.o \
-read_data_files.o \
-read_table.o \
-Ketch07.o \
-RD_Models.o \
-ExtractDEM.o \
-initialize_random_seed.o \
-calculate_TL.o \
-calculate_OSL.o \
-calculate_ESR.o \
-smooth_topo.o \
-Topography.o
+    module_Pecube.o \
+    Pecube_utils.o \
+    Trapped_charge.o \
+    Mad_He.o \
+    Mad_Trax.o \
+    Mad_Trax_Zircon.o \
+    Pecube.o \
+    calculate_fault_parameters.o \
+    calculate_ages.o \
+    create_pecube_in.o \
+    find_distance.o \
+    find_dt.o \
+    find_element.o \
+    find_neighbours.o \
+    find_temp.o \
+    find_triangle.o \
+    find_velo.o \
+    find_velocity.o \
+    four1.o \
+    heat_production.o \
+    hinterpolate.o \
+    interpol3d.o \
+    interpolate.o \
+    isostatic_rebound.o \
+    make_matrix.o \
+    move_fault.o \
+    naScalar.o \
+    read_in_fault_parameters.o \
+    realft.o \
+    screen_counter.o \
+    sinft.o \
+    solve_iterative.o \
+    thermal_diffusivity.o \
+    tridag.o \
+    KETCH.o \
+    calculate_Ttpath.o \
+    extract_Ttpath.o \
+    Diffusion1D.o \
+    element_surface.o \
+    read_input_file.o \
+    He_diffusion.o \
+    scanfile.o \
+    read_data_files.o \
+    read_table.o \
+    Ketch07.o \
+    RD_Models.o \
+    ExtractDEM.o \
+    initialize_random_seed.o \
+    calculate_TL.o \
+    calculate_OSL.o \
+    calculate_ESR.o \
+    smooth_topo.o \
+    Topography.o
 
-OBJECT_AGE = \
-CalcAge.o \
-He_diffusion.o \
-Mad_He.o \
-interpolate.o \
-Ketch07.o \
-KETCH.o \
-RD_Models.o \
-Pecube_utils.o \
-tridag.o
-
-
-OBJECTS_MPI = \
-module_Pecube.o \
-Pecube_utils.o \
-Trapped_charge.o \
-Mad_He.o \
-Mad_Trax.o \
-Mad_Trax_Zircon.o \
-Pecube.o \
-calculate_fault_parameters.o \
-calculate_ages.o \
-create_pecube_in.o \
-find_distance.o \
-find_dt.o \
-find_element.o \
-find_neighbours.o \
-find_temp.o \
-find_triangle.o \
-find_velo.o \
-find_velocity.o \
-four1.o \
-heat_production.o \
-hinterpolate.o \
-interpol3d.o \
-interpolate.o \
-isostatic_rebound.o \
-make_matrix.o \
-move_fault.o \
-read_in_fault_parameters.o \
-realft.o \
-screen_counter.o \
-sinft.o \
-solve_iterative.o \
-thermal_diffusivity.o \
-tridag.o \
-KETCH.o \
-calculate_Ttpath.o \
-extract_Ttpath.o \
-Diffusion1D.o \
-element_surface.o \
-read_input_file.o \
-He_diffusion.o \
-scanfile.o \
-read_data_files.o \
-read_table.o \
-Ketch07.o \
-RD_Models.o \
-ExtractDEM.o \
-initialize_random_seed.o \
-calculate_TL.o\
-calculate_OSL.o\
-calculate_ESR.o \
-smooth_topo.o \
-Topography.o
+OBJECTS_MPI = $(filter-out naScalar.o, $(OBJECTS))
 
 OBJECTS_TEST = \
-testFault.o \
-calculate_fault_parameters.o \
-find_distance.o \
-find_velocity.o \
-move_fault.o \
-read_in_fault_parameters.o \
-read_input_file.o \
-read_data_files.o \
-read_table.o \
-scanfile.o \
-testTopo.o \
-ExtractDEM.o\
-Pecube_utils.o \
-smooth_topo.o\
-Topography.o
+    testFault.o \
+    calculate_fault_parameters.o \
+    find_distance.o \
+    find_velocity.o \
+    move_fault.o \
+    read_in_fault_parameters.o \
+    read_input_file.o \
+    read_data_files.o \
+    read_table.o \
+    scanfile.o \
+    testTopo.o \
+    ExtractDEM.o \
+    Pecube_utils.o \
+    smooth_topo.o \
+    Topography.o
 
 OBJECTS_VTK = \
-Pecube_utils.o \
-vtk.o
+    Pecube_utils.o \
+    vtk.o
 
 OBJECTS_PECUBE324 = \
-Pecube324.o
+    Pecube324.o
 
-.f95.o:
-	$(FF90) $(FLAGS) $*.f95
+OBJECT_AGE = \
+    CalcAge.o \
+    He_diffusion.o \
+    Mad_He.o \
+    interpolate.o \
+    Ketch07.o \
+    KETCH.o \
+    RD_Models.o \
+    Pecube_utils.o \
+    tridag.o
+
+# ── Suffix rules ───────────────────────────────────────────────────────────────
+.SUFFIXES: .o .f90 .F90 .f95 .f .f77 .c
 
 .f90.o:
-	$(FF90) $(FLAGS) $*.f90
+	$(FF90) -c $(OPT) $(FFLAGS) $*.f90
 
 .F90.o:
-	$(FF90) $(FLAGS) $*.F90
+	$(FF90) -c $(OPT) $(FFLAGS) $*.F90
+
+.f95.o:
+	$(FF90) -c $(OPT) $(FFLAGS) $*.f95
 
 .f.o:
-	$(FF77) $(FLAGS) $*.f
+	$(FF77) -c $(OPT) $(F77FLAGS) $*.f
 
 .f77.o:
-	$(F77) $(FLAGS) $*.f77
+	$(FF77) -c $(OPT) $(F77FLAGS) $*.f77
 
 .c.o:
-	$(CC) $(FLAGS) $*.c
+	$(CC) -c $(OPT) $(CFLAGS) $*.c
 
-Pecube:	$(OBJECTS)
-	$(LINK) -O $(OBJECTS) -o ../bin/Pecube
+# ── Targets ────────────────────────────────────────────────────────────────────
+.PHONY: all Pecube MPI Test Vtk Pecube324 Age_specific clean
 
-MPI: $(OBJECTS_MPI)
-	mpif77 -c -O -fallow-invalid-boz naMPI.f 
-	$(FF90MPI) -O $(OBJECTS_MPI) naMPI.o -o ../bin/PecubeMPI
+# Build MPI target only if the MPI Fortran wrapper is available
+HAS_MPI := $(shell where $(MPIF77) 2>nul || which $(MPIF77) 2>/dev/null)
+ifneq ($(HAS_MPI),)
+all: Pecube Test Vtk Pecube324 Age_specific MPI
+else
+all: Pecube Test Vtk Pecube324 Age_specific
+    $(info Note: $(MPIF77) not found — skipping MPI build. Run 'make MPI' explicitly when MPI is available.)
+endif
 
-Test: $(OBJECTS_TEST)
-	$(LINK) -O $(OBJECTS_TEST) -o ../bin/Test
+Pecube: $(OBJECTS) $(EXTRA_OBJS)
+	$(LINK) $(FFLAGS) -o ../bin/Pecube $(OBJECTS) $(EXTRA_OBJS) $(LDFLAGS)
 
-Vtk: $(OBJECTS_VTK)
-	$(LINK) -O $(OBJECTS_VTK) -o ../bin/Vtk
+# naMPI.f compiled with the MPI F77 wrapper using F77MPIFLAGS so that
+# 'd'-prefixed lines are treated as active code (enabling MPI calls).
+# All other objects are reused from the serial build.
+MPI: $(OBJECTS_MPI) $(EXTRA_OBJS)
+	$(FF77MPI) -c $(OPT) $(F77MPIFLAGS) naMPI.f
+	$(FF90MPI) $(FFLAGS) -o ../bin/PecubeMPI $(OBJECTS_MPI) $(EXTRA_OBJS) naMPI.o $(LDFLAGS)
 
-Pecube324:	$(OBJECTS_PECUBE324)
-	$(LINK) -O $(OBJECTS_PECUBE324) -o ../bin/Pecube324
-	
-Age_specific: $(OBJECT_AGE)
-	$(LINK) -o ../bin/CalcAge $(OBJECT_AGE)
+Test: $(OBJECTS_TEST) $(EXTRA_OBJS)
+	$(LINK) $(FFLAGS) -o ../bin/Test $(OBJECTS_TEST) $(EXTRA_OBJS) $(LDFLAGS)
 
-all: $(OBJECTS) $(OBJECTS_TEST) $(OBJECTS_VTK) $(OBJECTS_PECUBE324) $(OBJECT_AGE) $(OBJECTS_MPI)
-	make Pecube
-	make Test
-	make Vtk
-	make Pecube324
-	make Age_specific
-	make MPI
-	
+Vtk: $(OBJECTS_VTK) $(EXTRA_OBJS)
+	$(LINK) $(FFLAGS) -o ../bin/Vtk $(OBJECTS_VTK) $(EXTRA_OBJS) $(LDFLAGS)
+
+Pecube324: $(OBJECTS_PECUBE324) $(EXTRA_OBJS)
+	$(LINK) $(FFLAGS) -o ../bin/Pecube324 $(OBJECTS_PECUBE324) $(EXTRA_OBJS) $(LDFLAGS)
+
+Age_specific: $(OBJECT_AGE) $(EXTRA_OBJS)
+	$(LINK) $(FFLAGS) -o ../bin/CalcAge $(OBJECT_AGE) $(EXTRA_OBJS) $(LDFLAGS)
+
+# ── Clean ──────────────────────────────────────────────────────────────────────
 clean:
-	rm *.o
-	rm *.exe
+	-$(RM) *.o
+	-$(RM) ../bin/Pecube ../bin/PecubeMPI ../bin/Test ../bin/Vtk \
+	       ../bin/Pecube324 ../bin/CalcAge
