@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pecube"
-version = "4.3.8"
+version = "4.3.9"
 description = "Thermo-kinematic model to invert thermochronological data"
 license = {text = "GPL-3.0-or-later"}
 requires-python = ">=3.9"
