@@ -17,6 +17,7 @@ class CustomBuildHook(BuildHookInterface):
         pkg_dir = os.path.join(root, "pecube")
 
         # Compile Fortran sources
+        os.makedirs(bin_dir, exist_ok=True)
         result = subprocess.run(["make", "all"], cwd=src_dir)
         if result.returncode != 0:
             sys.exit(
