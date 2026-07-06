@@ -38,7 +38,11 @@ class CustomBuildHook(BuildHookInterface):
                 shutil.copy2(src, pkg_bin)
                 os.chmod(os.path.join(pkg_bin, name),
                          os.stat(src).st_mode | 0o111)
-
+        build_data["shared_scripts"] = {
+            os.path.join(pkg_bin, name): name
+            for name in os.listdir(pkg_bin)
+            if not name.endswith('.sh')
+        }
 
         # Copy data directories into the Python package
         for name in DATA_DIRS:
