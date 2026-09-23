@@ -221,7 +221,7 @@ enddo
 ! Read other flags
 read (52,*) Alpha_flag,Alpha_Ejec_Flag,RDModel,D0,Ea ! Apatite He
 read (52,*) DiffzModel,D0z,Eaz ! Zircon He
-read (52,*) AnnModel, rhoST ! Apatite Fission track
+read (52,*) kinFTLID,Init_FTL_Model,AnnModel,rhoST,Init_FTL_value ! Apatite Fission track
 read (52,*) D0k, Eak ! KAr
 read (52,*) D0b, Eab ! BAr
 read (52,*) D0m, Eam ! MAr
@@ -230,8 +230,6 @@ read (52,*) D0h, Eah ! HAr
 if (He43_flag.eq.1) then
     !Read number of 4He/3He profiles
     call get_number_43He (dataFolder, nb_He43, is_unix, run, nsteps_He43_array)
-    print *, 'Number of 4He/3He spectrum: ', nb_He43
-    print *, 'Number of heating steps: ', nsteps_He43_array(1:nb_He43)
 
     ! allocate arrays
     allocate (sample_list_He43(nb_He43))
@@ -327,9 +325,9 @@ endif
 write(*,*) '-------------------------------------------------'
 
 ! !!! ro read from file !!!
-Init_FTL_Model = 0
-kinFTLID = 4
-Init_FTL_value = 16.3
+! Init_FTL_Model = 0
+! kinFTLID = 4
+! Init_FTL_value = 16.3
 
 ! name of directory where data are stored 
 dataFolder = trim(dataFolder)
@@ -518,6 +516,7 @@ do ks=1,nsamples !loop through samples
          
          
         !------------ Compute AFT age? ----------------------------------------
+         
         if (AFT_Obs(GrainCounter).eq.1.and.AnnModel.eq.2) then
             ! reverse time and temperature array (from 0 to x Ma)
             do irec=1,ntime
@@ -530,11 +529,11 @@ do ks=1,nsamples !loop through samples
             fmeanp = 0.0
             dfmeanp = 0.0
             oldest_age  = 0.0
-            if (KINAFT(i).ne.-9999) then
-                call ketch_main(ntime,ztime_real,ztemp_real,AnnModel,rhoST,Init_FTL_Model,KINAFT(GrainCounter),&
+            
+            if (KINAFT(kg).ne.-9999) then
+                call ketch_main(ntime,ztime_real,ztemp_real,AnnModel,rhoST,Init_FTL_Model,KINAFT(kg),&
                 kinFTLID,Init_FTL_value,final_age,oldest_age,fmeanp,dfmeanp,fdist)
 
-                print *, 'Age AFT: ', final_age, fmeanp, dfmeanp
                 if (final_age.le.1e-4) then
                     final_age = 1e-4
                 endif
@@ -1285,7 +1284,6 @@ write (13,'(a,64(",",a))') 'SAMPLE','LON','LAT','HEIGHTOBS','HEIGHTPRED', &
 ! first check thermochronometers flag
 ! if no prediction, get the default value read from CompareAge.csv file
 if (AHe_flag.eq.0) ageAHe_array = AHEPRED
-print *, 'AHe pred 2: ', AHEPRED
 if (AFT_flag.eq.0) ageAFT_array = AFTPRED
 if (ZHe_flag.eq.0) ageZHe_array = ZHEPRED
 if (BAr_flag.eq.0) ageBAr_array = BARPRED

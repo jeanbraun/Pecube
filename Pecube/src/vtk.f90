@@ -7,7 +7,7 @@ real,dimension(:),allocatable::xs,ys,zs,ex,a1,a2,a3,a4,a5,a6,a7,a8,He43,ftlm,nNt
 integer,dimension(:,:),allocatable::icon,iconsurf
 real tim
 integer nnode,nelem,nsurf,nelemsurf,mpe,npe,irec,nrec,itime,i,j,k,iunit,i1,i2,istep
-integer nnx
+integer nnx, agecomput
 character cs*3,ct*3,run*5,iq*1
 integer numarg
 logical is_unix
@@ -172,7 +172,7 @@ close (77)
 
 open (77,file=run//'/output/Ages.out',status='old',access='direct',recl=4)
 nrec=1
-2 read (77,rec=(nrec-1)*(4+17*nsurf+npe*nelemsurf)+1) nnx
+2 read (77,rec=(nrec-1)*(5+17*nsurf+npe*nelemsurf)+1) nnx
 if (nnx.lt.0) goto 998
 print*,'Record',nrec
 nrec=nrec+1
@@ -180,7 +180,7 @@ goto 2
 998 nrec=nrec-1
 close (77)
 
-open (77,file=run//'/output/Ages.out',status='old',access='direct',recl=4*(4+17*nsurf+npe*nelemsurf))
+open (77,file=run//'/output/Ages.out',status='old',access='direct',recl=4*(5+17*nsurf+npe*nelemsurf))
 
 allocate (xs(nsurf),ys(nsurf),zs(nsurf),ex(nsurf))
 allocate (a1(nsurf),a2(nsurf),a3(nsurf),a4(nsurf),a5(nsurf))
@@ -192,7 +192,9 @@ do irec=0,nrec-1
 
 print*,'doing record ',irec,'out of',nrec
 
-read (77,rec=irec+1) nsurf,nelemsurf,npe,tim,xs,ys,zs,ex,a1,a2,a3,a4,a5,a6,a7,a8,He43,ftlm,nNtl,nNosl,nNesr,iconsurf
+read (77,rec=irec+1) nsurf,nelemsurf,npe,agecomput,tim,xs,ys,zs,ex,a1,a2,a3,a4,a5,a6,a7,a8,He43,ftlm,&
+                    nNtl,nNosl,nNesr,iconsurf
+                    
 
 write(cs,'(i3)') irec
 if (irec.lt.10) cs(1:2)='00'
@@ -252,7 +254,7 @@ write(iunit,'(a)')'LOOKUP_TABLE default'
 write(iunit,'(a)')'SCALARS ApatiteHeAge float 1'
 write(iunit,'(a)')'LOOKUP_TABLE default'
     do i=1,nsurf
-      if (a1(i).lt.1e-4.or.a1(i).gt.1e3) then
+      if (a1(i).lt.1e-4.or.a1(i).gt.1e3.or.agecomput.gt.1) then
         a1(i) = 0.d0
       endif
     write(iunit,'(f18.13)') a1(i)
@@ -261,7 +263,7 @@ write(iunit,'(a)')'LOOKUP_TABLE default'
 write(iunit,'(a)')'SCALARS ZirconHeAge float 1'
 write(iunit,'(a)')'LOOKUP_TABLE default'
     do i=1,nsurf
-      if (a2(i).lt.1e-4.or.a2(i).gt.1e3) then
+      if (a2(i).lt.1e-4.or.a2(i).gt.1e3.or.agecomput.gt.1) then
         a2(i) = 0.d0
       endif
     write(iunit,'(f18.13)') a2(i)
@@ -270,7 +272,7 @@ write(iunit,'(a)')'LOOKUP_TABLE default'
 write(iunit,'(a)')'SCALARS ApatiteFTAge float 1'
 write(iunit,'(a)')'LOOKUP_TABLE default'
     do i=1,nsurf
-      if (a3(i).lt.1e-4.or.a3(i).gt.1e3) then
+      if (a3(i).lt.1e-4.or.a3(i).gt.1e3.or.agecomput.gt.1) then
         a3(i) = 0.d0
       endif
     write(iunit,'(f18.13)') a3(i)
@@ -279,7 +281,7 @@ write(iunit,'(a)')'LOOKUP_TABLE default'
 write(iunit,'(a)')'SCALARS ZirconFTAge float 1'
 write(iunit,'(a)')'LOOKUP_TABLE default'
     do i=1,nsurf
-      if (a4(i).lt.1e-4.or.a4(i).gt.1e3) then
+      if (a4(i).lt.1e-4.or.a4(i).gt.1e3.or.agecomput.gt.1) then
         a4(i) = 0.d0
       endif
     write(iunit,'(f18.13)') a4(i)
@@ -288,7 +290,7 @@ write(iunit,'(a)')'LOOKUP_TABLE default'
 write(iunit,'(a)')'SCALARS KsparArgonAge float 1'
 write(iunit,'(a)')'LOOKUP_TABLE default'
     do i=1,nsurf
-      if (a5(i).lt.1e-4.or.a5(i).gt.1e3) then
+      if (a5(i).lt.1e-4.or.a5(i).gt.1e3.or.agecomput.gt.1) then
         a5(i) = 0.d0
       endif
     write(iunit,'(f18.13)') a5(i)
@@ -297,7 +299,7 @@ write(iunit,'(a)')'LOOKUP_TABLE default'
 write(iunit,'(a)')'SCALARS BiotiteArgonAge float 1'
 write(iunit,'(a)')'LOOKUP_TABLE default'
     do i=1,nsurf
-      if (a6(i).lt.1e-4.or.a6(i).gt.1e3) then
+      if (a6(i).lt.1e-4.or.a6(i).gt.1e3.or.agecomput.gt.1) then
         a6(i) = 0.d0
       endif
     write(iunit,'(f18.13)') a6(i)
@@ -306,7 +308,7 @@ write(iunit,'(a)')'LOOKUP_TABLE default'
 write(iunit,'(a)')'SCALARS MuscoviteArgonAge float 1'
 write(iunit,'(a)')'LOOKUP_TABLE default'
     do i=1,nsurf
-      if (a7(i).lt.1e-4.or.a7(i).gt.1e3) then
+      if (a7(i).lt.1e-4.or.a7(i).gt.1e3.or.agecomput.gt.1) then
         a7(i) = 0.d0
       endif
     write(iunit,'(f18.13)') a7(i)
@@ -315,7 +317,7 @@ write(iunit,'(a)')'LOOKUP_TABLE default'
 write(iunit,'(a)')'SCALARS HornblendeArgonAge float 1'
 write(iunit,'(a)')'LOOKUP_TABLE default'
     do i=1,nsurf
-      if (a8(i).lt.1e-4.or.a8(i).gt.1e3) then
+      if (a8(i).lt.1e-4.or.a8(i).gt.1e3.or.agecomput.gt.1) then
         a8(i) = 0.d0
       endif
     write(iunit,'(f18.13)') a8(i)
@@ -324,7 +326,7 @@ write(iunit,'(a)')'LOOKUP_TABLE default'
 write(iunit,'(a)')'SCALARS EdgeAge float 1'
 write(iunit,'(a)')'LOOKUP_TABLE default'
     do i=1,nsurf
-      if (He43(i).lt.1e-4.or.He43(i).gt.1e3) then
+      if (He43(i).lt.1e-4.or.He43(i).gt.1e3.or.agecomput.gt.1) then
         He43(i) = 0.d0
       endif
     write(iunit,'(f18.13)') He43(i)
@@ -333,7 +335,7 @@ write(iunit,'(a)')'LOOKUP_TABLE default'
 write(iunit,'(a)')'SCALARS ApatiteMeanFTLength float 1'
 write(iunit,'(a)')'LOOKUP_TABLE default'
   do i=1,nsurf
-    if (ftlm(i).lt.1e-4.or.ftlm(i).gt.1e3) then
+    if (ftlm(i).lt.1e-4.or.ftlm(i).gt.1e3.or.agecomput.gt.1) then
         ftlm(i) = 0.d0
       endif
   write(iunit,'(f18.13)') ftlm(i)
@@ -342,7 +344,7 @@ write(iunit,'(a)')'LOOKUP_TABLE default'
 write(iunit,'(a)')'SCALARS TLnN float 1'
 write(iunit,'(a)')'LOOKUP_TABLE default'
   do i=1,nsurf
-    if (nNtl(i).lt.1e-4.or.nNtl(i).gt.1e3) then
+    if (nNtl(i).lt.1e-4.or.nNtl(i).gt.1e3.or.agecomput.gt.1) then
         nNtl(i) = 0.d0
       endif
   write(iunit,'(f18.13)') nNtl(i)
@@ -351,7 +353,7 @@ write(iunit,'(a)')'LOOKUP_TABLE default'
   write(iunit,'(a)')'SCALARS OSLnN float 1'
   write(iunit,'(a)')'LOOKUP_TABLE default'
     do i=1,nsurf
-      if (nNosl(i).lt.1e-4.or.nNosl(i).gt.1e3) then
+      if (nNosl(i).lt.1e-4.or.nNosl(i).gt.1e3.or.agecomput.gt.1) then
         nNosl(i) = 0.d0
       endif
     write(iunit,'(f18.13)') real(nNosl(i))
@@ -360,7 +362,7 @@ write(iunit,'(a)')'LOOKUP_TABLE default'
   write(iunit,'(a)')'SCALARS ESRnN float 1'
   write(iunit,'(a)')'LOOKUP_TABLE default'
     do i=1,nsurf
-      if (nNesr(i).lt.1e-4.or.nNesr(i).gt.1e3) then
+      if (nNesr(i).lt.1e-4.or.nNesr(i).gt.1e3.or.agecomput.gt.1) then
         nNesr(i) = 0.d0
       endif
     write(iunit,'(f18.13)') nNesr(i)

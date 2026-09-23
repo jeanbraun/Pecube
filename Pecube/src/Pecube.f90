@@ -1068,7 +1068,7 @@ subroutine forward (nd,param,misfit,run, iproc)
   ! Ages.out contains the ages at the end of each stage
 
   if (iproc.eq.0.and.nd.eq.0) open (11,file=run//'/output/Ages.out',status='unknown',access='direct', &
-        recl=4*(4+17*nsurf+npe*nelemsurf))
+        recl=4*(5+17*nsurf+npe*nelemsurf))
 
   ! Pecube.ptt contains the depth-temperture-paths of all surface nodes
     if (iproc.eq.0.and.saveCr) open (1192,status='scratch',access='direct', &
@@ -1738,7 +1738,8 @@ subroutine forward (nd,param,misfit,run, iproc)
           exhumation(i)= real(exhumation(i)+vz+usurf(i)+rsurf(i)/dtimesurf, kind=sp) !VKP - Maxime added isostatic rebound
       enddo
 
-      if (nd.eq.0) write (11,rec=irec) nsurf,nelemsurf,npe,sngl(tfinal-time),sngl(xsurf),sngl(ysurf),sngl(zl+zsurf), &
+      if (nd.eq.0) write (11,rec=irec) nsurf,nelemsurf,npe,agecomput,sngl(tfinal-time),sngl(xsurf),sngl(ysurf),&
+                      sngl(zl+zsurf), &
                       exhumation,age1,age2,age3,age4,age5,age6,age7,age8,EdgeAge, &
                       (sngl(sum(length*ftdist(:,j))),j=1,nsurf),nNtl,nNosl,nNesr,iconsurf
 
@@ -1805,7 +1806,7 @@ subroutine forward (nd,param,misfit,run, iproc)
   if (iproc.eq.0.and.nd.eq.0) then
     close (11)
     open (11,file=run//'/output/Ages.out',status='unknown',access='direct', recl=4)
-    write (11,rec=irec*(4+17*nsurf+npe*nelemsurf)+1) -1
+    write (11,rec=irec*(5+17*nsurf+npe*nelemsurf)+1) -1
     close (11)
   endif
 
@@ -1981,9 +1982,9 @@ subroutine forward (nd,param,misfit,run, iproc)
       hei(iobs)= real(wobs1*zsurf(iconsurf(1,ieobs)) &
           +wobs2*zsurf(iconsurf(2,ieobs)) &
           +wobs3*zsurf(iconsurf(3,ieobs)) &
-          +wobs4*zsurf(iconsurf(npe,ieobs)), kind=sp)
+          +wobs4*zsurf(iconsurf(npe,ieobs)), kind=sp) * 1000.
       if (heightobs.lt.0.0) then
-        hei(iobs)= real(hei(iobs)*1000.- (hei(iobs)*1000+min(0.d0,heightobs)), kind=sp)
+        hei(iobs)= real(hei(iobs)- (hei(iobs)+min(0.d0,heightobs)), kind=sp)
       endif
       lonobs(iobs)= real(xlonobs, kind=sp)
       latobs(iobs)= real(xlatobs, kind=sp)
@@ -2243,9 +2244,9 @@ subroutine forward (nd,param,misfit,run, iproc)
       hei(iobs)=real(wobs1*zsurf(iconsurf(1,ieobs)) &
                  +wobs2*zsurf(iconsurf(2,ieobs)) &
                  +wobs3*zsurf(iconsurf(3,ieobs)) &
-                 +wobs4*zsurf(iconsurf(npe,ieobs)), kind=sp)
+                 +wobs4*zsurf(iconsurf(npe,ieobs)), kind=sp) *1000.
       if (heightobs.lt.0.0) then
-        hei(iobs)= real(hei(iobs)*1000.- (hei(iobs)*1000+min(0.d0,heightobs)), kind=sp)
+        hei(iobs)= real(hei(iobs)- (hei(iobs)+min(0.d0,heightobs)), kind=sp)
       endif
       lonobs(iobs)=real(xlonobs, kind=sp)
       latobs(iobs)=real(xlatobs, kind=sp)
@@ -2289,9 +2290,9 @@ subroutine forward (nd,param,misfit,run, iproc)
       hei(iobs)=real(wobs1*zsurf(iconsurf(1,ieobs)) &
                  +wobs2*zsurf(iconsurf(2,ieobs)) &
                  +wobs3*zsurf(iconsurf(3,ieobs)) &
-                 +wobs4*zsurf(iconsurf(npe,ieobs)), kind=sp)
+                 +wobs4*zsurf(iconsurf(npe,ieobs)), kind=sp) * 1000.
       if (heightobs.lt.0.0) then
-        hei(iobs)= real(hei(iobs)*1000.- (hei(iobs)*1000+min(0.d0,heightobs)), kind=sp)
+        hei(iobs)= real(hei(iobs)- (hei(iobs)+min(0.d0,heightobs)), kind=sp)
       endif
 
       lonobs(iobs)=real(xlonobs, kind=sp)
@@ -2403,8 +2404,10 @@ subroutine forward (nd,param,misfit,run, iproc)
       hei(iobs)=real(wobs1*zsurf(iconsurf(1,ieobs)) &
                   +wobs2*zsurf(iconsurf(2,ieobs)) &
                   +wobs3*zsurf(iconsurf(3,ieobs)) &
-                  +wobs4*zsurf(iconsurf(npe,ieobs)), kind=sp)
-      hei(iobs)=real(hei(iobs)*1000.+min(0.d0,heighto(iobs)), kind=sp)
+                  +wobs4*zsurf(iconsurf(npe,ieobs)), kind=sp) * 1000.
+      if (heighto(iobs).lt.0.0) then
+          hei(iobs)= real(hei(iobs)- (hei(iobs)+min(0.d0,heighto(iobs))), kind=sp)
+      endif
       lonobs(iobs)=real(xlonobs, kind=sp)
       latobs(iobs)=real(xlatobs, kind=sp)
     enddo
@@ -2472,8 +2475,10 @@ subroutine forward (nd,param,misfit,run, iproc)
       hei(iobs)=real(wobs1*zsurf(iconsurf(1,ieobs)) &
                 +wobs2*zsurf(iconsurf(2,ieobs)) &
                 +wobs3*zsurf(iconsurf(3,ieobs)) &
-                +wobs4*zsurf(iconsurf(npe,ieobs)), kind=sp)
-      hei(iobs)=real(hei(iobs)*1000.+min(0.d0,heighto(iobs)), kind=sp)
+                +wobs4*zsurf(iconsurf(npe,ieobs)), kind=sp) * 1000.
+      if (heighto(iobs).lt.0.0) then
+          hei(iobs)= real(hei(iobs)- (hei(iobs)+min(0.d0,heighto(iobs))), kind=sp)
+      endif
       lonobs(iobs)=real(xlonobs, kind=sp)
       latobs(iobs)=real(xlatobs, kind=sp)
     enddo
@@ -2573,8 +2578,10 @@ subroutine forward (nd,param,misfit,run, iproc)
         hei(iobs)=real(wobs1*zsurf(iconsurf(1,ieobs)) &
                 +wobs2*zsurf(iconsurf(2,ieobs)) &
                 +wobs3*zsurf(iconsurf(3,ieobs)) &
-                +wobs4*zsurf(iconsurf(npe,ieobs)), kind=sp)
-        hei(iobs)=real(hei(iobs)*1000.+min(0.d0,heighto(iobs)), kind=sp)
+                +wobs4*zsurf(iconsurf(npe,ieobs)), kind=sp) * 1000.
+        if (heighto(iobs).lt.0.0) then
+          hei(iobs)= real(hei(iobs)- (hei(iobs)+min(0.d0,heighto(iobs))), kind=sp)
+        endif
         lonobs(iobs)=real(xlonobs, kind=sp)
         latobs(iobs)=real(xlatobs, kind=sp)
     enddo           
