@@ -235,7 +235,7 @@ The file should be in the `$RUN/data` directory and contain a single column of r
 [NOTE]
 ====
 - If `topo_file_name` is given the value `Nil`, the topography is assumed to be flat at elevation 0.
-- If `topo_file_name` is given the value `Topo30`, the topography is automatically extracted from the global elevation database GTOPO30 (`https://dds.cr.usgs.gov/srtm/version2_1/SRTM30/srtm30_documentation.pdf`). This option requires that you download the 1.8 GB file: `ftp://topex.ucsd.edu/pub/srtm30_plus/topo30/`.
+- If `topo_file_name` is given the value `Topo30`, the topography is automatically extracted from the global elevation database GTOPO30 (`https://dds.cr.usgs.gov/srtm/version2_1/SRTM30/srtm30_documentation.pdf`). This option requires that you download the 1.8 GB file: `https://topex.ucsd.edu/pub/srtm30_plus/topo30/`.
 - if `topo_file_name` ends with a slash '/', it will be assumed to be a directory in which there is a collection of files containing the topography, `topo0` to `topon`, the uplift rate, `uplift0` to `upliftn`, and the surface temperature, `temp0` to `tempn`. The number of steps needed are set by `ntime`, i.e. `n = ntime + 1`
 ====
 
