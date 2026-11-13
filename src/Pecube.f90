@@ -1295,10 +1295,12 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
         allocate (age1(nsurf),age2(nsurf),age3(nsurf),age4(nsurf),age5(nsurf),nNtl(nsurf),nNosl(nsurf),nNesr(nsurf))
         allocate (age6(nsurf),age7(nsurf),age8(nsurf),ftdist(20,nsurf),grainsize(nsurf))
 
+        nNtl=0.;nNosl=0.;nNesr=0.
+
         if (istep.eq.0.or.iout.eq.0) then
 
         age1=tprevious;age2=tprevious;age3=tprevious;age4=tprevious;age5=tprevious
-        age6=tprevious;age7=tprevious;age8=tprevious;ftdist=0.;nNtl=0.;nNosl=0.;nNesr=0.
+        age6=tprevious;age7=tprevious;age8=tprevious;ftdist=0.
 
         else
 
