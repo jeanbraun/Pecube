@@ -939,7 +939,7 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
 
 ! calculates initial temperature
 
-        if (nd.eq.0.and.ilog.eq.1) write (9,*) 'Calculatin ginitial temperature'
+        if (nd.eq.0.and.ilog.eq.1) write (9,*) 'Calculating initial temperature'
 
           do i=1,nsurf
           tsurf=-zsurf(i)*tlapse+tmsl
@@ -968,7 +968,7 @@ if (nd.eq.0) write (*,*) '------------------------------------------------------
 
 ! beginning of time stepping
 
-      if (nd.eq.0.and.ilog.eq.1) write (9,*) 'Begining of time stepping'
+      if (nd.eq.0.and.ilog.eq.1) write (9,*) 'Beginning of time stepping'
 
         do itime=1,ntime
         call cpu_time (times(3))
