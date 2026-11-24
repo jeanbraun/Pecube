@@ -39,7 +39,7 @@
       character run*5,fnme*300,obsfile*300,line*1024,c5*5,PecubeFnme*10,cproc*4
 
       real*4 range(2,*),param(*),xf
-      integer nd,nd0,nc5
+      integer nd,nc5
       logical vivi,xyz !VKP
 
       nd = 0
@@ -312,8 +312,6 @@ endif !VKP
 
       call read_in_fault_parameters (fault,nfault,xlon1,xlat1,xlon2,xlat2,xl,yl,zl,timek(nstep+1), &
                                      nd,range,param,run)
-
-      if (nd0.gt.0) nd=nd0
 
       open (7,status='scratch')
 !      open (7,file='JUNK.txt')
